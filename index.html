@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Jurídico - Controle de Andamentos</title>
+    <!-- Importação da Biblioteca de Gráficos (Chart.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --azul: #004b87;
@@ -110,7 +112,7 @@
 <div id="auth-screen" class="auth-container">
     <div id="login-box" class="auth-box">
         <h2>Entrar no Sistema</h2>
-        <div class="form-group"><label>Usuário (Login)</label><input type="text" id="login-username" placeholder="Ex: 1593LUCAS ou E-mail"></div>
+        <div class="form-group"><label>Usuário ou E-mail</label><input type="text" id="login-username" placeholder="Ex: 1593LUCAS ou Seu E-mail"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-password"></div>
         <button class="btn" style="width: 100%; font-size: 1.1rem; margin-top: 10px;" onclick="window.doLogin()">Entrar</button>
     </div>
@@ -137,7 +139,7 @@
 <!-- PAINEL PRINCIPAL -->
 <div id="app-screen">
     <header>
-        <h1>Painel de Controle <span style="font-size: 0.8rem; color: #a0c4ff; font-weight: normal;">v15 (Acesso Fechado)</span></h1>
+        <h1>Painel de Controle <span style="font-size: 0.8rem; color: #a0c4ff; font-weight: normal;">v16 (Executive)</span></h1>
         <div class="user-info">
             <span id="user-display" style="font-weight: 500;"></span>
             <span id="role-badge" class="badge"></span>
@@ -160,10 +162,10 @@
                 <h2 style="color: var(--azul); margin: 0;">Casos Cadastrados</h2>
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
                     
-                    <!-- NOVO: FILTRO DIÁRIO PARA ADMIN -->
-                    <label id="filtro-admin-diario" style="display: none; align-items: center; gap: 5px; font-size: 0.85rem; color: #1e8e3e; cursor: pointer; background: #e6f4ea; padding: 6px 10px; border-radius: 6px; border: 1px solid #ceead6; font-weight: bold;">
-                        <input type="checkbox" id="filtro-pendentes-hoje" onchange="window.renderizarCasos()">
-                        👁️ Ocultar analisados hoje
+                    <!-- FILTRO DIÁRIO OTIMIZADO (DISCRETO) -->
+                    <label id="filtro-admin-diario" style="display: none; align-items: center; gap: 5px; font-size: 0.8rem; color: #1e8e3e; cursor: pointer; background: #e6f4ea; padding: 4px 8px; border-radius: 4px; border: 1px solid #ceead6; font-weight: bold; margin: 0;">
+                        <input type="checkbox" id="filtro-pendentes-hoje" onchange="window.renderizarCasos()" style="width: auto; margin: 0;">
+                        👁️ Ocultar vistos
                     </label>
 
                     <input type="text" id="search-input" placeholder="🔍 Buscar cliente, contrato ou comarca..." onkeyup="window.renderizarCasos()" style="padding: 8px; border-radius:4px; border: 1px solid var(--borda); min-width: 250px;">
@@ -186,6 +188,24 @@
                 <div class="dash-card"><h4>Mandados Expedidos</h4><p class="number" id="dash-mandados" style="color: var(--verde);">0</p></div>
                 <div class="dash-card warning"><h4>Atenção (Sem ação há 7+ dias)</h4><p class="number" id="dash-atencao">0</p></div>
                 <div class="dash-card danger"><h4>Crítico (Sem ação há 15+ dias)</h4><p class="number" id="dash-critico">0</p></div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Gráfico de Pizza -->
+                <div class="admin-card">
+                    <h3 style="margin-top: 0; color: var(--azul);">Saúde da Base</h3>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chartStatus"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Barras (Comarcas) -->
+                <div class="admin-card">
+                    <h3 style="margin-top: 0; color: var(--azul);">Top Comarcas (Volume)</h3>
+                    <div style="position: relative; height: 250px; width: 100%;">
+                        <canvas id="chartComarcas"></canvas>
+                    </div>
+                </div>
             </div>
 
             <div class="grid-2">
@@ -337,7 +357,7 @@
     </div>
 </div>
 
-<!-- FIREBASE INTEGRATION (Módulo V10) -->
+<!-- FIREBASE E SCRIPTS PRINCIPAIS -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
@@ -359,6 +379,9 @@
     window.logsDb = [];
     window.usuarioLogado = null;
     window.usuarioPendenteTrocaSenha = null;
+
+    let chartStatusInstance = null;
+    let chartComarcasInstance = null;
 
     // === GESTÃO DO LOGIN MESTRE (OCULTO) ===
     window.abrirCriarAdminMestre = function() {
@@ -396,23 +419,34 @@
         window.voltarLogin();
     };
 
-    // === LOGIN / AUTH PADRÃO ===
+    // === LOGIN / AUTH PADRÃO COM TRAVAS ===
     window.doLogin = async function() {
         const userRaw = document.getElementById('login-username').value.trim();
-        const user = userRaw.toUpperCase(); 
         const pass = document.getElementById('login-password').value;
         
-        if (user === 'RESGATE') {
+        if (userRaw.toUpperCase() === 'RESGATE') {
             window.abrirCriarAdminMestre();
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
             return;
         }
         
-        if(!user || !pass) { alert("Preencha login e senha."); return; }
+        if(!userRaw || !pass) { alert("Preencha login e senha."); return; }
 
-        const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
-        const qSnap = await getDocs(q);
+        const isMasterEmail = userRaw.toLowerCase() === 'lucaslacerdamatos@hotmail.com';
+        let hasPrefix = userRaw.toUpperCase().startsWith('1593');
+
+        // Impede a busca no servidor se não for o e-mail master ou login da equipe
+        if (!isMasterEmail && !hasPrefix) {
+            alert('Acesso negado: Somente o administrador ou contas autorizadas (1593) podem entrar.');
+            return;
+        }
+
+        // Tenta buscar ignorando diferença de maiuscula/minuscula
+        let qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toLowerCase()), where("password", "==", pass)));
+        if (qSnap.empty) {
+            qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toUpperCase()), where("password", "==", pass)));
+        }
         
         if (!qSnap.empty) {
             const userData = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
@@ -426,7 +460,7 @@
                 mostrarPainel();
             }
         } else {
-            alert('Usuário ou senha incorretos!\n\nLembre-se: O login padrão começa com 1593 (Ex: 1593NOME) ou use seu e-mail cadastrado.');
+            alert('Usuário ou senha incorretos!');
         }
     };
 
@@ -513,7 +547,6 @@
         document.getElementById('nav-equipe').style.display = isAdmin ? 'block' : 'none';
         document.getElementById('nav-financeiro').style.display = isAdmin ? 'block' : 'none';
         
-        // Habilita o filtro diário apenas para admins
         document.getElementById('filtro-admin-diario').style.display = isAdmin ? 'flex' : 'none';
         
         window.switchTab('tab-casos');
@@ -536,7 +569,7 @@
     };
     window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
 
-    // === GESTÃO DE CASOS E RELATORIOS ===
+    // === GESTÃO DE CASOS ===
     window.registrarLog = async function(acao, detalhes) {
         try {
             const now = new Date();
@@ -547,10 +580,14 @@
         } catch(e) {}
     };
 
-    // MARCAR COMO VISTO HOJE
     window.marcarVistoHoje = async function(idCaso) {
         const dataHoje = new Date().toLocaleDateString('pt-BR');
         await updateDoc(doc(db, "casos", idCaso), { ultimaAnaliseData: dataHoje });
+    };
+
+    // NOVO: DESMARCAR VISTO
+    window.desmarcarVistoHoje = async function(idCaso) {
+        await updateDoc(doc(db, "casos", idCaso), { ultimaAnaliseData: "" });
     };
 
     function calcularDiasParado(caso) {
@@ -576,7 +613,7 @@
             contrato, cliente, comarcaOrigem, comarcaReq, obs, mesRegistro,
             criadoPor: window.usuarioLogado.nome,
             mandadoExpedido: false, valorComissao: 0, 
-            ultimaAnaliseData: "", // Campo para o controle diário
+            ultimaAnaliseData: "", 
             andamentos: [], timestamp: Date.now()
         });
         
@@ -640,7 +677,7 @@
 
         await updateDoc(doc(db, "casos", idCaso), { 
             andamentos: andamentosAtuais,
-            ultimaAnaliseData: now.toLocaleDateString('pt-BR') // Atualiza a análise automaticamente ao dar andamento
+            ultimaAnaliseData: now.toLocaleDateString('pt-BR') 
         });
         window.registrarLog('Novo Andamento', `Contrato: ${casoAtual.contrato} | Por: ${responsavel}`);
         window.closeModal('modal-novo-andamento');
@@ -688,14 +725,13 @@
         }
     };
 
-    // RELATÓRIOS E EXPORTAÇÃO
+    // RELATÓRIOS E EXPORTAÇÃO EXECUTIVA
     window.renderizarRelatorios = function() {
         if(window.usuarioLogado.role !== 'admin') return;
         
         let total = window.casosDb.length;
         let mandados = window.casosDb.filter(c => c.mandadoExpedido).length;
-        let atencao = 0;
-        let criticos = 0;
+        let agil = 0, atencao = 0, criticos = 0;
         let comarcasMap = {};
 
         const tbodyCriticos = document.getElementById('dash-criticos-tbody');
@@ -704,12 +740,11 @@
         window.casosDb.forEach(c => {
             let dias = calcularDiasParado(c);
             
-            // Stats Comarca (Requerimento é prioridade)
             let comarcaNome = '';
             if (c.comarcaReq && c.comarcaReq.trim() !== '') {
-                comarcaNome = c.comarcaReq.trim() + ' (Requerimento)';
+                comarcaNome = c.comarcaReq.trim() + ' (Req)';
             } else if (c.comarcaOrigem && c.comarcaOrigem.trim() !== '') {
-                comarcaNome = c.comarcaOrigem.trim() + ' (Origem)';
+                comarcaNome = c.comarcaOrigem.trim() + ' (Orig)';
             } else {
                 comarcaNome = 'Não Informada';
             }
@@ -718,13 +753,14 @@
             comarcasMap[comarcaNome].total++;
             comarcasMap[comarcaNome].somaDias += dias;
 
-            // Classificação e Tabela Críticos
             let statusBadge = `<span class="status-agil">Ágil (OK)</span>`;
             if(dias > 15) {
                 criticos++; statusBadge = `<span class="status-critico">Crítico 🔴</span>`;
                 tbodyCriticos.innerHTML += `<tr><td><strong>${c.cliente}</strong><br><span style="font-size:0.8rem;color:#666;">${c.contrato}</span></td><td>${dias} dias</td><td>${statusBadge}</td></tr>`;
             } else if(dias > 7) {
                 atencao++; statusBadge = `<span class="status-atencao">Atenção 🟡</span>`;
+            } else {
+                agil++;
             }
         });
 
@@ -733,7 +769,7 @@
         document.getElementById('dash-atencao').innerText = atencao;
         document.getElementById('dash-critico').innerText = criticos;
 
-        if(criticos === 0) tbodyCriticos.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#27ae60; font-weight:bold;">Excelente! Nenhum caso estagnado na base.</td></tr>';
+        if(criticos === 0) tbodyCriticos.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#27ae60; font-weight:bold;">Excelente! Nenhum caso estagnado.</td></tr>';
 
         // Tabela Comarcas
         const tbodyComarcas = document.getElementById('dash-comarcas-tbody');
@@ -742,33 +778,87 @@
             return { nome: k, casos: comarcasMap[k].total, media: Math.round(comarcasMap[k].somaDias / comarcasMap[k].total) }
         });
         
-        // Ordena da pior média (mais lenta) para a melhor
         listaComarcas.sort((a, b) => b.media - a.media).forEach(com => {
             let icon = com.media > 10 ? '🐢 Lenta' : '⚡ Ágil';
             tbodyComarcas.innerHTML += `<tr><td><strong>${com.nome}</strong></td><td>${com.casos}</td><td>${com.media} dias (${icon})</td></tr>`;
         });
+
+        // Gráficos Chart.js
+        const ctxStatus = document.getElementById('chartStatus');
+        const ctxComarcas = document.getElementById('chartComarcas');
+        
+        if(chartStatusInstance) chartStatusInstance.destroy();
+        if(chartComarcasInstance) chartComarcasInstance.destroy();
+
+        if(ctxStatus && (agil > 0 || atencao > 0 || criticos > 0)) {
+            chartStatusInstance = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Ágil (0-7 dias)', 'Atenção (8-15 dias)', 'Crítico (+15 dias)'],
+                    datasets: [{
+                        data: [agil, atencao, criticos],
+                        backgroundColor: ['#27ae60', '#f1c40f', '#e74c3c'],
+                        borderWidth: 1
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        if(ctxComarcas && listaComarcas.length > 0) {
+            let comarcasVolume = [...listaComarcas].sort((a,b) => b.casos - a.casos).slice(0, 7);
+            chartComarcasInstance = new Chart(ctxComarcas, {
+                type: 'bar',
+                data: {
+                    labels: comarcasVolume.map(c => c.nome.split(' ')[0]), 
+                    datasets: [{
+                        label: 'Volume de Processos',
+                        data: comarcasVolume.map(c => c.casos),
+                        backgroundColor: '#004b87'
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
     };
 
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) { alert("Não há casos para exportar."); return; }
 
-        let csv = "Contrato;Cliente;Comarca Origem;Comarca Req;Status Expedicao;Responsavel Criacao;Dias Sem Andamento;Desempenho;Observacoes\n";
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
+        let total = window.casosDb.length;
+        let agil = 0, atencao = 0, critico = 0;
+
+        let linhasCsv = "";
         
         window.casosDb.forEach(c => {
             let dias = calcularDiasParado(c);
-            let desempenho = dias > 15 ? 'Critico' : (dias > 7 ? 'Atencao' : 'Agil');
-            let expedido = c.mandadoExpedido ? 'Faturado' : 'Pendente';
+            let desempenho = dias > 15 ? 'CRITICO' : (dias > 7 ? 'ATENCAO' : 'AGIL');
+            if(desempenho === 'CRITICO') critico++;
+            else if(desempenho === 'ATENCAO') atencao++;
+            else agil++;
+
+            let expedido = c.mandadoExpedido ? 'FATURADO' : 'PENDENTE';
             let obs = (c.obs || '').replace(/;/g, ','); 
             let req = c.comarcaReq || '';
             let orig = c.comarcaOrigem || '';
+            
+            let ultimaAcaoData = c.andamentos && c.andamentos.length > 0 ? c.andamentos[0].data : c.mesRegistro;
 
-            csv += `${c.contrato};${c.cliente};${orig};${req};${expedido};${c.criadoPor};${dias};${desempenho};${obs}\n`;
+            linhasCsv += `${c.contrato};${c.cliente};${orig};${req};${expedido};${c.criadoPor};${ultimaAcaoData};${dias};${desempenho};${obs}\n`;
         });
 
-        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        let csvFinal = `RELATORIO GERENCIAL MESTRE\n`;
+        csvFinal += `Data de Exportacao:;${dataHoje}\n`;
+        csvFinal += `Total de Casos Ativos:;${total}\n`;
+        csvFinal += `Saude da Operacao:;${agil} Ageis | ${atencao} Atencao | ${critico} Criticos\n\n`;
+        csvFinal += `CONTRATO;CLIENTE;COMARCA ORIGEM;COMARCA REQUERIMENTO;STATUS FINANCEIRO;RESP. CADASTRO;DATA ULTIMA ACAO;DIAS PARADO;DESEMPENHO;OBSERVACOES\n`;
+        csvFinal += linhasCsv;
+
+        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.setAttribute("href", url); link.setAttribute("download", `Relatorio_Gerencial_Completo.csv`);
+        link.setAttribute("href", url); link.setAttribute("download", `Relatorio_Mestre_${dataHoje.replace(/\//g, '-')}.csv`);
         link.style.display = "none"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
     };
 
@@ -822,7 +912,6 @@
 
         let casosFiltrados = window.casosDb;
         
-        // Filtro Diário Admin
         if (isAdmin && ocultarAnalisadosHoje) {
             casosFiltrados = casosFiltrados.filter(c => c.ultimaAnaliseData !== dataHoje);
         }
@@ -831,7 +920,7 @@
         if (termoBusca) casosFiltrados = casosFiltrados.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.comarcaOrigem && c.comarcaOrigem.toLowerCase().includes(termoBusca)) || (c.comarcaReq && c.comarcaReq.toLowerCase().includes(termoBusca)));
 
         if (casosFiltrados.length === 0) { 
-            let msg = ocultarAnalisadosHoje ? 'Tudo limpo! Você já analisou todos os casos.' : 'Nenhum caso encontrado.';
+            let msg = ocultarAnalisadosHoje ? 'Tudo limpo! Você já analisou todos os casos de hoje.' : 'Nenhum caso encontrado.';
             container.innerHTML = `<div style="text-align:center; padding: 40px; color: #888;">${msg}</div>`; 
             return; 
         }
@@ -845,15 +934,13 @@
             let btnVistoHoje = '';
 
             if(isAdmin) {
-                // Lógica de Faturamento
                 if(!caso.mandadoExpedido) btnMandado = `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${caso.id}')">💲 Faturar</button>`;
                 else btnMandado = `<span style="background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #c3e6cb;">✅ Faturado (R$ ${parseFloat(caso.valorComissao).toFixed(2).replace('.',',')})</span>`;
 
-                // Lógica de Checklist Diário
                 if(caso.ultimaAnaliseData === dataHoje) {
-                    btnVistoHoje = `<span style="background: #e6f4ea; color: #1e8e3e; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #ceead6;">✅ Visto Hoje</span>`;
+                    btnVistoHoje = `<button class="btn btn-small" style="background: #e6f4ea; color: #1e8e3e; border: 1px solid #ceead6; cursor: pointer;" onclick="window.desmarcarVistoHoje('${caso.id}')">✅ Visto (Desfazer)</button>`;
                 } else {
-                    btnVistoHoje = `<button class="btn btn-small" style="background:#f1f3f4; color:#333; border:1px solid #ccc;" onclick="window.marcarVistoHoje('${caso.id}')">👁️ Marcar Visto</button>`;
+                    btnVistoHoje = `<button class="btn btn-small" style="background:#f1f3f4; color:#333; border:1px solid #ccc; cursor: pointer;" onclick="window.marcarVistoHoje('${caso.id}')">👁️ Marcar Visto</button>`;
                 }
             }
 
