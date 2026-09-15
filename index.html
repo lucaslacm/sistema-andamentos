@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Jurídico - Controle de Andamentos</title>
+    <style>
+        :root {
+            --azul: #004b87;
+            --laranja: #f26522;
+            --verde: #27ae60;
+            --branco: #ffffff;
+            --fundo: #f4f6f9;
+            --texto: #2c3e50;
+            --borda: #e1e8ed;
+            --vermelho: #e74c3c;
+            --amarelo: #f1c40f;
+        }
+        * { box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        body { margin: 0; background-color: var(--fundo); color: var(--texto); }
+        
+        /* Botoes */
+        .btn { background-color: var(--laranja); color: var(--branco); border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .btn:hover { filter: brightness(0.9); }
+        .btn-outline { background: transparent; border: 1px solid var(--laranja); color: var(--laranja); }
+        .btn-outline:hover { background: var(--laranja); color: var(--branco); }
+        .btn-small { padding: 4px 10px; font-size: 0.75rem; border-radius: 4px; }
+        .btn-danger { background-color: transparent; color: var(--vermelho); border: 1px solid var(--vermelho); cursor: pointer; }
+        .btn-danger:hover { background-color: var(--vermelho); color: var(--branco); }
+        .btn-success { background-color: var(--verde); color: var(--branco); }
+        .btn-success:hover { background-color: #219653; }
+        .btn-edit { background-color: transparent; color: var(--azul); border: 1px solid var(--azul); cursor: pointer; }
+        .btn-edit:hover { background-color: var(--azul); color: var(--branco); }
+        .btn-blue { background-color: var(--azul); color: var(--branco); }
+        .btn-blue:hover { filter: brightness(1.2); }
+        
+        /* Formulários */
+        .form-group { margin-bottom: 16px; text-align: left; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--azul); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--borda); border-radius: 6px; font-size: 1rem; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(242, 101, 34, 0.1); }
+        textarea { resize: vertical; min-height: 80px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        /* Telas de Auth */
+        .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: linear-gradient(135deg, var(--azul) 0%, #002b4d 100%); }
+        .auth-box { background: var(--branco); padding: 40px; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 400px; text-align: center; margin: 15px; }
+        .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.8rem; }
+        
+        /* Layout Principal */
+        #app-screen { display: none; }
+        header { background-color: var(--azul); color: var(--branco); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 1.4rem; }
+        .user-info { display: flex; align-items: center; gap: 15px; }
+        .badge { background: var(--laranja); padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        
+        /* Navegação */
+        .nav-tabs { display: flex; background: var(--branco); border-bottom: 1px solid var(--borda); padding: 0 30px; flex-wrap: wrap; }
+        .nav-tab { padding: 15px 20px; cursor: pointer; font-weight: 600; color: #666; border-bottom: 3px solid transparent; transition: 0.3s; }
+        .nav-tab.active { color: var(--azul); border-bottom-color: var(--laranja); }
+        
+        main { padding: 30px; max-width: 1200px; margin: auto; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        
+        /* Cards */
+        .case-card, .admin-card { background: var(--branco); border-radius: 10px; border: 1px solid var(--borda); margin-bottom: 15px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .admin-card { padding: 25px; }
+        .case-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: flex-start; background: #fafbfc; border-bottom: 1px solid var(--borda); flex-wrap: wrap; gap: 10px; }
+        .case-info h3 { margin: 0; color: var(--azul); font-size: 1.1rem; }
+        .case-info p { margin: 5px 0 0; color: #666; font-size: 0.9rem; }
+        .case-obs { margin-top: 8px; font-size: 0.85rem; background: #fff3cd; padding: 6px 10px; border-radius: 4px; color: #856404; display: inline-block; border: 1px solid #ffeeba; }
+        .case-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .case-body { padding: 20px; overflow-x: auto; }
+        
+        /* Dashboard Relatório */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .dash-card { background: var(--branco); border-radius: 8px; padding: 20px; border: 1px solid var(--borda); border-top: 4px solid var(--azul); box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; }
+        .dash-card h4 { margin: 0 0 10px 0; color: #666; font-size: 0.9rem; text-transform: uppercase; }
+        .dash-card .number { font-size: 2rem; font-weight: bold; color: var(--azul); margin: 0; }
+        .dash-card.warning { border-top-color: var(--amarelo); }
+        .dash-card.warning .number { color: #d4ac0d; }
+        .dash-card.danger { border-top-color: var(--vermelho); }
+        .dash-card.danger .number { color: var(--vermelho); }
+        
+        /* Tabelas */
+        .history-table, .audit-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 0.9rem; min-width: 600px; }
+        .history-table th, .history-table td, .audit-table th, .audit-table td { padding: 10px; text-align: left; border-bottom: 1px solid var(--borda); }
+        .history-table th, .audit-table th { color: #888; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; background: #f9f9f9; }
+        
+        /* Status Tags */
+        .status-agil { background: #d4edda; color: #155724; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .status-atencao { background: #fff3cd; color: #856404; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+        .status-critico { background: #f8d7da; color: #721c24; padding: 3px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
+
+        /* Modais */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto; padding: 20px 0; }
+        .modal-content { background: var(--branco); padding: 30px; border-radius: 12px; width: 90%; max-width: 600px; margin: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h3 { margin: 0; color: var(--azul); }
+        .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #999; }
+        
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<!-- TELAS DE AUTENTICAÇÃO -->
+<div id="auth-screen" class="auth-container">
+    <div id="login-box" class="auth-box">
+        <h2>Entrar no Sistema</h2>
+        <div class="form-group"><label>Usuário (Login)</label><input type="text" id="login-username" placeholder="Ex: 1593LUCAS ou E-mail"></div>
+        <div class="form-group"><label>Senha</label><input type="password" id="login-password"></div>
+        <button class="btn" style="width: 100%; font-size: 1.1rem; margin-top: 10px;" onclick="window.doLogin()">Entrar</button>
+    </div>
+
+    <div id="force-password-box" class="auth-box" style="display: none;">
+        <h2>Criar Senha Definitiva</h2>
+        <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">Este é seu primeiro acesso. Para sua segurança, crie uma senha definitiva para substituir a temporária.</p>
+        <div class="form-group"><label>Nova Senha</label><input type="password" id="nova-senha-input" placeholder="Digite sua nova senha particular"></div>
+        <button class="btn" style="width: 100%; font-size: 1.1rem; margin-top: 10px;" onclick="window.salvarNovaSenhaObrigatoria()">Salvar e Entrar</button>
+    </div>
+
+    <div id="master-admin-box" class="auth-box" style="display: none;">
+        <h2 style="color: var(--laranja);">Admin Mestre</h2>
+        <p style="color: #666; font-size: 0.85rem; margin-bottom: 20px;">Crie a sua conta principal para ter acesso total ao sistema e gerenciar a equipe.</p>
+        <div class="form-group"><label>Seu Nome (Ex: Lucas)</label><input type="text" id="master-nome"></div>
+        <div class="form-group"><label>Senha Definitiva</label><input type="password" id="master-senha"></div>
+        <button class="btn" style="width: 100%; font-size: 1.1rem; margin-top: 10px;" onclick="window.criarAdminMestre()">Criar Minha Conta</button>
+        <div style="margin-top: 20px;">
+            <a onclick="window.voltarLogin()" style="color: var(--azul); font-size: 0.9rem; cursor: pointer; text-decoration: underline;">Voltar ao Login</a>
+        </div>
+    </div>
+</div>
+
+<!-- PAINEL PRINCIPAL -->
+<div id="app-screen">
+    <header>
+        <h1>Painel de Controle <span style="font-size: 0.8rem; color: #a0c4ff; font-weight: normal;">v15 (Acesso Fechado)</span></h1>
+        <div class="user-info">
+            <span id="user-display" style="font-weight: 500;"></span>
+            <span id="role-badge" class="badge"></span>
+            <button class="btn btn-outline btn-small" onclick="window.doLogout()" style="margin-left: 10px; background: white; color: var(--azul); border: none;">Sair</button>
+        </div>
+    </header>
+    
+    <div class="nav-tabs">
+        <div class="nav-tab active" onclick="window.switchTab('tab-casos')" id="nav-casos">Casos e Andamentos</div>
+        <div class="nav-tab" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">Relatório Gerencial (Admin)</div>
+        <div class="nav-tab" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">Financeiro (Admin)</div>
+        <div class="nav-tab" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">Gerenciar Equipe (Admin)</div>
+        <div class="nav-tab" onclick="window.switchTab('tab-auditoria')" id="nav-auditoria" style="display: none;">Histórico (Admin)</div>
+    </div>
+    
+    <main>
+        <!-- ABA 1: CASOS -->
+        <div id="tab-casos" class="tab-content active">
+            <div class="top-bar">
+                <h2 style="color: var(--azul); margin: 0;">Casos Cadastrados</h2>
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    
+                    <!-- NOVO: FILTRO DIÁRIO PARA ADMIN -->
+                    <label id="filtro-admin-diario" style="display: none; align-items: center; gap: 5px; font-size: 0.85rem; color: #1e8e3e; cursor: pointer; background: #e6f4ea; padding: 6px 10px; border-radius: 6px; border: 1px solid #ceead6; font-weight: bold;">
+                        <input type="checkbox" id="filtro-pendentes-hoje" onchange="window.renderizarCasos()">
+                        👁️ Ocultar analisados hoje
+                    </label>
+
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente, contrato ou comarca..." onkeyup="window.renderizarCasos()" style="padding: 8px; border-radius:4px; border: 1px solid var(--borda); min-width: 250px;">
+                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="padding: 8px; border-radius:4px;"><option value="todos">Todos os meses</option></select>
+                    <button class="btn" onclick="window.openModal('modal-novo-caso')">+ Novo Cliente</button>
+                </div>
+            </div>
+            <div id="cases-container"></div>
+        </div>
+
+        <!-- ABA 2: RELATÓRIOS E DESEMPENHO -->
+        <div id="tab-relatorios" class="tab-content">
+            <div class="top-bar">
+                <h2 style="color: var(--azul); margin: 0;">Dashboard de Desempenho</h2>
+                <button class="btn btn-blue" onclick="window.exportarRelatorioMestre()">📊 Exportar Relatório Mestre (Excel)</button>
+            </div>
+            
+            <div class="dash-grid">
+                <div class="dash-card"><h4>Total de Casos</h4><p class="number" id="dash-total">0</p></div>
+                <div class="dash-card"><h4>Mandados Expedidos</h4><p class="number" id="dash-mandados" style="color: var(--verde);">0</p></div>
+                <div class="dash-card warning"><h4>Atenção (Sem ação há 7+ dias)</h4><p class="number" id="dash-atencao">0</p></div>
+                <div class="dash-card danger"><h4>Crítico (Sem ação há 15+ dias)</h4><p class="number" id="dash-critico">0</p></div>
+            </div>
+
+            <div class="grid-2">
+                <!-- Ranking Comarcas -->
+                <div class="admin-card">
+                    <h3 style="margin-top: 0; color: var(--azul);">Termômetro de Comarcas</h3>
+                    <p style="font-size: 0.85rem; color: #666;">Avalia a agilidade dos juízos com base nos dias parados.</p>
+                    <table class="audit-table">
+                        <thead><tr><th>Comarca</th><th>Casos</th><th>Média Dias Parado</th></tr></thead>
+                        <tbody id="dash-comarcas-tbody"></tbody>
+                    </table>
+                </div>
+
+                <!-- Casos Precisando de Atuação -->
+                <div class="admin-card">
+                    <h3 style="margin-top: 0; color: var(--vermelho);">Radar de Atuação (Críticos)</h3>
+                    <p style="font-size: 0.85rem; color: #666;">Contratos parados há mais de 10 dias.</p>
+                    <div style="overflow-x: auto;">
+                        <table class="audit-table">
+                            <thead><tr><th>Cliente</th><th>Dias Parado</th><th>Status</th></tr></thead>
+                            <tbody id="dash-criticos-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: FINANCEIRO (COMISSÕES) -->
+        <div id="tab-financeiro" class="tab-content">
+            <div class="top-bar">
+                <h2 style="color: var(--azul); margin: 0;">Relatório de Mandados Expedidos</h2>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="font-weight: 600; color: #666; margin-bottom: 0;">Filtro:</label>
+                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px; border-radius:4px;"><option value="todos">Todos os meses</option></select>
+                    <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📊 Exportar Financeiro</button>
+                </div>
+            </div>
+            <div class="admin-card" style="border-left: 5px solid var(--verde); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; color: #333;">Total de Comissões no Período</h3>
+                <span id="total-financeiro" style="color: var(--verde); font-size: 1.4rem; font-weight: bold;">R$ 0,00</span>
+            </div>
+            <div style="overflow-x: auto; background: white; border-radius: 8px; border: 1px solid var(--borda);">
+                <table class="audit-table">
+                    <thead><tr><th>Data da Expedição</th><th>Contrato</th><th>Cliente</th><th>Responsável Cadastro</th><th>Valor (R$)</th><th>Ações</th></tr></thead>
+                    <tbody id="financeiro-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- ABA 4: GERENCIAR EQUIPE -->
+        <div id="tab-equipe" class="tab-content">
+            <div class="top-bar"><h2 style="color: var(--azul); margin: 0;">Gerenciar Acessos da Equipe</h2></div>
+            <div class="admin-card">
+                <h3 style="margin-top: 0; color: var(--laranja);">+ Criar Novo Acesso</h3>
+                <div class="grid-2">
+                    <div class="form-group"><label>Nome da Pessoa</label><input type="text" id="novo-membro-nome" placeholder="Primeiro nome"></div>
+                    <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha" placeholder="Crie uma senha inicial"></div>
+                    <div class="form-group" style="grid-column: span 2;"><label>Perfil de Permissão</label>
+                        <select id="novo-membro-role">
+                            <option value="cadastro">Equipe (Apenas Visualiza e Cadastra)</option>
+                            <option value="admin">Administrador (Total Acesso)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn" onclick="window.criarMembroEquipe()">Gerar Login de Acesso</button>
+            </div>
+            <div id="lista-equipe-container" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- ABA 5: AUDITORIA -->
+        <div id="tab-auditoria" class="tab-content">
+            <div class="top-bar"><h2 style="color: var(--azul); margin: 0;">Auditoria do Sistema</h2></div>
+            <div style="overflow-x: auto; background: white; border-radius: 8px; border: 1px solid var(--borda);">
+                <table class="audit-table">
+                    <thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação Realizada</th><th>Detalhes</th></tr></thead>
+                    <tbody id="audit-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- === MODAIS === -->
+
+<!-- MODAL: NOVO CLIENTE -->
+<div id="modal-novo-caso" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Cadastrar Novo Cliente</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
+        <div class="form-group">
+            <label>Responsável Pelo Cadastro</label>
+            <input type="text" id="novo-responsavel" disabled style="background-color: #f4f6f9; color: #666; font-weight: bold;">
+        </div>
+        <div class="grid-2">
+            <div class="form-group"><label>Nº do Contrato</label><input type="text" id="novo-contrato"></div>
+            <div class="form-group"><label>Nome do Cliente</label><input type="text" id="novo-cliente"></div>
+        </div>
+        <div class="grid-2">
+            <div class="form-group"><label>Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas - MG"></div>
+            <div class="form-group"><label>Comarca Requerimento (Opcional)</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba - MG"></div>
+        </div>
+        <div class="form-group"><label>Observações / Motivo</label><textarea id="novo-obs"></textarea></div>
+        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="window.salvarCaso()">Salvar Cliente</button>
+    </div>
+</div>
+
+<!-- MODAL: EDITAR CLIENTE -->
+<div id="modal-editar-caso" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Editar Informações do Cliente</h3><button class="close-btn" onclick="window.closeModal('modal-editar-caso')">&times;</button></div>
+        <input type="hidden" id="edit-caso-id">
+        <div class="grid-2">
+            <div class="form-group"><label>Nº do Contrato</label><input type="text" id="edit-contrato"></div>
+            <div class="form-group"><label>Nome do Cliente</label><input type="text" id="edit-cliente"></div>
+        </div>
+        <div class="grid-2">
+            <div class="form-group"><label>Comarca de Origem</label><input type="text" id="edit-comarca-origem"></div>
+            <div class="form-group"><label>Comarca Requerimento</label><input type="text" id="edit-comarca-req"></div>
+        </div>
+        <div class="form-group"><label>Observações / Motivo</label><textarea id="edit-obs"></textarea></div>
+        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="window.salvarEdicaoCaso()">Salvar Alterações</button>
+    </div>
+</div>
+
+<!-- MODAL: NOVO ANDAMENTO -->
+<div id="modal-novo-andamento" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Atualizar Andamento</h3><button class="close-btn" onclick="window.closeModal('modal-novo-andamento')">&times;</button></div>
+        <input type="hidden" id="andamento-caso-id">
+        <div class="form-group">
+            <label>Responsável Pelo Andamento</label>
+            <select id="nova-acao-responsavel">
+                <option value="Lucas">Lucas</option>
+                <option value="Bárbara">Bárbara</option>
+            </select>
+        </div>
+        <div class="form-group"><label>Descrição do Andamento / Diligência</label><textarea id="nova-acao"></textarea></div>
+        <button class="btn" style="width: 100%; margin-top: 15px;" onclick="window.salvarAndamento()">Registrar Andamento</button>
+    </div>
+</div>
+
+<!-- MODAL: EXPEDIR MANDADO (FINANCEIRO) -->
+<div id="modal-mandado" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header"><h3>Registrar Expedição</h3><button class="close-btn" onclick="window.closeModal('modal-mandado')">&times;</button></div>
+        <input type="hidden" id="mandado-caso-id">
+        <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Confirme o valor da comissão referente à expedição deste mandado.</p>
+        <div class="form-group"><label>Valor da Comissão (R$)</label><input type="number" id="mandado-valor" value="30.00" step="0.01"></div>
+        <button class="btn btn-success" style="width: 100%; margin-top: 10px;" onclick="window.salvarMandado()">✅ Confirmar e Faturar</button>
+    </div>
+</div>
+
+<!-- FIREBASE INTEGRATION (Módulo V10) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
+    from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM",
+        authDomain: "sistema-andamentos.firebaseapp.com",
+        projectId: "sistema-andamentos",
+        storageBucket: "sistema-andamentos.firebasestorage.app",
+        messagingSenderId: "421431391255",
+        appId: "1:421431391255:web:fa23c4f9685b2ab2a15852"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.casosDb = [];
+    window.logsDb = [];
+    window.usuarioLogado = null;
+    window.usuarioPendenteTrocaSenha = null;
+
+    // === GESTÃO DO LOGIN MESTRE (OCULTO) ===
+    window.abrirCriarAdminMestre = function() {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('master-admin-box').style.display = 'block';
+    };
+
+    window.voltarLogin = function() {
+        document.getElementById('master-admin-box').style.display = 'none';
+        document.getElementById('login-box').style.display = 'block';
+    };
+
+    window.criarAdminMestre = async function() {
+        const nome = document.getElementById('master-nome').value.trim();
+        const senha = document.getElementById('master-senha').value;
+        if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
+
+        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        const usernameGerado = "1593" + primeiroNome;
+
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
+        
+        if(!qSnap.empty) {
+            alert(`O login ${usernameGerado} já existe. Tente logar com ele!`);
+            window.voltarLogin();
+            return;
+        }
+
+        await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
+        alert(`✅ Conta Mestre criada com sucesso!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações!`);
+        
+        document.getElementById('login-username').value = usernameGerado;
+        document.getElementById('login-password').value = senha;
+        window.voltarLogin();
+    };
+
+    // === LOGIN / AUTH PADRÃO ===
+    window.doLogin = async function() {
+        const userRaw = document.getElementById('login-username').value.trim();
+        const user = userRaw.toUpperCase(); 
+        const pass = document.getElementById('login-password').value;
+        
+        if (user === 'RESGATE') {
+            window.abrirCriarAdminMestre();
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            return;
+        }
+        
+        if(!user || !pass) { alert("Preencha login e senha."); return; }
+
+        const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
+        const qSnap = await getDocs(q);
+        
+        if (!qSnap.empty) {
+            const userData = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+            if (userData.precisaTrocarSenha === true) {
+                window.usuarioPendenteTrocaSenha = userData;
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('force-password-box').style.display = 'block';
+            } else {
+                window.usuarioLogado = userData;
+                localStorage.setItem('usuarioSessao', JSON.stringify(window.usuarioLogado));
+                mostrarPainel();
+            }
+        } else {
+            alert('Usuário ou senha incorretos!\n\nLembre-se: O login padrão começa com 1593 (Ex: 1593NOME) ou use seu e-mail cadastrado.');
+        }
+    };
+
+    window.salvarNovaSenhaObrigatoria = async function() {
+        const novaSenha = document.getElementById('nova-senha-input').value.trim();
+        if(novaSenha.length < 4) { alert("Sua nova senha precisa ter pelo menos 4 caracteres."); return; }
+
+        await updateDoc(doc(db, "usuarios", window.usuarioPendenteTrocaSenha.id), { password: novaSenha, precisaTrocarSenha: false });
+        window.usuarioPendenteTrocaSenha.password = novaSenha;
+        window.usuarioPendenteTrocaSenha.precisaTrocarSenha = false;
+        window.usuarioLogado = window.usuarioPendenteTrocaSenha;
+        localStorage.setItem('usuarioSessao', JSON.stringify(window.usuarioLogado));
+        
+        alert("Senha atualizada com sucesso!");
+        document.getElementById('force-password-box').style.display = 'none';
+        mostrarPainel();
+    };
+
+    window.doLogout = function() {
+        window.usuarioLogado = null;
+        localStorage.removeItem('usuarioSessao');
+        document.getElementById('app-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
+        document.getElementById('login-box').style.display = 'block';
+        document.getElementById('force-password-box').style.display = 'none';
+        document.getElementById('master-admin-box').style.display = 'none';
+        document.getElementById('login-username').value = '';
+        document.getElementById('login-password').value = '';
+    };
+
+    // === GERENCIAR EQUIPE ===
+    window.criarMembroEquipe = async function() {
+        const nomeCompleto = document.getElementById('novo-membro-nome').value.trim();
+        const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
+        const role = document.getElementById('novo-membro-role').value;
+        if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
+
+        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        const usernameGerado = "1593" + primeiroNome;
+
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
+        if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe.`); return; }
+
+        await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
+        alert(`✅ Conta criada!\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
+        document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
+        renderizarEquipe();
+    };
+
+    window.excluirMembroEquipe = async function(idUsuario, nomeUsuario) {
+        if(confirm(`Remover o acesso de ${nomeUsuario}?`)) {
+            await deleteDoc(doc(db, "usuarios", idUsuario));
+            window.registrarLog('Exclusão de Acesso', `Usuário removido da equipe: ${nomeUsuario}`);
+            renderizarEquipe();
+        }
+    };
+
+    async function renderizarEquipe() {
+        if(window.usuarioLogado.role !== 'admin') return;
+        const container = document.getElementById('lista-equipe-container');
+        const qSnap = await getDocs(collection(db, "usuarios"));
+        let html = '<h3 style="color: var(--azul);">Contas Ativas</h3><div style="overflow-x: auto;"><table class="history-table"><thead><tr><th>Nome</th><th>Login</th><th>Perfil</th><th>Ação</th></tr></thead><tbody>';
+        
+        qSnap.forEach(docSnap => {
+            const u = docSnap.data();
+            const perfil = u.role === 'admin' ? 'Administrador' : 'Equipe';
+            let btnExcluir = window.usuarioLogado.id !== docSnap.id ? `<button class="btn btn-small btn-danger" onclick="window.excluirMembroEquipe('${docSnap.id}', '${u.nome}')">🗑️ Excluir</button>` : `<span style="color: #999; font-size: 0.8rem;">(Você)</span>`;
+            html += `<tr><td>${u.nome}</td><td><strong>${u.username}</strong></td><td>${perfil}</td><td>${btnExcluir}</td></tr>`;
+        });
+        container.innerHTML = html + '</tbody></table></div>';
+    }
+
+    // === INTERFACE GERAL ===
+    function mostrarPainel() {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'block';
+        document.getElementById('user-display').innerText = window.usuarioLogado.nome;
+        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe';
+        
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        document.getElementById('nav-relatorios').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('nav-auditoria').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('nav-equipe').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('nav-financeiro').style.display = isAdmin ? 'block' : 'none';
+        
+        // Habilita o filtro diário apenas para admins
+        document.getElementById('filtro-admin-diario').style.display = isAdmin ? 'flex' : 'none';
+        
+        window.switchTab('tab-casos');
+        window.atualizarFiltros();
+        window.renderizarCasos();
+        if (isAdmin) { window.renderizarLogs(); window.renderizarFinanceiro(); renderizarEquipe(); window.renderizarRelatorios(); }
+    }
+
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
+        if(tabId === 'tab-relatorios') window.renderizarRelatorios();
+    };
+
+    window.openModal = function(id) { 
+        document.getElementById(id).style.display = 'flex'; 
+        if(id === 'modal-novo-caso' && window.usuarioLogado) document.getElementById('novo-responsavel').value = window.usuarioLogado.nome;
+    };
+    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
+
+    // === GESTÃO DE CASOS E RELATORIOS ===
+    window.registrarLog = async function(acao, detalhes) {
+        try {
+            const now = new Date();
+            await addDoc(collection(db, "logs"), {
+                data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                usuario: window.usuarioLogado.nome, acao: acao, detalhes: detalhes, timestamp: Date.now()
+            });
+        } catch(e) {}
+    };
+
+    // MARCAR COMO VISTO HOJE
+    window.marcarVistoHoje = async function(idCaso) {
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
+        await updateDoc(doc(db, "casos", idCaso), { ultimaAnaliseData: dataHoje });
+    };
+
+    function calcularDiasParado(caso) {
+        const agora = Date.now();
+        let ultimoTs = caso.timestamp || agora;
+        if(caso.andamentos && caso.andamentos.length > 0) {
+            ultimoTs = caso.andamentos[0].id; 
+        }
+        return Math.floor((agora - ultimoTs) / (1000 * 60 * 60 * 24));
+    }
+
+    window.salvarCaso = async function() {
+        const contrato = document.getElementById('novo-contrato').value.trim();
+        const cliente = document.getElementById('novo-cliente').value.trim().toUpperCase();
+        const comarcaOrigem = document.getElementById('novo-comarca-origem').value.trim();
+        const comarcaReq = document.getElementById('novo-comarca-req').value.trim();
+        const obs = document.getElementById('novo-obs').value.trim();
+
+        if (!contrato || !cliente) { alert('Preencha contrato e cliente!'); return; }
+        const mesRegistro = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+
+        await addDoc(collection(db, "casos"), {
+            contrato, cliente, comarcaOrigem, comarcaReq, obs, mesRegistro,
+            criadoPor: window.usuarioLogado.nome,
+            mandadoExpedido: false, valorComissao: 0, 
+            ultimaAnaliseData: "", // Campo para o controle diário
+            andamentos: [], timestamp: Date.now()
+        });
+        
+        window.registrarLog('Criação de Cliente', `Cliente: ${cliente}`);
+        window.closeModal('modal-novo-caso');
+        document.getElementById('novo-contrato').value = ''; document.getElementById('novo-cliente').value = ''; 
+        document.getElementById('novo-comarca-origem').value = ''; document.getElementById('novo-comarca-req').value = ''; document.getElementById('novo-obs').value = '';
+    };
+
+    window.excluirCaso = async function(idCaso, clienteNome) {
+        if(confirm("Deseja EXCLUIR este cliente da nuvem?")) {
+            await deleteDoc(doc(db, "casos", idCaso));
+            window.registrarLog('Exclusão de Cliente', `Cliente excluído: ${clienteNome}`);
+        }
+    };
+
+    window.abrirModalEditarCaso = function(idCaso) {
+        const caso = window.casosDb.find(c => c.id === idCaso);
+        if(!caso) return;
+        document.getElementById('edit-caso-id').value = caso.id;
+        document.getElementById('edit-contrato').value = caso.contrato || '';
+        document.getElementById('edit-cliente').value = caso.cliente || '';
+        document.getElementById('edit-comarca-origem').value = caso.comarcaOrigem || '';
+        document.getElementById('edit-comarca-req').value = caso.comarcaReq || '';
+        document.getElementById('edit-obs').value = caso.obs || '';
+        window.openModal('modal-editar-caso');
+    };
+
+    window.salvarEdicaoCaso = async function() {
+        const idCaso = document.getElementById('edit-caso-id').value;
+        const contrato = document.getElementById('edit-contrato').value.trim();
+        const cliente = document.getElementById('edit-cliente').value.trim().toUpperCase();
+        const comarcaOrigem = document.getElementById('edit-comarca-origem').value.trim();
+        const comarcaReq = document.getElementById('edit-comarca-req').value.trim();
+        const obs = document.getElementById('edit-obs').value.trim();
+
+        if (!contrato || !cliente) { alert('Preencha contrato e cliente!'); return; }
+        await updateDoc(doc(db, "casos", idCaso), { contrato, cliente, comarcaOrigem, comarcaReq, obs });
+        window.registrarLog('Edição de Cliente', `Cliente: ${cliente} editado.`);
+        window.closeModal('modal-editar-caso');
+    };
+
+    window.abrirModalAndamento = function(idCaso) {
+        document.getElementById('andamento-caso-id').value = idCaso;
+        document.getElementById('nova-acao').value = '';
+        window.openModal('modal-novo-andamento');
+    };
+
+    window.salvarAndamento = async function() {
+        const idCaso = document.getElementById('andamento-caso-id').value;
+        const acaoText = document.getElementById('nova-acao').value.trim();
+        const responsavel = document.getElementById('nova-acao-responsavel').value;
+        if (!acaoText) { alert('Descreva o andamento!'); return; }
+
+        const now = new Date();
+        const novoAndamento = { id: Date.now(), descricao: acaoText, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: responsavel };
+
+        const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andamentosAtuais = casoAtual.andamentos || [];
+        andamentosAtuais.unshift(novoAndamento);
+
+        await updateDoc(doc(db, "casos", idCaso), { 
+            andamentos: andamentosAtuais,
+            ultimaAnaliseData: now.toLocaleDateString('pt-BR') // Atualiza a análise automaticamente ao dar andamento
+        });
+        window.registrarLog('Novo Andamento', `Contrato: ${casoAtual.contrato} | Por: ${responsavel}`);
+        window.closeModal('modal-novo-andamento');
+    };
+
+    window.excluirAndamento = async function(idCaso, idAndamento) {
+        if(confirm("Apagar este andamento permanentemente?")) {
+            const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            const novosAndamentos = casoAtual.andamentos.filter(a => a.id !== idAndamento);
+            await updateDoc(doc(db, "casos", idCaso), { andamentos: novosAndamentos });
+            window.registrarLog('Exclusão de Andamento', `Andamento removido do Contrato: ${casoAtual.contrato}`);
+        }
+    };
+
+    // FINANCEIRO
+    window.abrirModalMandado = function(idCaso) {
+        document.getElementById('mandado-caso-id').value = idCaso; document.getElementById('mandado-valor').value = "30.00"; window.openModal('modal-mandado');
+    };
+
+    window.salvarMandado = async function() {
+        const idCaso = document.getElementById('mandado-caso-id').value;
+        const valor = parseFloat(document.getElementById('mandado-valor').value);
+        if(isNaN(valor) || valor <= 0) { alert("Valor inválido."); return; }
+
+        const now = new Date();
+        const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andamentosAtuais = casoAtual.andamentos || [];
+        andamentosAtuais.unshift({
+            id: Date.now(), descricao: `✅ Mandado Expedido. Comissão de R$ ${valor.toFixed(2).replace('.',',')} registrada no sistema.`,
+            data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA"
+        });
+
+        await updateDoc(doc(db, "casos", idCaso), {
+            mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais
+        });
+        window.registrarLog('Expedição de Mandado', `Contrato: ${casoAtual.contrato}`);
+        window.closeModal('modal-mandado');
+    };
+
+    window.desfazerMandado = async function(idCaso) {
+        if(confirm("Cancelar faturamento deste mandado?")) {
+            const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            const novosAndamentos = casoAtual.andamentos.filter(a => a.responsavel !== "SISTEMA");
+            await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+        }
+    };
+
+    // RELATÓRIOS E EXPORTAÇÃO
+    window.renderizarRelatorios = function() {
+        if(window.usuarioLogado.role !== 'admin') return;
+        
+        let total = window.casosDb.length;
+        let mandados = window.casosDb.filter(c => c.mandadoExpedido).length;
+        let atencao = 0;
+        let criticos = 0;
+        let comarcasMap = {};
+
+        const tbodyCriticos = document.getElementById('dash-criticos-tbody');
+        tbodyCriticos.innerHTML = '';
+
+        window.casosDb.forEach(c => {
+            let dias = calcularDiasParado(c);
+            
+            // Stats Comarca (Requerimento é prioridade)
+            let comarcaNome = '';
+            if (c.comarcaReq && c.comarcaReq.trim() !== '') {
+                comarcaNome = c.comarcaReq.trim() + ' (Requerimento)';
+            } else if (c.comarcaOrigem && c.comarcaOrigem.trim() !== '') {
+                comarcaNome = c.comarcaOrigem.trim() + ' (Origem)';
+            } else {
+                comarcaNome = 'Não Informada';
+            }
+
+            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0, somaDias: 0 };
+            comarcasMap[comarcaNome].total++;
+            comarcasMap[comarcaNome].somaDias += dias;
+
+            // Classificação e Tabela Críticos
+            let statusBadge = `<span class="status-agil">Ágil (OK)</span>`;
+            if(dias > 15) {
+                criticos++; statusBadge = `<span class="status-critico">Crítico 🔴</span>`;
+                tbodyCriticos.innerHTML += `<tr><td><strong>${c.cliente}</strong><br><span style="font-size:0.8rem;color:#666;">${c.contrato}</span></td><td>${dias} dias</td><td>${statusBadge}</td></tr>`;
+            } else if(dias > 7) {
+                atencao++; statusBadge = `<span class="status-atencao">Atenção 🟡</span>`;
+            }
+        });
+
+        document.getElementById('dash-total').innerText = total;
+        document.getElementById('dash-mandados').innerText = mandados;
+        document.getElementById('dash-atencao').innerText = atencao;
+        document.getElementById('dash-critico').innerText = criticos;
+
+        if(criticos === 0) tbodyCriticos.innerHTML = '<tr><td colspan="3" style="text-align:center; color:#27ae60; font-weight:bold;">Excelente! Nenhum caso estagnado na base.</td></tr>';
+
+        // Tabela Comarcas
+        const tbodyComarcas = document.getElementById('dash-comarcas-tbody');
+        tbodyComarcas.innerHTML = '';
+        let listaComarcas = Object.keys(comarcasMap).map(k => {
+            return { nome: k, casos: comarcasMap[k].total, media: Math.round(comarcasMap[k].somaDias / comarcasMap[k].total) }
+        });
+        
+        // Ordena da pior média (mais lenta) para a melhor
+        listaComarcas.sort((a, b) => b.media - a.media).forEach(com => {
+            let icon = com.media > 10 ? '🐢 Lenta' : '⚡ Ágil';
+            tbodyComarcas.innerHTML += `<tr><td><strong>${com.nome}</strong></td><td>${com.casos}</td><td>${com.media} dias (${icon})</td></tr>`;
+        });
+    };
+
+    window.exportarRelatorioMestre = function() {
+        if(window.casosDb.length === 0) { alert("Não há casos para exportar."); return; }
+
+        let csv = "Contrato;Cliente;Comarca Origem;Comarca Req;Status Expedicao;Responsavel Criacao;Dias Sem Andamento;Desempenho;Observacoes\n";
+        
+        window.casosDb.forEach(c => {
+            let dias = calcularDiasParado(c);
+            let desempenho = dias > 15 ? 'Critico' : (dias > 7 ? 'Atencao' : 'Agil');
+            let expedido = c.mandadoExpedido ? 'Faturado' : 'Pendente';
+            let obs = (c.obs || '').replace(/;/g, ','); 
+            let req = c.comarcaReq || '';
+            let orig = c.comarcaOrigem || '';
+
+            csv += `${c.contrato};${c.cliente};${orig};${req};${expedido};${c.criadoPor};${dias};${desempenho};${obs}\n`;
+        });
+
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url); link.setAttribute("download", `Relatorio_Gerencial_Completo.csv`);
+        link.style.display = "none"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    };
+
+    window.exportarExcelFinanceiro = function() {
+        const mesFiltro = document.getElementById('filtro-mes-fin').value;
+        let casosFin = window.casosDb.filter(c => c.mandadoExpedido === true);
+        if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
+        if(casosFin.length === 0) { alert("Não há dados financeiros neste mês."); return; }
+
+        let csv = "Data Expedicao;Mes Referencia;Contrato;Cliente;Comarca Origem;Comarca Req;Responsavel Cadastro;Valor (R$)\n";
+        let total = 0;
+        casosFin.forEach(c => {
+            const valor = parseFloat(c.valorComissao || 0); total += valor;
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato};${c.cliente};${c.comarcaOrigem || ''};${c.comarcaReq || ''};${c.criadoPor};${valor.toFixed(2).replace('.', ',')}\n`;
+        });
+        csv += `;;;;;;TOTAL;${total.toFixed(2).replace('.', ',')}\n`;
+
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url); link.setAttribute("download", `Comissoes_${mesFiltro}.csv`);
+        link.style.display = "none"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    };
+
+    // Atualização de View Geral
+    window.atualizarFiltros = function() {
+        const selectCasos = document.getElementById('filtro-mes');
+        const selectFin = document.getElementById('filtro-mes-fin');
+        const mesesCasos = [...new Set(window.casosDb.map(c => c.mesRegistro))];
+        const mesesFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))];
+
+        const atualCasos = selectCasos.value; const atualFin = selectFin.value;
+
+        selectCasos.innerHTML = '<option value="todos">Todos os meses</option>';
+        mesesCasos.sort().reverse().forEach(m => { if(m) selectCasos.innerHTML += `<option value="${m}">${m}</option>`; });
+        if(mesesCasos.includes(atualCasos)) selectCasos.value = atualCasos;
+
+        selectFin.innerHTML = '<option value="todos">Todos os meses</option>';
+        mesesFin.sort().reverse().forEach(m => { if(m) selectFin.innerHTML += `<option value="${m}">${m}</option>`; });
+        if(mesesFin.includes(atualFin)) selectFin.value = atualFin;
+    };
+
+    window.renderizarCasos = function() {
+        const container = document.getElementById('cases-container'); container.innerHTML = '';
+        const mesFiltro = document.getElementById('filtro-mes').value;
+        const termoBusca = document.getElementById('search-input').value.toLowerCase();
+        
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        const ocultarAnalisadosHoje = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
+
+        let casosFiltrados = window.casosDb;
+        
+        // Filtro Diário Admin
+        if (isAdmin && ocultarAnalisadosHoje) {
+            casosFiltrados = casosFiltrados.filter(c => c.ultimaAnaliseData !== dataHoje);
+        }
+
+        if (mesFiltro !== 'todos') casosFiltrados = casosFiltrados.filter(c => c.mesRegistro === mesFiltro);
+        if (termoBusca) casosFiltrados = casosFiltrados.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.comarcaOrigem && c.comarcaOrigem.toLowerCase().includes(termoBusca)) || (c.comarcaReq && c.comarcaReq.toLowerCase().includes(termoBusca)));
+
+        if (casosFiltrados.length === 0) { 
+            let msg = ocultarAnalisadosHoje ? 'Tudo limpo! Você já analisou todos os casos.' : 'Nenhum caso encontrado.';
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: #888;">${msg}</div>`; 
+            return; 
+        }
+
+        casosFiltrados.forEach(caso => {
+            const btnAtualizar = isAdmin ? `<button class="btn btn-small" onclick="window.abrirModalAndamento('${caso.id}')">+ Andamento</button>` : '';
+            const btnEditarCaso = isAdmin ? `<button class="btn btn-small btn-edit" onclick="window.abrirModalEditarCaso('${caso.id}')">✏️ Editar</button>` : '';
+            const btnExcluirCaso = isAdmin ? `<button class="btn btn-small btn-danger" onclick="window.excluirCaso('${caso.id}', '${caso.cliente}', '${caso.contrato}')">🗑️</button>` : '';
+            
+            let btnMandado = '';
+            let btnVistoHoje = '';
+
+            if(isAdmin) {
+                // Lógica de Faturamento
+                if(!caso.mandadoExpedido) btnMandado = `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${caso.id}')">💲 Faturar</button>`;
+                else btnMandado = `<span style="background: #d4edda; color: #155724; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #c3e6cb;">✅ Faturado (R$ ${parseFloat(caso.valorComissao).toFixed(2).replace('.',',')})</span>`;
+
+                // Lógica de Checklist Diário
+                if(caso.ultimaAnaliseData === dataHoje) {
+                    btnVistoHoje = `<span style="background: #e6f4ea; color: #1e8e3e; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; border: 1px solid #ceead6;">✅ Visto Hoje</span>`;
+                } else {
+                    btnVistoHoje = `<button class="btn btn-small" style="background:#f1f3f4; color:#333; border:1px solid #ccc;" onclick="window.marcarVistoHoje('${caso.id}')">👁️ Marcar Visto</button>`;
+                }
+            }
+
+            const infoComarcas = (caso.comarcaOrigem || caso.comarcaReq) ? `<p style="color:#555; margin-bottom: 5px; font-size: 0.85rem;">${caso.comarcaOrigem ? `📍 <strong>Origem:</strong> ${caso.comarcaOrigem} ` : ''} ${caso.comarcaReq ? `| 📨 <strong>Req:</strong> ${caso.comarcaReq}` : ''}</p>` : '';
+            const obsHtml = caso.obs ? `<div class="case-obs" style="margin-bottom: 8px;"><strong>Motivo/Obs:</strong> ${caso.obs}</div>` : '';
+            const infoCriador = caso.criadoPor ? `<div style="margin-top: 10px; margin-bottom: 15px;"><span style="background: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 0.85rem; color: var(--azul);">👤 <strong>Adicionado por:</strong> ${caso.criadoPor}</span></div>` : '';
+
+            let andamentosVisiveis = caso.andamentos ? caso.andamentos.filter(a => isAdmin || a.responsavel !== 'SISTEMA') : [];
+            let andamentosHTML = andamentosVisiveis.length > 0 ? `<table class="history-table"><thead><tr><th>Ação / Diligência</th><th>Data</th><th>Hora</th><th>Responsável</th></tr></thead><tbody>${andamentosVisiveis.map(a => {
+                    const btnApagarAndamento = isAdmin && a.responsavel !== 'SISTEMA' ? `<button class="btn btn-danger" style="padding: 3px 6px; font-size: 0.7rem; border-radius: 3px; margin-left: 10px;" onclick="window.excluirAndamento('${caso.id}', ${a.id})">🗑️</button>` : '';
+                    return `<tr><td width="55%"><strong>${a.descricao}</strong></td><td width="15%">${a.data}</td><td width="15%">${a.hora}</td><td width="15%">${a.responsavel} ${btnApagarAndamento}</td></tr>`;
+                }).join('')}</tbody></table>` : '<p style="color: #999; font-size: 0.9rem; margin-top: 15px;">Nenhum andamento registrado.</p>';
+
+            const card = document.createElement('div');
+            card.className = 'case-card';
+            card.innerHTML = `<div class="case-header"><div class="case-info" style="width: 100%;"><h3>${caso.cliente}</h3><p style="color:#555; margin-bottom: 5px;">Contrato: ${caso.contrato} | Mês ref: ${caso.mesRegistro || 'N/A'}</p>${infoComarcas}${obsHtml}${infoCriador}</div><div class="case-actions" style="min-width: fit-content; align-items: center;">${btnVistoHoje}${btnMandado}${btnEditarCaso}${btnExcluirCaso}${btnAtualizar}</div></div><div class="case-body">${andamentosHTML}</div>`;
+            container.appendChild(card);
+        });
+    };
+
+    window.renderizarFinanceiro = function() {
+        const tbody = document.getElementById('financeiro-tbody'); tbody.innerHTML = '';
+        const mesFiltro = document.getElementById('filtro-mes-fin').value;
+        let casosFin = window.casosDb.filter(c => c.mandadoExpedido === true);
+        if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
+
+        let total = 0;
+        if(casosFin.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 20px; color: #888;">Nenhum mandado expedido.</td></tr>';
+            document.getElementById('total-financeiro').innerText = "R$ 0,00"; return;
+        }
+
+        casosFin.forEach(c => {
+            const valor = parseFloat(c.valorComissao || 0); total += valor;
+            const btnDesfazer = `<button class="btn btn-danger" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 4px;" onclick="window.desfazerMandado('${c.id}')">❌ Cancelar</button>`;
+            tbody.innerHTML += `<tr><td>${c.dataExpedicao}</td><td>${c.contrato}</td><td>${c.cliente}</td><td>${c.criadoPor}</td><td>R$ ${valor.toFixed(2).replace('.',',')}</td><td>${btnDesfazer}</td></tr>`;
+        });
+        document.getElementById('total-financeiro').innerText = `R$ ${total.toFixed(2).replace('.',',')}`;
+    };
+
+    // INIT FIREBASE
+    onSnapshot(collection(db, "casos"), (snapshot) => {
+        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        if(window.usuarioLogado) { 
+            window.atualizarFiltros(); window.renderizarCasos(); 
+            if(window.usuarioLogado.role === 'admin') { window.renderizarFinanceiro(); window.renderizarRelatorios(); }
+        }
+    });
+
+    onSnapshot(collection(db, "logs"), (snapshot) => {
+        window.logsDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') window.renderizarLogs();
+    });
+
+    let sessao = localStorage.getItem('usuarioSessao');
+    if(sessao) { window.usuarioLogado = JSON.parse(sessao); mostrarPainel(); }
+</script>
+</body>
+</html>
