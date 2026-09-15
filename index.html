@@ -30,6 +30,7 @@
             /* Cores Kanban / Tags */
             --kb-aguardando: #94a3b8;
             --kb-deferida: #8b5cf6;
+            --kb-aguardando-mandado: #6366f1; /* NOVA COR */
             --kb-solic-bloq: #f59e0b;
             --kb-bloqueado: #ef4444;
             --kb-mandado: #3b82f6;
@@ -86,7 +87,7 @@
         /* Main Content */
         main { flex: 1; display: flex; flex-direction: column; background: var(--fundo); position: relative; overflow: hidden; }
         
-        /* Top Header Area (For Notifs) */
+        /* Top Header Area */
         .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: var(--branco); border-bottom: 1px solid var(--borda); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .notif-bell { position: relative; cursor: pointer; font-size: 1.5rem; padding: 5px; }
         .notif-badge { position: absolute; top: 0; right: -5px; background: var(--erro); color: white; font-size: 0.65rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; display: none; }
@@ -101,9 +102,6 @@
         
         /* Cards Modernos (Lista) */
         .card { background: var(--branco); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 20px; border: 1px solid rgba(226, 232, 240, 0.8); }
-        .case-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; border-bottom: 1px solid var(--borda); padding-bottom: 15px; margin-bottom: 15px; }
-        .case-info h3 { margin: 0 0 5px 0; color: var(--azul); font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-        .case-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         
         /* Status Badges e Tags */
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; }
@@ -115,9 +113,11 @@
         .kanban-header { padding: 12px 15px; font-weight: 600; border-bottom: 3px solid transparent; color: var(--texto); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; background: #fff; }
         .k-count { background: var(--fundo); color: var(--texto-claro); font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; }
         .kanban-cards { padding: 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 150px; }
-        .k-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: grab; border: 1px solid var(--borda); transition: 0.2s; position: relative; }
-        .k-card:active { cursor: grabbing; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transform: scale(0.98); }
-        .k-card:hover { border-color: var(--laranja); }
+        .k-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--borda); transition: 0.2s; position: relative; }
+        
+        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transform: scale(0.98); }
+        .k-card.draggable:hover { border-color: var(--laranja); }
+        
         .k-card h4 { margin: 0 0 5px 0; color: var(--azul); font-size: 0.9rem; }
         .k-card p { margin: 0; color: var(--texto-claro); font-size: 0.75rem; }
         .k-card .k-meta { margin-top: 8px; font-size: 0.7rem; color: #94a3b8; display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 5px; }
@@ -142,6 +142,7 @@
         /* Cores das Colunas/Tags */
         .cor-aguardando { background-color: var(--kb-aguardando); } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
         .cor-deferida { background-color: var(--kb-deferida); } .borda-deferida { border-bottom-color: var(--kb-deferida); }
+        .cor-aguardando-mandado { background-color: var(--kb-aguardando-mandado); } .borda-aguardando-mandado { border-bottom-color: var(--kb-aguardando-mandado); }
         .cor-solic-bloq { background-color: var(--kb-solic-bloq); } .borda-solic-bloq { border-bottom-color: var(--kb-solic-bloq); }
         .cor-bloqueado { background-color: var(--kb-bloqueado); } .borda-bloqueado { border-bottom-color: var(--kb-bloqueado); }
         .cor-mandado { background-color: var(--kb-mandado); } .borda-mandado { border-bottom-color: var(--kb-mandado); }
@@ -165,7 +166,6 @@
         <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
     </div>
 
-    <!-- Modais de Senha e Mestre Ocultos no HTML (mantidos no código) -->
     <div id="force-password-box" class="auth-box" style="display: none;">
         <h2>Definir Senha</h2>
         <div class="form-group"><label>Nova Senha Pessoal</label><input type="password" id="nova-senha-input"></div>
@@ -192,8 +192,8 @@
             <div class="user-role" id="role-badge">Admin</div>
         </div>
         <nav>
-            <div class="nav-item active" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
-            <div class="nav-item" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos Cadastrados</div>
+            <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos Cadastrados</div>
+            <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">📊 Dashboard Gerencial</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">💰 Financeiro</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">👥 Gestão de Equipe</div>
@@ -208,23 +208,13 @@
                 <div class="notif-bell admin-only" onclick="window.abrirModalInercia()" title="Alertas de Cartório" style="display:none;">
                     🔔 <span class="notif-badge" id="notif-badge">0</span>
                 </div>
+                <!-- Botão de cadastro liberado para todos (Analistas podem cadastrar) -->
                 <button class="btn btn-small btn-outline" style="border:none;" onclick="window.openModal('modal-novo-caso')">➕ Novo Caso</button>
             </div>
         </header>
 
-        <!-- ABA 0: KANBAN -->
-        <div id="tab-kanban" class="tab-content kanban-active active">
-            <div class="top-bar" style="margin-bottom: 15px;">
-                <h2 style="font-size: 1.4rem;">Quadro de Fluxo</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases.</div>
-            </div>
-            <div class="kanban-wrapper" id="kanban-board-container">
-                <!-- Colunas Geradas via JS -->
-            </div>
-        </div>
-
-        <!-- ABA 1: CASOS (LISTA) -->
-        <div id="tab-casos" class="tab-content">
+        <!-- ABA 1: CASOS (LISTA - Abertura Padrão) -->
+        <div id="tab-casos" class="tab-content active">
             <div class="top-bar">
                 <h2>Casos Cadastrados</h2>
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
@@ -236,6 +226,17 @@
                 </div>
             </div>
             <div id="cases-container"></div>
+        </div>
+
+        <!-- ABA 0: KANBAN -->
+        <div id="tab-kanban" class="tab-content">
+            <div class="top-bar" style="margin-bottom: 15px;">
+                <h2 style="font-size: 1.4rem;">Quadro de Fluxo</h2>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
+            </div>
+            <div class="kanban-wrapper" id="kanban-board-container" style="min-height: calc(100vh - 200px);">
+                <!-- Colunas Geradas via JS -->
+            </div>
         </div>
 
         <!-- ABA 2: DASHBOARD EXECUTIVO -->
@@ -280,7 +281,7 @@
                     <div class="form-group"><label>Nome</label><input type="text" id="novo-membro-nome"></div>
                     <div class="form-group"><label>Senha Temp.</label><input type="text" id="novo-membro-senha"></div>
                     <div class="form-group" style="grid-column:span 2;"><label>Perfil</label>
-                        <select id="novo-membro-role"><option value="cadastro">Equipe</option><option value="admin">Admin</option></select>
+                        <select id="novo-membro-role"><option value="cadastro">Equipe (Apenas visualiza e cadastra clientes iniciais)</option><option value="admin">Admin</option></select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar</button>
@@ -292,11 +293,10 @@
 
 <!-- === MODAIS === -->
 
-<!-- MODAL: NOVO/EDITAR (Unificado visualmente) -->
 <div id="modal-novo-caso" class="modal">
     <div class="modal-content">
         <div class="modal-header"><h3>📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
-        <input type="hidden" id="novo-caso-id"> <!-- Se preenchido, é edição -->
+        <input type="hidden" id="novo-caso-id">
         
         <div class="grid-2">
             <div class="form-group"><label>Nº Contrato</label><input type="text" id="novo-contrato"></div>
@@ -308,6 +308,8 @@
             <select id="novo-status">
                 <option value="Aguardando Liminar">Aguardando Liminar</option>
                 <option value="Liminar Deferida">Liminar Deferida</option>
+                <!-- NOVA FASE AQUI -->
+                <option value="Aguardando Mandado">Aguardando Mandado</option>
                 <option value="Solicitado Bloqueio">Solicitado Bloqueio</option>
                 <option value="Bloqueado">Bloqueado</option>
                 <option value="Mandado Expedido">Mandado Expedido</option>
@@ -346,14 +348,13 @@
     </div>
 </div>
 
-<!-- MODAL DE ALERTA DE INÉRCIA -->
 <div id="modal-notificacoes" class="modal">
     <div class="modal-content" style="max-width: 700px;">
         <div class="modal-header">
             <h3 style="color: var(--erro);">🚨 Alerta: Gargalo no Cartório</h3>
             <button class="close-btn" onclick="window.closeModal('modal-notificacoes')">&times;</button>
         </div>
-        <p style="font-size: 0.9rem; color: var(--texto-claro);">Os processos abaixo estão com a Liminar Deferida há mais de 5 dias sem expedição do mandado. Entre em contato com a Vara imediatamente.</p>
+        <p style="font-size: 0.9rem; color: var(--texto-claro);">Os processos abaixo estão com a Liminar Deferida há mais de 5 dias sem expedição. Cobre o cartório!</p>
         <div class="table-container">
             <table class="audit-table">
                 <thead><tr><th>Cliente/Contrato</th><th>Comarca</th><th>Dias Travado</th></tr></thead>
@@ -363,7 +364,6 @@
     </div>
 </div>
 
-<!-- === FIREBASE E LÓGICA MESTRA === -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
@@ -375,10 +375,11 @@
     window.casosDb = []; window.usuariosDb = []; window.usuarioLogado = null; window.usuarioPendenteTrocaSenha = null;
     let chartStatusInstance = null; let chartComarcasInstance = null;
 
-    // Fases Kanban Ordem
+    // Fases Kanban com a Nova Inclusão
     const STATUS_PHASES = [
         {id: 'Aguardando Liminar', cor: 'cor-aguardando', borda: 'borda-aguardando'},
         {id: 'Liminar Deferida', cor: 'cor-deferida', borda: 'borda-deferida'},
+        {id: 'Aguardando Mandado', cor: 'cor-aguardando-mandado', borda: 'borda-aguardando-mandado'},
         {id: 'Solicitado Bloqueio', cor: 'cor-solic-bloq', borda: 'borda-solic-bloq'},
         {id: 'Bloqueado', cor: 'cor-bloqueado', borda: 'borda-bloqueado'},
         {id: 'Mandado Expedido', cor: 'cor-mandado', borda: 'borda-mandado'},
@@ -388,10 +389,8 @@
         {id: 'Acordo Realizado', cor: 'cor-acordo', borda: 'borda-acordo'}
     ];
 
-    // Auth Utils (Mantidos iguais, ocultados para focar no Kanban)
     window.abrirCriarAdminMestre = function() { document.getElementById('login-box').style.display = 'none'; document.getElementById('master-admin-box').style.display = 'block'; };
     window.voltarLogin = function() { document.getElementById('master-admin-box').style.display = 'none'; document.getElementById('login-box').style.display = 'block'; };
-    window.criarAdminMestre = async function() { /* ... */ };
     
     window.doLogin = async function() {
         const userRaw = document.getElementById('login-username').value.trim(); const pass = document.getElementById('login-password').value;
@@ -410,22 +409,20 @@
     window.salvarNovaSenhaObrigatoria = async function() { /*...*/ };
     window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessao'); location.reload(); };
 
-    // Equipe Utils
-    window.criarMembroEquipe = async function() { /*...*/ };
-    window.excluirMembroEquipe = async function(id, nome) { /*...*/ };
-    function desenharTabelaEquipe() { /*...*/ }
-
     function mostrarPainel() {
         document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
         document.getElementById('user-display').innerText = window.usuarioLogado.nome;
         document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
-        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Acesso Total' : 'Analista';
+        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Acesso Total' : 'Equipe';
         
         const isAdmin = window.usuarioLogado.role === 'admin';
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'flex' : 'none');
         document.getElementById('filtro-admin-diario').style.display = isAdmin ? 'flex' : 'none';
         
-        // Setup Kanban Board HTML
+        // Define texto da aba kanban baseado no perfil
+        document.getElementById('kb-subtitle').innerText = isAdmin ? "Arraste os cartões para atualizar as fases." : "Modo de visualização (Apenas Administradores podem mover os cartões).";
+
+        // Setup Kanban Board HTML para TODOS (Visualização)
         const kbContainer = document.getElementById('kanban-board-container');
         kbContainer.innerHTML = STATUS_PHASES.map(fase => `
             <div class="kanban-col" ondrop="window.dropKanban(event, '${fase.id}')" ondragover="window.allowDrop(event)" ondragleave="window.dragLeave(event)">
@@ -434,7 +431,8 @@
             </div>
         `).join('');
 
-        window.switchTab('tab-kanban'); window.atualizarFiltros(); window.renderizarGeral();
+        // Todos começam na aba de casos cadastrados (Lista)
+        window.switchTab('tab-casos'); window.atualizarFiltros(); window.renderizarGeral();
     }
 
     window.switchTab = function(tabId) {
@@ -449,10 +447,9 @@
     window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
     window.abrirModalInercia = function() { window.openModal('modal-notificacoes'); };
 
-    // === GESTÃO CORE ===
     window.renderizarGeral = function() {
         window.renderizarCasos();
-        window.renderizarKanban();
+        window.renderizarKanban(); // Atualiza Kanban para todos
         if(window.usuarioLogado.role === 'admin') { window.checarInercia(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
     };
 
@@ -470,7 +467,7 @@
         
         if(idCaso) {
             const casoAtual = window.casosDb.find(c => c.id === idCaso);
-            if(casoAtual.status !== payload.status) {
+            if(casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
                 payload.dataStatus = Date.now();
                 let hist = casoAtual.andamentos || [];
                 hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
@@ -485,20 +482,17 @@
         window.closeModal('modal-novo-caso');
     };
 
-    window.abrirModalNovoCaso = function() {
-        document.getElementById('novo-caso-id').value = '';
-        ['novo-contrato', 'novo-cliente', 'novo-comarca-origem', 'novo-comarca-req', 'novo-obs'].forEach(id => document.getElementById(id).value = '');
-        document.getElementById('novo-status').value = 'Aguardando Liminar';
-        window.openModal('modal-novo-caso');
-    }
-
     window.abrirModalEditarCaso = function(idCaso) {
         const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
         document.getElementById('novo-caso-id').value = c.id;
         document.getElementById('novo-contrato').value = c.contrato || ''; document.getElementById('novo-cliente').value = c.cliente || '';
         document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
-        document.getElementById('novo-obs').value = c.obs || ''; document.getElementById('novo-status').value = c.status || 'Aguardando Liminar';
-        window.openModal('modal-novo-caso'); // Reuse modal
+        document.getElementById('novo-obs').value = c.obs || ''; 
+        document.getElementById('novo-status').value = c.status || 'Aguardando Liminar';
+        
+        // Bloqueia alteração de status para Analistas
+        document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin';
+        window.openModal('modal-novo-caso');
     };
 
     window.excluirCaso = async function(idCaso) { if(confirm("Apagar PROCESSO?")) await deleteDoc(doc(db, "casos", idCaso)); };
@@ -516,32 +510,27 @@
     };
     window.excluirAndamento = async function(id, idA) { if(confirm("Deletar andamento?")){ const c = window.casosDb.find(x=>x.id===id); await updateDoc(doc(db,"casos",id),{andamentos: c.andamentos.filter(a=>a.id!==idA)}); } };
 
-    // === VISTO DIARIO ===
     window.marcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: new Date().toLocaleDateString('pt-BR') }); };
     window.desmarcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: "" }); };
 
     // === KANBAN DRAG & DROP ===
-    window.allowDrop = function(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
+    window.allowDrop = function(ev) { if(window.usuarioLogado.role !== 'admin') return; ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
     window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
     window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
-    
     window.dropKanban = async function(ev, novoStatus) {
-        ev.preventDefault();
-        ev.currentTarget.classList.remove('drop-hover');
-        const idCaso = ev.dataTransfer.getData("caseId");
-        const caso = window.casosDb.find(c => c.id === idCaso);
+        if(window.usuarioLogado.role !== 'admin') return;
+        ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
+        const idCaso = ev.dataTransfer.getData("caseId"); const caso = window.casosDb.find(c => c.id === idCaso);
         if(!caso || caso.status === novoStatus) return;
 
-        let andamentos = caso.andamentos || [];
-        const now = new Date();
+        let andamentos = caso.andamentos || []; const now = new Date();
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-
-        // Update DB
         await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
     };
 
     window.renderizarKanban = function() {
-        // Limpa colunas
+        const isAdmin = window.usuarioLogado.role === 'admin';
+
         STATUS_PHASES.forEach(f => {
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
             if(col) col.innerHTML = '';
@@ -549,51 +538,45 @@
         });
 
         window.casosDb.forEach(c => {
-            const status = c.status || 'Aguardando Liminar';
-            const colId = 'col-' + status.replace(/\s+/g, '');
-            const col = document.getElementById(colId);
+            const status = c.status || 'Aguardando Liminar'; const col = document.getElementById('col-' + status.replace(/\s+/g, ''));
             if(col) {
                 const conf = STATUS_PHASES.find(x => x.id === status);
                 const dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
                 let diasHtml = dias > 0 ? `<span style="color:${dias > 5 ? 'var(--erro)' : 'var(--texto-claro)'};">⏱️ ${dias}d</span>` : '<span>✨ Novo</span>';
                 
+                // Lógica para permitir arrasto apenas para Admins
+                let dragAttr = isAdmin ? `draggable="true" ondragstart="window.dragKanban(event, '${c.id}')"` : '';
+                let cursorStyle = isAdmin ? 'cursor: grab;' : 'cursor: default;';
+                // Analistas podem abrir para ver detalhes da ficha (sem poder mudar status lá dentro)
+                let onclickAttr = `onclick="window.abrirModalEditarCaso('${c.id}')"`;
+
                 col.innerHTML += `
-                    <div class="k-card" id="kb-${c.id}" draggable="true" ondragstart="window.dragKanban(event, '${c.id}')" onclick="window.abrirModalEditarCaso('${c.id}')">
+                    <div class="k-card ${isAdmin ? 'draggable' : ''}" ${dragAttr} ${onclickAttr} style="${cursorStyle}">
                         <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${status}</div>
-                        <h4>${c.cliente}</h4>
-                        <p>${c.contrato}</p>
-                        <div class="k-meta"><span>${c.comarcaReq || c.comarcaOrigem || 'N/A'}</span>${diasHtml}</div>
+                        <h4>${c.cliente}</h4><p>${c.contrato}</p><div class="k-meta"><span>${c.comarcaReq || c.comarcaOrigem || 'N/A'}</span>${diasHtml}</div>
                     </div>`;
             }
         });
-        
-        // Update counts
         STATUS_PHASES.forEach(f => {
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
             if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length;
         });
     };
 
-    // === ALERTA DE INÉRCIA ===
     window.checarInercia = function() {
-        const hoje = Date.now();
-        let travados = [];
+        const hoje = Date.now(); let travados = [];
         window.casosDb.forEach(c => {
             if((c.status || 'Aguardando Liminar') === 'Liminar Deferida') {
-                let ts = c.dataStatus || c.timestamp;
-                let dias = Math.floor((hoje - ts) / 86400000);
+                let dias = Math.floor((hoje - (c.dataStatus || c.timestamp)) / 86400000);
                 if(dias >= 5) travados.push({...c, diasTravado: dias});
             }
         });
-
-        const bell = document.getElementById('notif-badge');
-        const tbody = document.getElementById('notif-tbody');
+        const bell = document.getElementById('notif-badge'); const tbody = document.getElementById('notif-tbody');
         if(travados.length > 0) {
             bell.style.display = 'flex'; bell.innerText = travados.length;
             tbody.innerHTML = travados.map(t => `<tr><td><strong>${t.cliente}</strong><br><span style="font-size:0.75rem;color:#64748b;">${t.contrato}</span></td><td>${t.comarcaReq || t.comarcaOrigem || '-'}</td><td style="color:var(--erro); font-weight:bold;">${t.diasTravado} dias</td></tr>`).join('');
         } else {
-            bell.style.display = 'none';
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--sucesso);">Tudo em dia! Sem gargalos no cartório. ✅</td></tr>';
+            bell.style.display = 'none'; tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--sucesso);">Tudo em dia! Sem gargalos no cartório. ✅</td></tr>';
         }
     };
 
@@ -602,9 +585,9 @@
     window.renderizarCasos = function() {
         const container = document.getElementById('cases-container'); container.innerHTML = '';
         const termoBusca = document.getElementById('search-input').value.toLowerCase();
-        const dataHoje = new Date().toLocaleDateString('pt-BR');
         const isAdmin = window.usuarioLogado.role === 'admin';
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
 
         let base = window.casosDb;
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
@@ -616,12 +599,20 @@
             const st = c.status || 'Aguardando Liminar';
             const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
 
-            let bVisto = '';
+            let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
+            
+            // SOMENTE O ADMIN PODE LANÇAR ANDAMENTO E VER VISTOS/FINANCEIRO
             if(isAdmin) {
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:4px 8px;" onclick="window.excluirCaso('${c.id}')">🗑️</button>`;
+                badgeFin = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Aprovar PG</button>` : `<span class="badge badge-faturado">Comissão Lib.</span>`;
                 bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--azul); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Ciente</button>`;
+                btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">+ Lançar Ação</button>`;
             }
             
-            let andHTML = (c.andamentos||[]).slice(0,3).map(a => `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data}:</strong> ${a.descricao}</div>`).join('');
+            let andHTML = (c.andamentos||[]).slice(0,3).map(a => {
+                let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span style="cursor:pointer; color:var(--erro); margin-left:8px;" onclick="window.excluirAndamento('${c.id}', ${a.id})">✖</span>` : '';
+                return `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data}:</strong> ${a.descricao} <span style="color:#94a3b8; font-size:0.75rem;">(${a.responsavel})</span> ${dBtn}</div>`;
+            }).join('');
             
             let div = document.createElement('div'); div.className = 'card'; div.style.padding = '20px';
             div.innerHTML = `
@@ -632,27 +623,27 @@
                         <p style="margin:0; font-family:monospace; color:var(--laranja);">${c.contrato}</p>
                     </div>
                     <div style="text-align:right;">
-                        <button class="btn btn-small btn-edit" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>
-                        <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">+ Lançar Ação</button>
+                        <button class="btn btn-small btn-edit" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar Info</button>
+                        ${btnLancar}
+                        ${btnsAdmin}
                     </div>
                 </div>
                 <div style="background:#f8fafc; padding:10px; border-radius:8px;">${andHTML || '<span style="color:#94a3b8;font-size:0.85rem;">Sem andamentos.</span>'}</div>
-                <div style="margin-top:15px; display:flex; justify-content:flex-end;">${bVisto}</div>
+                <div style="margin-top:15px; display:flex; justify-content:space-between; align-items:center;">
+                    <div style="font-size:0.85rem; color:#64748b;">📍 ${c.comarcaReq || c.comarcaOrigem || 'Comarca não informada'}</div>
+                    <div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div>
+                </div>
             `;
             container.appendChild(div);
         });
     };
 
-    // Restante do Dashboard e Financeiro mantidos iguais (Dashboard já atualiza via realtime)
-    window.renderizarFinanceiro = function() { /*...*/ };
-    window.exportarRelatorioMestre = function() { /*...*/ };
-    window.exportarExcelFinanceiro = function() { /*...*/ };
-    window.renderizarRelatorios = function() { /*...*/ };
+    window.abrirModalMandado = function(idCaso) { document.getElementById('mandado-caso-id').value = idCaso; window.openModal('modal-mandado'); };
+    window.salvarMandado = async function() { /*...*/ window.closeModal('modal-mandado'); };
 
-    // INIT REAL-TIME FIREBASE
-    onSnapshot(collection(db, "usuarios"), (snapshot) => { window.usuariosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })); });
-    onSnapshot(collection(db, "casos"), (snapshot) => {
-        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    onSnapshot(collection(db, "usuarios"), (s) => { window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); });
+    onSnapshot(collection(db, "casos"), (s) => {
+        window.casosDb = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
         if(window.usuarioLogado) window.renderizarGeral();
     });
 
