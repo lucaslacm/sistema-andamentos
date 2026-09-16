@@ -37,8 +37,6 @@
             --kb-mandado: #3b82f6;
             --kb-em-busca: #f97316;
             --kb-localizado: #84cc16;
-            --kb-apreendido: #10b981;
-            --kb-acordo: #0ea5e9;
         }
         
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -116,7 +114,7 @@
         .top-bar h2 { margin: 0; font-size: 1.4rem; color: var(--azul); font-weight: 700; letter-spacing: -0.5px; }
         
         /* Cards (Lista) */
-        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); }
+        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; }
         .tag-status { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; margin: 10px 0; border: 1px dashed var(--borda); font-size: 0.85rem; }
@@ -184,7 +182,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas/Tags ATUALIZADAS COM NOVOS STATUS */
+        /* Cores das Colunas Kanban - Apenas as ativas */
         .cor-aguardando { background-color: var(--kb-aguardando); } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
         .cor-deferida { background-color: var(--kb-deferida); } .borda-deferida { border-bottom-color: var(--kb-deferida); }
         .cor-aguardando-mandado { background-color: var(--kb-aguardando-mandado); } .borda-aguardando-mandado { border-bottom-color: var(--kb-aguardando-mandado); }
@@ -194,14 +192,10 @@
         .cor-em-busca { background-color: var(--kb-em-busca); } .borda-em-busca { border-bottom-color: var(--kb-em-busca); }
         .cor-localizado { background-color: var(--kb-localizado); } .borda-localizado { border-bottom-color: var(--kb-localizado); }
         
-        /* Novas tags de encerramento */
-        .cor-apreendido { background-color: var(--kb-apreendido); } .borda-apreendido { border-bottom-color: var(--kb-apreendido); }
-        .cor-acordo { background-color: var(--kb-acordo); } .borda-acordo { border-bottom-color: var(--kb-acordo); }
-        .cor-devolucao { background-color: #14b8a6; } .borda-devolucao { border-bottom-color: #14b8a6; }
-        .cor-quitado { background-color: #059669; } .borda-quitado { border-bottom-color: #059669; }
-        .cor-mora { background-color: #0284c7; } .borda-mora { border-bottom-color: #0284c7; }
-        
         .drop-hover { background-color: rgba(234, 88, 12, 0.05); border: 2px dashed var(--laranja); }
+        
+        /* Badge de caso encerrado */
+        .badge-encerrado { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
@@ -248,8 +242,9 @@
             <div class="user-role" id="role-badge">Admin</div>
         </div>
         <nav>
-            <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos Cadastrados</div>
+            <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos Ativos</div>
             <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
+            <div class="nav-item" onclick="window.switchTab('tab-encerrados')" id="nav-encerrados">🔒 Casos Encerrados</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">📊 Dashboard Gerencial</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">💰 Financeiro</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">👥 Gestão de Equipe</div>
@@ -271,10 +266,10 @@
             </div>
         </header>
 
-        <!-- ABA 1: CASOS (LISTA) -->
+        <!-- ABA 1: CASOS ATIVOS (LISTA) -->
         <div id="tab-casos" class="tab-content active">
             <div class="top-bar">
-                <h2>Casos e Processos</h2>
+                <h2>Processos em Andamento</h2>
                 <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <div class="toggle-wrapper admin-only" style="display: none;">
                         <span>Ocultar já vistos</span>
@@ -291,7 +286,7 @@
         </div>
 
         <!-- ABA 0: KANBAN -->
-        <div id="tab-kanban" class="tab-content kanban-active">
+        <div id="tab-kanban" class="tab-content">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2>Quadro de Fluxo</h2>
                 <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
@@ -299,6 +294,17 @@
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
             </div>
+        </div>
+
+        <!-- ABA NOVA: ENCERRADOS -->
+        <div id="tab-encerrados" class="tab-content">
+            <div class="top-bar">
+                <h2>Arquivo de Casos Encerrados</h2>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="search-encerrados" placeholder="🔍 Buscar caso encerrado..." onkeyup="window.renderizarEncerrados()" style="max-width: 250px;">
+                </div>
+            </div>
+            <div id="encerrados-container"></div>
         </div>
 
         <!-- ABA 2: DASHBOARD GERENCIAL -->
@@ -329,7 +335,7 @@
 
             <div class="grid-2">
                 <div class="chart-container">
-                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📊 Distribuição de Fases</h3>
+                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📊 Distribuição de Fases (Ativos)</h3>
                     <div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartStatus"></canvas></div>
                 </div>
                 <div class="chart-container">
@@ -401,12 +407,6 @@
                 <option value="Mandado Expedido">Mandado Expedido</option>
                 <option value="Em Busca">Em Busca</option>
                 <option value="Veículo Localizado">Veículo Localizado</option>
-                <hr>
-                <option value="Apreendido">Apreendido</option>
-                <option value="Devolução Amigável">Devolução Amigável (Sugestão)</option>
-                <option value="Acordo Realizado">Acordo Realizado</option>
-                <option value="Quitado">Quitado</option>
-                <option value="Parcelas Pagas (Mora)">Pagou parcelas em atraso (Purgação da Mora)</option>
             </select>
         </div>
 
@@ -414,7 +414,7 @@
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
-        <div class="form-group"><label>Observações / Motivo</label><textarea id="novo-obs" placeholder="Detalhes adicionais do caso..."></textarea></div>
+        <div class="form-group"><label>Observações Iniciais</label><textarea id="novo-obs" placeholder="Detalhes adicionais do caso..."></textarea></div>
         <button class="btn btn-primary" style="width: 100%; padding: 12px;" id="btn-salvar-caso" onclick="window.salvarCasoFull()">Salvar Ficha</button>
     </div>
 </div>
@@ -435,6 +435,34 @@
 
         <div class="form-group"><label>Descrição da Diligência</label><textarea id="nova-acao" placeholder="O que foi feito?"></textarea></div>
         <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarAndamento()">Registrar Atividade</button>
+    </div>
+</div>
+
+<!-- NOVO MODAL DE ENCERRAMENTO -->
+<div id="modal-encerrar" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3>🔒 Encerrar Processo</h3>
+            <button class="close-btn" onclick="window.closeModal('modal-encerrar')">&times;</button>
+        </div>
+        <input type="hidden" id="encerrar-caso-id">
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0;">O caso será movido para o arquivo de Encerrados.</p>
+        
+        <div class="form-group">
+            <label>Motivo do Encerramento</label>
+            <select id="encerrar-motivo">
+                <option value="Apreensão">Apreensão</option>
+                <option value="Entrega Amigável">Entrega Amigável</option>
+                <option value="Acordo Realizado">Acordo Realizado</option>
+                <option value="Quitado">Quitado</option>
+                <option value="Pagou parcelas em atraso (Purgação da Mora)">Pagou parcelas em atraso (Purgação da Mora)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Observação Final (Opcional)</label>
+            <textarea id="encerrar-obs" placeholder="Descreva os detalhes do encerramento (opcional)..."></textarea>
+        </div>
+        <button class="btn btn-danger" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="window.confirmarEncerramento()">Finalizar e Arquivar Caso</button>
     </div>
 </div>
 
@@ -476,7 +504,7 @@
     window.casosDb = []; window.usuariosDb = []; window.usuarioLogado = null; window.usuarioPendenteTrocaSenha = null;
     let chartStatusInstance = null; let chartComarcasInstance = null;
 
-    // ARRAY DE STATUS ATUALIZADO COM AS NOVAS OPÇÕES
+    // FASES ATIVAS (Para o Kanban e Edição)
     const STATUS_PHASES = [
         {id: 'Aguardando Liminar', cor: 'cor-aguardando', borda: 'borda-aguardando'},
         {id: 'Liminar Deferida', cor: 'cor-deferida', borda: 'borda-deferida'},
@@ -485,12 +513,7 @@
         {id: 'Bloqueado', cor: 'cor-bloqueado', borda: 'borda-bloqueado'},
         {id: 'Mandado Expedido', cor: 'cor-mandado', borda: 'borda-mandado'},
         {id: 'Em Busca', cor: 'cor-em-busca', borda: 'borda-em-busca'},
-        {id: 'Veículo Localizado', cor: 'cor-localizado', borda: 'borda-localizado'},
-        {id: 'Apreendido', cor: 'cor-apreendido', borda: 'borda-apreendido'},
-        {id: 'Devolução Amigável', cor: 'cor-devolucao', borda: 'borda-devolucao'},
-        {id: 'Acordo Realizado', cor: 'cor-acordo', borda: 'borda-acordo'},
-        {id: 'Quitado', cor: 'cor-quitado', borda: 'borda-quitado'},
-        {id: 'Parcelas Pagas (Mora)', cor: 'cor-mora', borda: 'borda-mora'}
+        {id: 'Veículo Localizado', cor: 'cor-localizado', borda: 'borda-localizado'}
     ];
 
     window.copiarTexto = function(texto) {
@@ -645,6 +668,7 @@
 
     window.renderizarGeral = function() {
         window.renderizarCasos();
+        window.renderizarEncerrados();
         window.renderizarKanban();
         if(window.usuarioLogado.role === 'admin') { window.checarInercia(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
     };
@@ -682,6 +706,7 @@
             } else {
                 payload.mesRegistro = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
                 payload.criadoPor = window.usuarioLogado.nome; payload.mandadoExpedido = false; payload.valorComissao = 0; payload.ultimaAnaliseData = ""; payload.andamentos = []; payload.timestamp = Date.now(); payload.dataStatus = Date.now();
+                payload.encerrado = false;
                 await addDoc(collection(db, "casos"), payload);
             }
             
@@ -702,26 +727,84 @@
         document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
         document.getElementById('novo-obs').value = c.obs || ''; 
         document.getElementById('novo-status').value = c.status || 'Aguardando Liminar';
-        document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin';
+        document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
         window.openModal('modal-novo-caso');
     };
 
     window.excluirCaso = async function(idCaso) { if(confirm("Tem certeza que deseja APAGAR este processo definitivamente?")) await deleteDoc(doc(db, "casos", idCaso)); };
     
+    // ENCERRAMENTO E ARQUIVAMENTO DE CASOS
+    window.abrirModalEncerrar = function(idCaso) {
+        document.getElementById('encerrar-caso-id').value = idCaso;
+        document.getElementById('encerrar-obs').value = '';
+        window.openModal('modal-encerrar');
+    };
+
+    window.confirmarEncerramento = async function() {
+        const idCaso = document.getElementById('encerrar-caso-id').value;
+        const motivo = document.getElementById('encerrar-motivo').value;
+        const obs = document.getElementById('encerrar-obs').value.trim();
+        
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andAtuais = casoAtual.andamentos || [];
+        
+        let msgEncerramento = `🔒 CASO ENCERRADO: ${motivo}.`;
+        if (obs) msgEncerramento += ` Obs: ${obs}`;
+
+        andAtuais.unshift({ 
+            id: Date.now(), 
+            descricao: msgEncerramento, 
+            data: now.toLocaleDateString('pt-BR'), 
+            hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 
+            responsavel: window.usuarioLogado.nome 
+        });
+        
+        await updateDoc(doc(db, "casos", idCaso), { 
+            encerrado: true,
+            motivoEncerramento: motivo,
+            status: 'Encerrado',
+            andamentos: andAtuais,
+            dataEncerramento: now.toLocaleDateString('pt-BR'),
+            ultimaAnaliseData: now.toLocaleDateString('pt-BR')
+        });
+        
+        window.closeModal('modal-encerrar');
+    };
+
+    window.reabrirCaso = async function(idCaso) {
+        if(confirm("Deseja reativar este processo? Ele voltará para a fila de 'Aguardando Liminar' e aparecerá no Kanban novamente.")) {
+            const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            let andAtuais = casoAtual.andamentos || [];
+            
+            andAtuais.unshift({ 
+                id: Date.now(), 
+                descricao: `🔓 CASO REABERTO pelo administrador.`, 
+                data: now.toLocaleDateString('pt-BR'), 
+                hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 
+                responsavel: window.usuarioLogado.nome 
+            });
+            
+            await updateDoc(doc(db, "casos", idCaso), { 
+                encerrado: false,
+                motivoEncerramento: null,
+                status: 'Aguardando Liminar',
+                dataStatus: Date.now(),
+                andamentos: andAtuais
+            });
+        }
+    };
+
     // ANDAMENTOS E SELEÇÃO DE RESPONSÁVEL
     window.abrirModalAndamento = function(idCaso) { 
         document.getElementById('andamento-caso-id').value = idCaso; 
         document.getElementById('nova-acao').value = ''; 
         
-        // Verifica se é admin para liberar a escolha do responsável
         if(window.usuarioLogado.role === 'admin') {
             document.getElementById('div-responsavel-andamento').style.display = 'block';
-            // Se você (Lucas) logar, já seleciona "Lucas" por padrão
             document.getElementById('nova-acao-responsavel').value = window.usuarioLogado.nome.toUpperCase().includes('LUCAS') ? 'Lucas' : 'Bárbara';
         } else {
             document.getElementById('div-responsavel-andamento').style.display = 'none';
         }
-
         window.openModal('modal-novo-andamento'); 
     };
 
@@ -731,23 +814,13 @@
         
         if (!acaoText) return alert('Descreva o andamento!'); 
         
-        // Captura o nome de quem executou a diligência
         let responsavelDaAcao = window.usuarioLogado.nome;
-        if(window.usuarioLogado.role === 'admin') {
-            responsavelDaAcao = document.getElementById('nova-acao-responsavel').value;
-        }
+        if(window.usuarioLogado.role === 'admin') { responsavelDaAcao = document.getElementById('nova-acao-responsavel').value; }
 
         const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
         let andAtuais = casoAtual.andamentos || [];
         
-        andAtuais.unshift({ 
-            id: Date.now(), 
-            descricao: acaoText, 
-            data: now.toLocaleDateString('pt-BR'), 
-            hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 
-            responsavel: responsavelDaAcao 
-        });
-        
+        andAtuais.unshift({ id: Date.now(), descricao: acaoText, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: responsavelDaAcao });
         await updateDoc(doc(db, "casos", idCaso), { andamentos: andAtuais, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
         window.closeModal('modal-novo-andamento');
     };
@@ -780,7 +853,8 @@
             document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
         });
 
-        window.casosDb.forEach(c => {
+        // Filtrar apenas casos NÃO ENCERRADOS para o Kanban
+        window.casosDb.filter(c => c.encerrado !== true).forEach(c => {
             const status = c.status || 'Aguardando Liminar'; const col = document.getElementById('col-' + status.replace(/\s+/g, ''));
             if(col) {
                 const conf = STATUS_PHASES.find(x => x.id === status);
@@ -789,9 +863,7 @@
                 
                 let dragAttr = isAdmin ? `draggable="true" ondragstart="window.dragKanban(event, '${c.id}')"` : '';
                 let cursorStyle = isAdmin ? 'cursor: grab;' : 'cursor: default;';
-                let onclickAttr = `onclick="window.abrirModalEditarCaso('${c.id}')"`;
-
-                // Inteligência Comarcas
+                
                 let origKb = c.comarcaOrigem ? `Orig: ${c.comarcaOrigem}` : '';
                 let reqKb = c.comarcaReq ? `Req: ${c.comarcaReq}` : '';
                 let kbComarcas = (origKb && reqKb) ? `${origKb} | ${reqKb}` : (origKb || reqKb || 'N/A');
@@ -814,7 +886,7 @@
 
     window.checarInercia = function() {
         const hoje = Date.now(); let travados = [];
-        window.casosDb.forEach(c => {
+        window.casosDb.filter(c => c.encerrado !== true).forEach(c => {
             if((c.status || 'Aguardando Liminar') === 'Liminar Deferida') {
                 let dias = Math.floor((hoje - (c.dataStatus || c.timestamp)) / 86400000);
                 if(dias >= 5) travados.push({...c, diasTravado: dias});
@@ -844,6 +916,7 @@
         if(mCasos.includes(aCasos)) selCasos.value = aCasos; if(mFin.includes(aFin)) selFin.value = aFin;
     };
 
+    // RENDERIZAR CASOS ATIVOS
     window.renderizarCasos = function() {
         const container = document.getElementById('cases-container'); container.innerHTML = '';
         const termoBusca = document.getElementById('search-input').value.toLowerCase();
@@ -851,12 +924,14 @@
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-        let base = window.casosDb;
+        // Filtrar para remover os encerrados
+        let base = window.casosDb.filter(c => c.encerrado !== true);
+        
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
         if(document.getElementById('filtro-mes').value !== 'todos') base = base.filter(c => c.mesRegistro === document.getElementById('filtro-mes').value);
         if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
 
-        if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🧹</div><h3>Nenhum processo encontrado!</h3></div>`;
+        if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🧹</div><h3>Nenhum processo ativo encontrado!</h3></div>`;
 
         base.forEach(c => {
             const st = c.status || 'Aguardando Liminar';
@@ -865,13 +940,13 @@
             let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
             
             if(isAdmin) {
-                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>`;
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>
+                             <button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')" title="Finalizar e Arquivar">🔒 Encerrar</button>`;
                 badgeFin = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Aprovar PG</button>` : `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;">Comissão Paga</span>`;
                 bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`;
                 btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
             }
             
-            // TIMELINE DE ANDAMENTOS
             let andHTML = (c.andamentos||[]).slice(0,4).map((a, i) => {
                 let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}', ${a.id})" title="Excluir">✖</span>` : '';
                 let isRecent = i === 0 ? 'recent' : '';
@@ -910,7 +985,7 @@
                         <p style="margin:0; font-family:monospace; color:var(--laranja); font-weight:600;">Contrato: ${c.contrato}</p>
                     </div>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados / Editar</button>
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados</button>
                         ${btnLancar}
                         ${btnsAdmin}
                     </div>
@@ -924,6 +999,72 @@
                     <div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div>
                     <div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div>
                 </div>
+            `;
+            container.appendChild(div);
+        });
+    };
+
+    // RENDERIZAR CASOS ENCERRADOS (NOVA ABA)
+    window.renderizarEncerrados = function() {
+        const container = document.getElementById('encerrados-container'); container.innerHTML = '';
+        const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
+        const isAdmin = window.usuarioLogado.role === 'admin';
+
+        // Filtrar apenas casos ENCERRADOS
+        let base = window.casosDb.filter(c => c.encerrado === true);
+        
+        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+
+        if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">📁</div><h3>Nenhum caso no arquivo morto.</h3></div>`;
+
+        base.forEach(c => {
+            let btnsAdmin = '';
+            if(isAdmin) {
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>
+                             <button class="btn btn-small btn-outline" style="color:var(--sucesso); border-color:var(--sucesso);" onclick="window.reabrirCaso('${c.id}')">🔓 Reabrir Processo</button>`;
+            }
+            
+            let andHTML = (c.andamentos||[]).slice(0,5).map((a, i) => {
+                let isRecent = i === 0 ? 'recent' : '';
+                return `<div class="tl-item ${isRecent}">
+                    <div><strong>${a.descricao}</strong></div>
+                    <div class="tl-meta">${a.data} às ${a.hora} • 👤 ${a.responsavel}</div>
+                </div>`;
+            }).join('');
+            
+            let infoProcessoHtml = '';
+            if(c.processo || c.vara) {
+                let txtP = c.processo ? `${c.processo}` : '-';
+                let txtV = c.vara || '-';
+                infoProcessoHtml = `<div class="info-grid" style="background:#f1f5f9;">
+                    <div><strong>Nº Processo CNJ</strong>${txtP}</div>
+                    <div><strong>Vara de Tramitação</strong>${txtV}</div>
+                </div>`;
+            }
+
+            let motivoColor = "#10b981"; // verde padrão para exito
+            if(c.motivoEncerramento === "Quitado") motivoColor = "#059669";
+            if(c.motivoEncerramento && c.motivoEncerramento.includes("Mora")) motivoColor = "#0284c7";
+
+            let div = document.createElement('div'); div.className = 'card';
+            div.style.backgroundColor = "#fafbfc";
+            div.innerHTML = `
+                <div class="badge-encerrado">🔒 Arquivado</div>
+                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div style="margin-top: 15px;">
+                        <span class="tag-status" style="background-color:${motivoColor}; margin-bottom:8px; display:inline-block;">Finalizado: ${c.motivoEncerramento || 'Não informado'}</span>
+                        <h3 style="margin:5px 0; color:var(--texto); font-size: 1.3rem;">${c.cliente}</h3>
+                        <p style="margin:0; font-family:monospace; color:#64748b; font-weight:600;">Contrato: ${c.contrato}</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar Ficha</button>
+                        ${btnsAdmin}
+                    </div>
+                </div>
+                
+                ${infoProcessoHtml}
+                
+                <div class="timeline">${andHTML}</div>
             `;
             container.appendChild(div);
         });
@@ -1004,31 +1145,32 @@
 
     window.renderizarRelatorios = function() {
         if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
-        let total = window.casosDb.length;
+        
+        let ativos = window.casosDb.filter(c => c.encerrado !== true);
+        let encerrados = window.casosDb.filter(c => c.encerrado === true);
+        
+        let totalAtivos = ativos.length;
         
         let faseMandadoId = STATUS_PHASES.findIndex(f => f.id === 'Mandado Expedido');
         
-        let expedidos = 0; let encerramentosExito = 0; let agil = 0, atencao = 0, criticos = 0; let comarcasMap = {};
+        let expedidos = 0; let encerramentosExito = encerrados.length; // Como todas as opções de encerramento são êxito processual/negocial
+        let agil = 0, atencao = 0, criticos = 0; let comarcasMap = {};
 
         window.casosDb.forEach(c => {
-            let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === c.status);
-            if(idxFaseAtual >= faseMandadoId) expedidos++;
-            
-            // Conta processos com êxito
-            if(['Apreendido', 'Devolução Amigável', 'Acordo Realizado', 'Quitado', 'Parcelas Pagas (Mora)'].includes(c.status)) {
-                encerramentosExito++;
-            }
+            if(c.encerrado !== true) {
+                let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === c.status);
+                if(idxFaseAtual >= faseMandadoId) expedidos++;
 
-            let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
-            let comarcaNome = (c.comarcaReq && c.comarcaReq.trim() !== '') ? c.comarcaReq.trim() : ((c.comarcaOrigem && c.comarcaOrigem.trim() !== '') ? c.comarcaOrigem.trim() : 'Sem Comarca');
+                let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
+                if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
+            }
             
+            let comarcaNome = (c.comarcaReq && c.comarcaReq.trim() !== '') ? c.comarcaReq.trim() : ((c.comarcaOrigem && c.comarcaOrigem.trim() !== '') ? c.comarcaOrigem.trim() : 'Sem Comarca');
             if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
             comarcasMap[comarcaNome].total++;
-
-            if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
         });
 
-        document.getElementById('dash-total').innerText = total; 
+        document.getElementById('dash-total').innerText = totalAtivos; 
         document.getElementById('dash-mandados').innerText = expedidos;
         document.getElementById('dash-apreendidos').innerText = encerramentosExito;
         
@@ -1041,7 +1183,7 @@
         const ctxStatus = document.getElementById('chartStatus'); const ctxComarcas = document.getElementById('chartComarcas');
         if(chartStatusInstance) chartStatusInstance.destroy(); if(chartComarcasInstance) chartComarcasInstance.destroy();
 
-        if(ctxStatus && total > 0) {
+        if(ctxStatus && totalAtivos > 0) {
             chartStatusInstance = new Chart(ctxStatus, {
                 type: 'doughnut',
                 data: { labels: ['No Prazo', 'Atenção (>7d)', 'Crítico (>15d)'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
