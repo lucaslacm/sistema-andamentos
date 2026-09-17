@@ -80,6 +80,7 @@
         .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, var(--azul) 0%, var(--azul-escuro) 100%); }
         .auth-box { background: var(--fundo-card); padding: 40px; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--laranja); }
         .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.5rem; font-weight: 700; }
+        #error-msg { color: var(--erro); background: #fee2e2; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; display: none; text-align: left; }
         
         /* Layout Principal */
         #app-screen { display: none; height: 100vh; display: flex; width: 100vw; }
@@ -116,7 +117,7 @@
         .top-bar h2 { margin: 0; font-size: 1.4rem; color: var(--azul); font-weight: 700; letter-spacing: -0.5px; }
         
         /* Cards (Lista) */
-        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; }
+        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; transition: all 0.2s; }
         .tag-status { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; margin: 10px 0; border: 1px dashed var(--borda); font-size: 0.85rem; }
@@ -151,7 +152,7 @@
         .kanban-cards { padding: 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
         
         .k-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--borda); transition: 0.2s; position: relative; }
-        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transform: scale(0.97) rotate(1deg); border-color: var(--laranja); z-index: 100; }
+        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transform: scale(0.97) rotate(1deg); z-index: 100; }
         .k-card h4 { margin: 0 0 5px 0; color: var(--azul); font-size: 0.9rem; line-height: 1.2; }
         .k-card .k-meta { margin-top: 8px; font-size: 0.7rem; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 8px; }
 
@@ -169,7 +170,7 @@
         
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 1px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 2px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
         td { padding: 12px 15px; border-bottom: 1px solid var(--borda); color: var(--texto); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto; padding: 20px; }
@@ -201,6 +202,15 @@
         .badge-encerrado { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 5px; }
         
         #loading { display: none; background: #fff3cd; color: #856404; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #ffeeba; }
+        
+        /* EFEITO DE URGENCIA PARA VEICULOS LOCALIZADOS */
+        @keyframes pulseAlert {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+            70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .urgente-highlight { border: 2px solid var(--erro) !important; background-color: #fef2f2 !important; }
+        .urgente-badge { background-color: var(--erro); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; animation: pulseAlert 2s infinite; display: inline-block; margin-bottom: 8px; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -441,7 +451,7 @@
         </div>
         
         <div class="form-group">
-            <label>Status / Fase Atual</label>
+            <label>Status / Fase Atual do Processo</label>
             <select id="novo-status">
                 <option value="Aguardando recolhimento das custas iniciais">Aguardando recolhimento das custas iniciais</option>
                 <option value="Aguardando distribuição da ação">Aguardando distribuição da ação</option>
@@ -461,6 +471,17 @@
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
+        
+        <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;">
+            <label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+                🚨 MARCAR COMO VEÍCULO LOCALIZADO (URGENTE)
+            </label>
+            <p style="margin: 5px 0 0 28px; font-size: 0.7rem; color: #991b1b; text-transform: none; font-weight: 500;">
+                Ative esta opção se já souber onde o veículo está, <b>independentemente do status atual do processo</b> (Aguardando Liminar, Custas, etc). O caso ficará destacado em vermelho no topo das listas.
+            </p>
+        </div>
+
         <div class="form-group"><label>Observações Iniciais</label><textarea id="novo-obs" placeholder="Detalhes adicionais do caso..."></textarea></div>
         <button class="btn btn-primary" style="width: 100%; padding: 12px;" id="btn-salvar-caso" onclick="window.salvarCasoFull()">Salvar Ficha</button>
     </div>
@@ -661,7 +682,7 @@ Guarde essas informações.`);
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
-        if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
+        if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
         alert(`✅ Conta gerada com sucesso!
 
@@ -825,11 +846,24 @@ SENHA TEMP: ${senhaTemp}`);
         container.innerHTML = html;
     };
 
+    window.abrirModalNovoCaso = function() {
+        document.getElementById('novo-caso-id').value = ''; document.getElementById('novo-contrato').value = '';
+        document.getElementById('novo-cliente').value = ''; document.getElementById('novo-processo').value = '';
+        document.getElementById('novo-vara').value = ''; document.getElementById('novo-comarca-origem').value = '';
+        document.getElementById('novo-comarca-req').value = ''; document.getElementById('novo-obs').value = '';
+        document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais';
+        document.getElementById('novo-is-localizado').checked = false;
+        
+        document.getElementById('novo-status').disabled = false;
+        window.openModal('modal-novo-caso');
+    };
+
     window.salvarCasoFull = async function() {
         const btn = document.getElementById('btn-salvar-caso');
         btn.innerText = "Salvando..."; btn.disabled = true;
 
         const idCaso = document.getElementById('novo-caso-id').value;
+        const isLoc = document.getElementById('novo-is-localizado').checked;
         const payload = {
             contrato: document.getElementById('novo-contrato').value.trim(),
             cliente: document.getElementById('novo-cliente').value.trim().toUpperCase(),
@@ -838,7 +872,8 @@ SENHA TEMP: ${senhaTemp}`);
             comarcaOrigem: document.getElementById('novo-comarca-origem').value.trim(),
             comarcaReq: document.getElementById('novo-comarca-req').value.trim(),
             obs: document.getElementById('novo-obs').value.trim(),
-            status: document.getElementById('novo-status').value
+            status: document.getElementById('novo-status').value,
+            isLocalizado: isLoc
         };
         
         if (!payload.contrato || !payload.cliente) { 
@@ -854,11 +889,23 @@ SENHA TEMP: ${senhaTemp}`);
                     hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
+                // Adicionar tracking se ele foi marcado como localizado agora
+                if(isLoc && casoAtual.isLocalizado !== true) {
+                    let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
+                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    payload.andamentos = hist;
+                }
+                
                 await updateDoc(doc(db, "casos", idCaso), payload);
             } else {
                 payload.mesRegistro = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
                 payload.criadoPor = window.usuarioLogado.nome; payload.mandadoExpedido = false; payload.valorComissao = 0; payload.ultimaAnaliseData = ""; payload.andamentos = []; payload.timestamp = Date.now(); payload.dataStatus = Date.now();
                 payload.encerrado = false;
+                
+                if(isLoc) {
+                    payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                }
+                
                 await addDoc(collection(db, "casos"), payload);
             }
             
@@ -867,7 +914,7 @@ SENHA TEMP: ${senhaTemp}`);
             document.getElementById('novo-comarca-origem').value = ''; document.getElementById('novo-comarca-req').value = '';
             document.getElementById('novo-obs').value = '';
             window.closeModal('modal-novo-caso');
-        } catch(e) { alert("Erro ao salvar. Verifique a conexão."); }
+        } catch(e) { alert("Erro ao salvar. Verifique a conexão."); console.error(e); }
         btn.innerText = "Salvar Ficha"; btn.disabled = false;
     };
 
@@ -878,6 +925,7 @@ SENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-processo').value = c.processo || ''; document.getElementById('novo-vara').value = c.vara || '';
         document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
         document.getElementById('novo-obs').value = c.obs || ''; 
+        document.getElementById('novo-is-localizado').checked = c.isLocalizado === true;
         
         let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
         if (st === 'Localizado') st = 'Veículo Localizado';
@@ -1014,7 +1062,16 @@ SENHA TEMP: ${senhaTemp}`);
             document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
         });
 
-        window.casosDb.filter(c => c.encerrado !== true).forEach(c => {
+        let kanbanBase = window.casosDb.filter(c => c.encerrado !== true);
+        
+        // ORDENAÇÃO: Casos LOCALIZADOS sempre aparecem no topo de qualquer coluna!
+        kanbanBase.sort((a, b) => {
+            if(a.isLocalizado && !b.isLocalizado) return -1;
+            if(!a.isLocalizado && b.isLocalizado) return 1;
+            return 0;
+        });
+
+        kanbanBase.forEach(c => {
             let statusStr = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
             if (statusStr === 'Localizado') statusStr = 'Veículo Localizado';
 
@@ -1034,10 +1091,14 @@ SENHA TEMP: ${senhaTemp}`);
 
                 const clienteFormatado = c.cliente || 'Sem Cliente';
                 const contratoFormatado = c.contrato || 'Sem Contrato';
+                
+                let isLocBadge = c.isLocalizado ? `<div class="urgente-badge">🚨 LOCALIZADO</div>` : '';
+                let cardClass = c.isLocalizado ? `k-card urgente-highlight ${isAdmin ? 'draggable' : ''}` : `k-card ${isAdmin ? 'draggable' : ''}`;
 
                 col.innerHTML += `
-                    <div class="k-card ${isAdmin ? 'draggable' : ''}" ${dragAttr} style="${cursorStyle}">
+                    <div class="${cardClass}" ${dragAttr} style="${cursorStyle}">
                         <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${statusStr}</div>
+                        ${isLocBadge}
                         <h4 onclick="window.abrirModalEditarCaso('${c.id}')" style="cursor:pointer;">${clienteFormatado}</h4>
                         <p>${contratoFormatado}</p>
                         ${c.processo ? `<p style="color:var(--info); font-size:0.7rem; margin-top:2px;">${c.processo} <span style="cursor:pointer" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span></p>` : ''}
@@ -1045,6 +1106,7 @@ SENHA TEMP: ${senhaTemp}`);
                     </div>`;
             }
         });
+        
         STATUS_PHASES.forEach(f => {
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
             if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length;
@@ -1075,6 +1137,13 @@ SENHA TEMP: ${senhaTemp}`);
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
         if(document.getElementById('filtro-mes').value !== 'todos') base = base.filter(c => c.mesRegistro === document.getElementById('filtro-mes').value);
         if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+
+        // ORDENAÇÃO: Casos LOCALIZADOS sempre aparecem no topo!
+        base.sort((a, b) => {
+            if(a.isLocalizado && !b.isLocalizado) return -1;
+            if(!a.isLocalizado && b.isLocalizado) return 1;
+            return 0;
+        });
 
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🧹</div><h3>Nenhum processo ativo encontrado!</h3></div>`;
 
@@ -1129,10 +1198,14 @@ SENHA TEMP: ${senhaTemp}`);
             const contratoFormatado = c.contrato || 'Sem Contrato';
             const infoCriador = c.criadoPor ? ` | 👤 Cadastrado por: ${c.criadoPor}` : '';
 
-            let div = document.createElement('div'); div.className = 'card';
+            let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px;">🚨 VEÍCULO LOCALIZADO</span>` : '';
+            let cardClass = c.isLocalizado ? 'card urgente-highlight' : 'card';
+
+            let div = document.createElement('div'); div.className = cardClass;
             div.innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
                     <div>
+                        ${isLocBadge}
                         <span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span>
                         <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${clienteFormatado}</h3>
                         <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${contratoFormatado}${infoCriador}</p>
@@ -1202,6 +1275,8 @@ SENHA TEMP: ${senhaTemp}`);
 
             const clienteFormatado = c.cliente || 'Sem Cliente';
             const contratoFormatado = c.contrato || 'Sem Contrato';
+            
+            let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px; background-color: #64748b; animation: none;">VEÍCULO ESTAVA LOCALIZADO</span>` : '';
 
             let div = document.createElement('div'); div.className = 'card';
             div.style.backgroundColor = "#fafbfc";
@@ -1209,6 +1284,7 @@ SENHA TEMP: ${senhaTemp}`);
                 <div class="badge-encerrado">🔒 Arquivado</div>
                 <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
                     <div style="margin-top: 15px;">
+                        ${isLocBadge}
                         <span class="tag-status" style="background-color:${motivoColor}; margin-bottom:8px; display:inline-block;">Finalizado: ${c.motivoEncerramento || 'Não informado'}</span>
                         <h3 style="margin:5px 0; color:var(--texto); font-size: 1.3rem;">${clienteFormatado}</h3>
                         <p style="margin:0; font-family:monospace; color:#64748b; font-weight:600;">Contrato: ${contratoFormatado}</p>
