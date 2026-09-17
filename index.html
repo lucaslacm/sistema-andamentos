@@ -1163,14 +1163,13 @@ SENHA TEMP: ${senhaTemp}`);
             }
             
             const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            let andHTML = arr.slice(0,4).map((a, i) => {
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && a.descricao.includes('Mandado Faturado')));
+            
+            let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => {
                 let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}', ${a.id})" title="Excluir">✖</span>` : '';
                 let isRecent = i === 0 ? 'recent' : '';
                 
                 let descFormatada = a.descricao || '';
-                if(!isAdmin && descFormatada.includes('Comissão autorizada:')) {
-                    descFormatada = descFormatada.replace(/Comissão autorizada: R\$ [0-9,.]+/, '(Valor oculto - Restrito à Gestão)');
-                }
                 
                 return `<div class="tl-item ${isRecent}">
                     <div><strong>${descFormatada}</strong> ${dBtn}</div>
@@ -1251,7 +1250,9 @@ SENHA TEMP: ${senhaTemp}`);
             }
             
             const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            let andHTML = arr.slice(0,5).map((a, i) => {
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && a.descricao.includes('Mandado Faturado')));
+            
+            let andHTML = andamentosVisiveis.slice(0,5).map((a, i) => {
                 let isRecent = i === 0 ? 'recent' : '';
                 return `<div class="tl-item ${isRecent}">
                     <div><strong>${a.descricao || ''}</strong></div>
