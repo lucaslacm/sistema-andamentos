@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle - Omni (Online Firebase)</title>
+    <title>Painel de Controle - Omni (Completo)</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root {
@@ -90,7 +91,6 @@
         /* Main Content */
         main { flex: 1; display: flex; flex-direction: column; background: var(--fundo); position: relative; overflow: hidden; }
         
-        /* Top Header Area (For Notifs) */
         .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: var(--branco); border-bottom: 1px solid var(--borda); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
         .notif-bell { position: relative; cursor: pointer; font-size: 1.5rem; padding: 5px; }
         .notif-badge { position: absolute; top: 0; right: -5px; background: var(--erro); color: white; font-size: 0.65rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; display: none; }
@@ -119,6 +119,17 @@
         .k-card h4 { margin: 0 0 5px 0; color: var(--azul); font-size: 0.9rem; }
         .k-card p { margin: 0; color: var(--texto-claro); font-size: 0.75rem; }
         .k-card .k-meta { margin-top: 8px; font-size: 0.7rem; color: #94a3b8; display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 5px; }
+
+        /* Dashboard e Financeiro Grids */
+        .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .dash-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; overflow: hidden; border: 1px solid var(--borda); }
+        .dash-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
+        .dash-card.primary::after { background: linear-gradient(90deg, var(--azul), #2563eb); }
+        .dash-card.success::after { background: linear-gradient(90deg, #10b981, #059669); }
+        .dash-card.warning::after { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .dash-card h4 { margin: 0 0 10px 0; color: var(--texto-claro); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .dash-card .number { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--azul); line-height: 1; }
+        .chart-container { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--borda); margin-bottom: 20px; }
 
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
@@ -169,7 +180,7 @@
         <div class="form-group"><label>Usuário</label><input type="text" id="reg-username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="reg-password"></div>
         <div class="form-group"><label>Perfil</label>
-            <select id="reg-role"><option value="admin">Administrador (Ver Alertas IA)</option><option value="cadastro">Equipe Externa</option></select>
+            <select id="reg-role"><option value="admin">Administrador (Total Acesso)</option><option value="cadastro">Equipe Externa</option></select>
         </div>
         <button class="btn btn-primary" style="width: 100%;" onclick="window.doRegister()">Cadastrar</button>
         <div class="auth-toggle">Já tem uma conta? <a onclick="window.toggleAuth()">Fazer Login</a></div>
@@ -191,20 +202,21 @@
         <nav>
             <div class="nav-item active" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
             <div class="nav-item" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos e Andamentos</div>
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">📊 Dashboard Gerencial</div>
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">💰 Financeiro</div>
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">👥 Gestão de Equipe</div>
             <div class="nav-item" onclick="window.doLogout()" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);">🚪 Sair</div>
         </nav>
     </aside>
     
     <main>
-        <!-- TOPO (NOTIFICAÇÕES) -->
+        <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.2rem; font-weight: 600; color: var(--azul);">SGI - Banco de Dados Online</div>
             <div style="display: flex; gap: 20px; align-items: center;">
-                <!-- Sino de Notificações do Copiloto IA -->
                 <div class="notif-bell admin-only" onclick="window.abrirModalCopiloto()" title="Copiloto IA - Alertas" style="display:none;">
                     🤖 Copiloto <span class="notif-badge" id="notif-badge">0</span>
                 </div>
-                
                 <button class="btn btn-small btn-primary" style="border:none;" onclick="window.abrirModalNovoCaso()">➕ Novo Caso</button>
             </div>
         </header>
@@ -215,36 +227,79 @@
         <div id="tab-kanban" class="tab-content kanban-active active">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2 style="font-size: 1.4rem;">Quadro de Fluxo (Kanban)</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases. Salvo na nuvem.</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases.</div>
             </div>
-            <div class="kanban-wrapper" id="kanban-board-container">
-                <!-- Colunas Geradas via JS -->
-            </div>
+            <div class="kanban-wrapper" id="kanban-board-container"></div>
         </div>
 
         <!-- ABA 1: CASOS (LISTA) -->
         <div id="tab-casos" class="tab-content">
-            <div class="top-bar">
-                <h2>Todos os Casos</h2>
-            </div>
+            <div class="top-bar"><h2>Todos os Casos</h2></div>
             <div id="cases-container"></div>
+        </div>
+
+        <!-- ABA 2: DASHBOARD (ADMIN) -->
+        <div id="tab-relatorios" class="tab-content">
+            <div class="top-bar">
+                <h2>Dashboard Gerencial</h2>
+                <button class="btn btn-outline" onclick="window.exportarRelatorioMestre()">📥 Exportar Relatório Excel</button>
+            </div>
+            <div class="dash-grid">
+                <div class="dash-card primary"><h4>Total de Casos</h4><p class="number" id="dash-total">0</p></div>
+                <div class="dash-card success"><h4>Mandados Expedidos</h4><p class="number" id="dash-mandados">0</p></div>
+                <div class="dash-card warning"><h4>Atenção (>7 dias parado)</h4><p class="number" id="dash-atencao">0</p></div>
+                <div class="dash-card" style="border-top-color: var(--erro);"><h4>Críticos (>15 dias parado)</h4><p class="number" id="dash-critico" style="color: var(--erro);">0</p></div>
+            </div>
+            <div class="grid-2">
+                <div class="chart-container"><h3 style="margin-top:0; font-size:1rem; color:var(--azul);">Saúde da Base</h3><div style="height:250px;"><canvas id="chartStatus"></canvas></div></div>
+                <div class="chart-container"><h3 style="margin-top:0; font-size:1rem; color:var(--azul);">Top Comarcas</h3><div style="height:250px;"><canvas id="chartComarcas"></canvas></div></div>
+            </div>
+        </div>
+
+        <!-- ABA 3: FINANCEIRO (ADMIN) -->
+        <div id="tab-financeiro" class="tab-content">
+            <div class="top-bar">
+                <h2>Faturamento e Comissões</h2>
+                <div style="display: flex; gap: 10px;">
+                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px; border-radius: 6px;"><option value="todos">Todos os meses</option></select>
+                    <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
+                </div>
+            </div>
+            <div class="card" style="border-left: 5px solid var(--sucesso); display: flex; justify-content: space-between; align-items: center; padding: 20px;">
+                <div><h3 style="margin: 0; font-size: 1.1rem;">Comissões (Mandados Faturados)</h3></div>
+                <span id="total-financeiro" style="color: var(--sucesso); font-size: 2.2rem; font-weight: 700;">R$ 0,00</span>
+            </div>
+            <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
+        </div>
+
+        <!-- ABA 4: EQUIPE (ADMIN) -->
+        <div id="tab-equipe" class="tab-content">
+            <div class="top-bar"><h2>Gestão de Equipe</h2></div>
+            <div class="card">
+                <h3 style="margin-top:0; font-size: 1rem;">➕ Novo Acesso</h3>
+                <div class="grid-2">
+                    <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome"></div>
+                    <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha"></div>
+                    <div class="form-group" style="grid-column:span 2;"><label>Perfil</label>
+                        <select id="novo-membro-role"><option value="cadastro">Equipe Externa</option><option value="admin">Administrador</option></select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
+            </div>
+            <div class="table-container"><table class="audit-table"><thead><tr><th>Usuário</th><th>Login</th><th>Perfil</th><th>Ação</th></tr></thead><tbody id="lista-equipe-container"></tbody></table></div>
         </div>
     </main>
 </div>
 
 <!-- === MODAIS === -->
-
-<!-- MODAL: NOVO/EDITAR CASO -->
 <div id="modal-novo-caso" class="modal">
     <div class="modal-content">
         <div class="modal-header"><h3>📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
         <input type="hidden" id="novo-caso-id">
-        
         <div class="grid-2">
             <div class="form-group"><label>Nº Contrato</label><input type="text" id="novo-contrato"></div>
             <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente"></div>
         </div>
-        
         <div class="form-group">
             <label>Status Inicial / Fase Atual</label>
             <select id="novo-status">
@@ -262,7 +317,6 @@
                 <option value="Acordo Realizado">Acordo Realizado</option>
             </select>
         </div>
-
         <div class="grid-2">
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req"></div>
@@ -281,7 +335,17 @@
     </div>
 </div>
 
-<!-- MODAL DO COPILOTO IA -->
+<div id="modal-mandado" class="modal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <div class="modal-header" style="border: none; padding-bottom: 0;"><h3></h3><button class="close-btn" onclick="window.closeModal('modal-mandado')">&times;</button></div>
+        <h3 style="color: var(--azul); margin-top: 0;">Faturar Mandado</h3>
+        <p style="font-size: 0.85rem; color: #64748b;">Aprovar o pagamento de comissão referente à expedição.</p>
+        <input type="hidden" id="mandado-caso-id">
+        <div class="form-group" style="text-align: left;"><label>Valor da Comissão (R$)</label><input type="number" id="mandado-valor" value="30.00" step="0.01"></div>
+        <button class="btn btn-success" style="width: 100%; padding: 12px;" onclick="window.salvarMandado()">Confirmar Lançamento</button>
+    </div>
+</div>
+
 <div id="modal-notificacoes" class="modal">
     <div class="modal-content" style="max-width: 800px;">
         <div class="modal-header">
@@ -298,13 +362,12 @@
     </div>
 </div>
 
-<!-- FIREBASE INTEGRATION (Módulo V10) -->
+<!-- FIREBASE INTEGRATION -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, doc, updateDoc, where } 
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, where } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // CHAVES DO SEU FIREBASE
     const firebaseConfig = {
         apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM",
         authDomain: "sistema-andamentos.firebaseapp.com",
@@ -318,7 +381,10 @@
     const db = getFirestore(app);
 
     window.casosDb = [];
+    window.usuariosDb = [];
     window.usuarioLogado = null;
+    let chartStatusInstance = null;
+    let chartComarcasInstance = null;
 
     const STATUS_PHASES = [
         {id: 'Aguardando recolhimento das custas iniciais', cor: 'cor-custas', borda: 'borda-custas'},
@@ -335,20 +401,17 @@
         {id: 'Acordo Realizado', cor: 'cor-acordo', borda: 'borda-acordo'}
     ];
 
-    // Verifica Sessão
     let sessao = localStorage.getItem('usuarioSessaoOmni');
-    if(sessao) {
-        window.usuarioLogado = JSON.parse(sessao);
-        mostrarPainel();
-    }
+    if(sessao) { window.usuarioLogado = JSON.parse(sessao); mostrarPainel(); }
 
-    // LISTENER EM TEMPO REAL: Casos
     onSnapshot(query(collection(db, "casos_omni"), orderBy("timestamp", "desc")), (snapshot) => {
         window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        if(window.usuarioLogado) {
-            window.renderizarGeral();
-            document.getElementById('loading').style.display = 'none';
-        }
+        if(window.usuarioLogado) { window.renderizarGeral(); document.getElementById('loading').style.display = 'none'; }
+    });
+    
+    onSnapshot(collection(db, "usuarios"), (s) => { 
+        window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); 
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') window.desenharTabelaEquipe();
     });
 
     window.toggleAuth = function() {
@@ -362,83 +425,61 @@
         const user = document.getElementById('reg-username').value.trim();
         const pass = document.getElementById('reg-password').value;
         const role = document.getElementById('reg-role').value;
-
         if (!nome || !user || !pass) return alert('Preencha todos os campos!');
-        
         const q = query(collection(db, "usuarios"), where("username", "==", user));
         const qSnap = await getDocs(q);
         if(!qSnap.empty) return alert('Este nome de usuário já está em uso na nuvem.');
-
         await addDoc(collection(db, "usuarios"), { nome, username: user, password: pass, role });
-        alert('Conta criada na nuvem com sucesso! Faça login.');
-        window.toggleAuth();
+        alert('Conta criada na nuvem com sucesso! Faça login.'); window.toggleAuth();
     };
 
     window.doLogin = async function() {
-        const user = document.getElementById('login-username').value.trim();
-        const pass = document.getElementById('login-password').value;
-        
+        const user = document.getElementById('login-username').value.trim(); const pass = document.getElementById('login-password').value;
         const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
         const qSnap = await getDocs(q);
-        
         if (!qSnap.empty) {
             window.usuarioLogado = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
-            localStorage.setItem('usuarioSessaoOmni', JSON.stringify(window.usuarioLogado));
-            mostrarPainel();
-        } else {
-            alert('Usuário ou senha incorretos no banco de dados!');
-        }
+            localStorage.setItem('usuarioSessaoOmni', JSON.stringify(window.usuarioLogado)); mostrarPainel();
+        } else alert('Usuário ou senha incorretos!');
     };
 
     function mostrarPainel() {
-        document.getElementById('auth-screen').style.display = 'none';
-        document.getElementById('app-screen').style.display = 'flex';
+        document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
         document.getElementById('user-display').innerText = window.usuarioLogado.nome;
         document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
         document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe Externa';
-        
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = window.usuarioLogado.role === 'admin' ? 'flex' : 'none');
         document.getElementById('loading').style.display = 'block';
-        
-        gerarColunasKanban();
+        gerarColunasKanban(); window.atualizarFiltros();
     }
 
-    window.doLogout = function() {
-        window.usuarioLogado = null;
-        localStorage.removeItem('usuarioSessaoOmni');
-        location.reload();
-    };
+    window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessaoOmni'); location.reload(); };
 
     window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
+        document.getElementById(tabId).classList.add('active'); document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
+        if(tabId === 'tab-relatorios') setTimeout(window.renderizarRelatorios, 100);
     };
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
     window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
     window.abrirModalCopiloto = function() { window.openModal('modal-notificacoes'); };
+    window.abrirModalMandado = function(idCaso) { document.getElementById('mandado-caso-id').value = idCaso; document.getElementById('mandado-valor').value = "30.00"; window.openModal('modal-mandado'); };
 
     window.abrirModalNovoCaso = function() {
-        document.getElementById('novo-caso-id').value = '';
-        document.getElementById('novo-contrato').value = '';
-        document.getElementById('novo-cliente').value = '';
-        document.getElementById('novo-comarca-origem').value = '';
-        document.getElementById('novo-comarca-req').value = '';
-        document.getElementById('novo-obs').value = '';
+        document.getElementById('novo-caso-id').value = ''; document.getElementById('novo-contrato').value = '';
+        document.getElementById('novo-cliente').value = ''; document.getElementById('novo-comarca-origem').value = '';
+        document.getElementById('novo-comarca-req').value = ''; document.getElementById('novo-obs').value = '';
         document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais';
         window.openModal('modal-novo-caso');
     };
 
     window.abrirModalEditarCaso = function(idCaso) {
         const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
-        document.getElementById('novo-caso-id').value = c.id;
-        document.getElementById('novo-contrato').value = c.contrato || ''; 
-        document.getElementById('novo-cliente').value = c.cliente || '';
-        document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; 
-        document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
-        document.getElementById('novo-obs').value = c.obs || ''; 
+        document.getElementById('novo-caso-id').value = c.id; document.getElementById('novo-contrato').value = c.contrato || ''; 
+        document.getElementById('novo-cliente').value = c.cliente || ''; document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; 
+        document.getElementById('novo-comarca-req').value = c.comarcaReq || ''; document.getElementById('novo-obs').value = c.obs || ''; 
         document.getElementById('novo-status').value = c.status || 'Aguardando recolhimento das custas iniciais';
         window.openModal('modal-novo-caso');
     };
@@ -458,57 +499,61 @@
         
         if(idCaso) {
             const cAtual = window.casosDb.find(x => x.id === idCaso);
-            let andamentos = cAtual.andamentos || [];
-            let dataStatus = cAtual.dataStatus;
-            
+            let andamentos = cAtual.andamentos || []; let dataStatus = cAtual.dataStatus;
             if(cAtual.status !== payload.status) {
                 dataStatus = Date.now();
                 andamentos.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
             }
-            
             await updateDoc(doc(db, "casos_omni", idCaso), { ...payload, dataStatus, andamentos });
         } else {
             await addDoc(collection(db, "casos_omni"), {
-                ...payload,
-                andamentos: [],
-                dataStatus: Date.now(),
-                timestamp: Date.now()
+                ...payload, andamentos: [], dataStatus: Date.now(), timestamp: Date.now(), mandadoExpedido: false, mesRegistro: new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' })
             });
         }
-        
         window.closeModal('modal-novo-caso');
+    };
+
+    window.excluirCaso = async function(idCaso) {
+        if(confirm("Deseja apagar este caso da nuvem?")) await deleteDoc(doc(db, "casos_omni", idCaso));
     };
 
     window.abrirModalAndamento = function(idCaso) { document.getElementById('andamento-caso-id').value = idCaso; document.getElementById('nova-acao').value = ''; window.openModal('modal-novo-andamento'); };
     
     window.salvarAndamento = async function() {
-        const idCaso = document.getElementById('andamento-caso-id').value; 
-        const acaoText = document.getElementById('nova-acao').value.trim();
+        const idCaso = document.getElementById('andamento-caso-id').value; const acaoText = document.getElementById('nova-acao').value.trim();
         if (!acaoText) return alert('Descreva!'); 
-        
-        const cAtual = window.casosDb.find(x => x.id === idCaso);
-        let andamentos = cAtual.andamentos || [];
+        const cAtual = window.casosDb.find(x => x.id === idCaso); let andamentos = cAtual.andamentos || [];
         andamentos.unshift({ id: Date.now(), descricao: acaoText, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        
-        await updateDoc(doc(db, "casos_omni", idCaso), { andamentos });
-        window.closeModal('modal-novo-andamento');
+        await updateDoc(doc(db, "casos_omni", idCaso), { andamentos }); window.closeModal('modal-novo-andamento');
     };
 
-    // KANBAN DRAG & DROP
+    // FINANCEIRO
+    window.salvarMandado = async function() {
+        const idCaso = document.getElementById('mandado-caso-id').value; const valor = parseFloat(document.getElementById('mandado-valor').value);
+        if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andamentosAtuais = casoAtual.andamentos || [];
+        andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
+        await updateDoc(doc(db, "casos_omni", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
+        window.closeModal('modal-mandado');
+    };
+
+    window.desfazerMandado = async function(idCaso) {
+        if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório financeiro.")) {
+            const casoAtual = window.casosDb.find(c => c.id === idCaso); const novosAndamentos = casoAtual.andamentos.filter(a => a.responsavel !== "SISTEMA");
+            await updateDoc(doc(db, "casos_omni", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+        }
+    };
+
+    // DRAG & DROP
     window.allowDrop = function(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
     window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
     window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
-    
     window.dropKanban = async function(ev, novoStatus) {
         ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
-        const idCaso = ev.dataTransfer.getData("caseId");
-        const cAtual = window.casosDb.find(c => c.id === idCaso);
-        
+        const idCaso = ev.dataTransfer.getData("caseId"); const cAtual = window.casosDb.find(c => c.id === idCaso);
         if(!cAtual || cAtual.status === novoStatus) return;
-
         let andamentos = cAtual.andamentos || [];
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        
         await updateDoc(doc(db, "casos_omni", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
     };
 
@@ -523,16 +568,14 @@
     }
 
     window.renderizarGeral = function() {
-        renderizarKanban();
-        renderizarCasos();
-        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') analisarRegrasCopiloto();
+        renderizarKanban(); renderizarCasos();
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { 
+            analisarRegrasCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); 
+        }
     };
 
     function renderizarKanban() {
-        STATUS_PHASES.forEach(f => {
-            const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) col.innerHTML = '';
-        });
-
+        STATUS_PHASES.forEach(f => { const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) col.innerHTML = ''; });
         window.casosDb.forEach(c => {
             const status = c.status || 'Aguardando recolhimento das custas iniciais';
             const col = document.getElementById('col-' + status.replace(/\s+/g, ''));
@@ -540,17 +583,14 @@
                 const conf = STATUS_PHASES.find(x => x.id === status) || STATUS_PHASES[0];
                 const dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
                 let diasHtml = dias > 0 ? `<span style="color:${dias > 5 ? 'var(--erro)' : 'var(--texto-claro)'};">⏱️ ${dias}d</span>` : '<span>✨ Novo</span>';
-                
                 col.innerHTML += `
                     <div class="k-card" draggable="true" ondragstart="window.dragKanban(event, '${c.id}')" onclick="window.abrirModalEditarCaso('${c.id}')">
                         <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${status}</div>
-                        <h4>${c.cliente}</h4>
-                        <p>${c.contrato}</p>
+                        <h4>${c.cliente}</h4><p>${c.contrato}</p>
                         <div class="k-meta"><span>${c.comarcaReq || c.comarcaOrigem || 'N/A'}</span>${diasHtml}</div>
                     </div>`;
             }
         });
-        
         STATUS_PHASES.forEach(f => {
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
             if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length;
@@ -559,21 +599,30 @@
 
     function renderizarCasos() {
         const container = document.getElementById('cases-container'); container.innerHTML = '';
+        const isAdmin = window.usuarioLogado.role === 'admin';
         window.casosDb.forEach(c => {
             const st = c.status || 'Aguardando recolhimento das custas iniciais'; const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
             let andHTML = (c.andamentos||[]).slice(0,3).map(a => `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data}:</strong> ${a.descricao}</div>`).join('');
             
+            let btnFaturar = ''; let btnExcluir = '';
+            if(isAdmin) {
+                btnExcluir = `<button class="btn btn-small btn-danger" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>`;
+                btnFaturar = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Faturar</button>` : `<span class="tag-status" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:0.75rem;">Faturado</span>`;
+            }
+
             let div = document.createElement('div'); div.className = 'card';
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
                     <div>
                         <span class="tag-status ${conf.cor}">${st}</span>
                         <h3 style="margin:10px 0 5px; color:var(--azul);">${c.cliente}</h3>
                         <p style="margin:0; font-family:monospace; color:var(--laranja);">${c.contrato}</p>
                     </div>
-                    <div style="text-align:right;">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        ${btnFaturar}
                         <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>
                         <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">+ Lançar Ação</button>
+                        ${btnExcluir}
                     </div>
                 </div>
                 <div style="background:#f8fafc; padding:10px; border-radius:8px;">${andHTML || '<span style="color:#94a3b8;font-size:0.85rem;">Sem andamentos.</span>'}</div>
@@ -582,45 +631,156 @@
         });
     }
 
-    function analisarRegrasCopiloto() {
-        const hoje = Date.now();
-        let alertas = [];
+    window.atualizarFiltros = function() {
+        const selFin = document.getElementById('filtro-mes-fin');
+        const mFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))].sort().reverse();
+        const aFin = selFin.value;
+        selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
+        if(mFin.includes(aFin)) selFin.value = aFin;
+    };
+
+    window.renderizarFinanceiro = function() {
+        const tbody = document.getElementById('financeiro-tbody'); tbody.innerHTML = '';
+        let base = window.casosDb.filter(c => c.mandadoExpedido === true);
+        if (document.getElementById('filtro-mes-fin').value !== 'todos') base = base.filter(c => c.mesExpedicao === document.getElementById('filtro-mes-fin').value);
+
+        let t = 0;
+        if(base.length === 0) {
+            document.getElementById('total-financeiro').innerText = `R$ 0,00`; return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">Fila financeira vazia.</td></tr>';
+        }
+        base.forEach(c => {
+            const v = parseFloat(c.valorComissao || 0); t += v;
+            let btn = `<button class="btn btn-outline btn-small" style="color:var(--erro); border-color:var(--erro);" onclick="window.desfazerMandado('${c.id}')">Estornar</button>`;
+            tbody.innerHTML += `<tr><td>${c.dataExpedicao}</td><td style="font-family:monospace;">${c.contrato}</td><td><strong>${c.cliente}</strong></td><td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td><td>${btn}</td></tr>`;
+        });
+        document.getElementById('total-financeiro').innerText = `R$ ${t.toFixed(2).replace('.',',')}`;
+    };
+
+    window.exportarExcelFinanceiro = function() {
+        let casosFin = window.casosDb.filter(c => c.mandadoExpedido === true);
+        const mesFiltro = document.getElementById('filtro-mes-fin').value;
+        if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
+        if(casosFin.length === 0) return alert("Sem comissões no período.");
+        
+        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;COMARCA;VALOR_COMISSAO
+`;
+        let total = 0;
+        casosFin.forEach(c => {
+            const v = parseFloat(c.valorComissao || 0); total += v;
+            let comarca = c.comarcaReq ? c.comarcaReq : (c.comarcaOrigem || '');
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato};${c.cliente};${comarca};${v.toFixed(2).replace('.', ',')}
+`;
+        });
+        csv += `;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
+`;
+        const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
+    };
+
+    window.renderizarRelatorios = function() {
+        let total = window.casosDb.length;
+        let expedidos = 0, agil = 0, atencao = 0, criticos = 0; let comarcasMap = {};
 
         window.casosDb.forEach(c => {
+            if(c.mandadoExpedido) expedidos++;
+            let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
+            let comarcaNome = (c.comarcaReq && c.comarcaReq.trim() !== '') ? c.comarcaReq.trim() : ((c.comarcaOrigem && c.comarcaOrigem.trim() !== '') ? c.comarcaOrigem.trim() : 'Sem Comarca');
+            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
+            comarcasMap[comarcaNome].total++;
+
+            if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
+        });
+
+        document.getElementById('dash-total').innerText = total; document.getElementById('dash-mandados').innerText = expedidos;
+        document.getElementById('dash-atencao').innerText = atencao; document.getElementById('dash-critico').innerText = criticos;
+
+        let topVol = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total })).sort((a,b) => b.casos - a.casos).slice(0, 5);
+        const ctxStatus = document.getElementById('chartStatus'); const ctxComarcas = document.getElementById('chartComarcas');
+        if(chartStatusInstance) chartStatusInstance.destroy(); if(chartComarcasInstance) chartComarcasInstance.destroy();
+
+        if(ctxStatus && total > 0) {
+            chartStatusInstance = new Chart(ctxStatus, {
+                type: 'doughnut', data: { labels: ['Ageis', 'Atenção', 'Críticos'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right' } } }
+            });
+        }
+        if(ctxComarcas && topVol.length > 0) {
+            chartComarcasInstance = new Chart(ctxComarcas, {
+                type: 'bar', data: { labels: topVol.map(c => c.nome.split(' ')[0]), datasets: [{ label: 'Processos', data: topVol.map(c => c.casos), backgroundColor: '#003986', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+        }
+    };
+
+    window.exportarRelatorioMestre = function() {
+        if(window.casosDb.length === 0) return alert("Base vazia.");
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
+        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI
+Gerado em:;${dataHoje}
+Base total:;${window.casosDb.length} processos
+
+CONTRATO;CLIENTE;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
+`;
+        window.casosDb.forEach(c => {
+            let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
+            let comarca = c.comarcaReq ? `${c.comarcaReq} (Req)` : (c.comarcaOrigem ? `${c.comarcaOrigem} (Orig)` : 'Não inf.');
+            csvFinal += `${c.contrato};${c.cliente};${comarca};${c.status};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
+`;
+        });
+        const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
+    };
+
+    window.criarMembroEquipe = async function() {
+        const nome = document.getElementById('novo-membro-nome').value.trim();
+        const senha = document.getElementById('novo-membro-senha').value.trim();
+        const role = document.getElementById('novo-membro-role').value;
+        if(!nome || !senha) return alert("Preencha o nome e a senha temporária.");
+        
+        const usernameGerado = "1593" + nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
+        if(!qSnap.empty) return alert(`O login ${usernameGerado} já existe na base.`);
+        
+        await addDoc(collection(db, "usuarios"), { nome, username: usernameGerado, password: senha, role });
+        alert(`Conta gerada!
+LOGIN: ${usernameGerado}
+SENHA: ${senha}`);
+        document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
+    };
+
+    window.desenharTabelaEquipe = function() {
+        const tbody = document.getElementById('lista-equipe-container'); if(!tbody) return;
+        let html = '';
+        window.usuariosDb.forEach(u => {
+            const badge = u.role === 'admin' ? '<span class="tag-status" style="background:#dcfce7;color:#166534;">Admin</span>' : '<span class="tag-status" style="background:#f1f5f9;color:#475569;">Equipe</span>';
+            let btnExcluir = window.usuarioLogado.id !== u.id ? `<button class="btn btn-small btn-danger" onclick="window.excluirMembroEquipe('${u.id}', '${u.nome}')">Remover</button>` : `<span style="color: #94a3b8; font-size: 0.8rem;">(Você)</span>`;
+            html += `<tr><td><strong>${u.nome}</strong></td><td style="color: var(--laranja); font-weight:600;">${u.username}</td><td>${badge}</td><td>${btnExcluir}</td></tr>`;
+        });
+        tbody.innerHTML = html;
+    };
+
+    window.excluirMembroEquipe = async function(id, nome) {
+        if(confirm(`Bloquear e apagar o acesso de ${nome}?`)) await deleteDoc(doc(db, "usuarios", id));
+    };
+
+    function analisarRegrasCopiloto() {
+        const hoje = Date.now(); let alertas = [];
+        window.casosDb.forEach(c => {
             if((c.status || 'Aguardando recolhimento das custas iniciais') === 'Liminar Deferida') {
-                let ts = c.dataStatus || hoje;
-                let dias = Math.floor((hoje - ts) / 86400000); 
+                let ts = c.dataStatus || hoje; let dias = Math.floor((hoje - ts) / 86400000); 
                 if(dias >= 5) {
-                    alertas.push({
-                        cliente: c.cliente,
-                        contrato: c.contrato,
-                        dias: dias,
-                        tipo: "🚨 Gargalo de Cartório",
-                        mensagem: "O juiz defere a liminar, mas o cartório demora a emitir. Despache com o escrivão ou chefe de secretaria para acelerar a expedição do mandado."
-                    });
+                    alertas.push({ cliente: c.cliente, contrato: c.contrato, dias: dias, tipo: "🚨 Gargalo de Cartório", mensagem: "O juiz defere a liminar, mas o cartório demora a emitir. Despache com o escrivão ou chefe de secretaria para acelerar a expedição do mandado." });
                 }
             }
         });
 
-        const bell = document.getElementById('notif-badge');
-        const tbody = document.getElementById('notif-tbody');
-        
+        const bell = document.getElementById('notif-badge'); const tbody = document.getElementById('notif-tbody');
         if(alertas.length > 0) {
-            bell.style.display = 'flex'; 
-            bell.innerText = alertas.length;
-            tbody.innerHTML = alertas.map(a => `
-                <tr>
-                    <td><strong>${a.cliente}</strong><br><span style="font-size:0.75rem;color:#64748b;">${a.contrato}</span></td>
-                    <td style="color:var(--erro); font-weight:bold; font-size:1.1rem; text-align:center;">${a.dias}</td>
-                    <td>
-                        <div style="color:var(--alerta); font-weight:bold; margin-bottom:5px;">${a.tipo}</div>
-                        <div style="font-size: 0.85rem; color:var(--texto);">${a.mensagem}</div>
-                    </td>
-                </tr>
-            `).join('');
+            bell.style.display = 'flex'; bell.innerText = alertas.length;
+            tbody.innerHTML = alertas.map(a => `<tr><td><strong>${a.cliente}</strong><br><span style="font-size:0.75rem;color:#64748b;">${a.contrato}</span></td><td style="color:var(--erro); font-weight:bold; font-size:1.1rem; text-align:center;">${a.dias}</td><td><div style="color:var(--alerta); font-weight:bold; margin-bottom:5px;">${a.tipo}</div><div style="font-size: 0.85rem; color:var(--texto);">${a.mensagem}</div></td></tr>`).join('');
         } else {
-            bell.style.display = 'none';
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--sucesso); font-weight:bold;">Tudo em dia! Sem gargalos nos processos. ✅</td></tr>';
+            bell.style.display = 'none'; tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--sucesso); font-weight:bold;">Tudo em dia! Sem gargalos nos processos. ✅</td></tr>';
         }
     }
 </script>
