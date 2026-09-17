@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle - Omni</title>
+    <title>Painel de Controle - Omni (Online Firebase)</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
@@ -133,20 +133,21 @@
         .close-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #64748b; }
         
         /* Cores das Colunas/Tags */
-        .cor-custas { background-color: var(--kb-custas); } .borda-custas { border-bottom-color: var(--kb-custas); }
-        .cor-distribuicao { background-color: var(--kb-distribuicao); } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
-        .cor-aguardando { background-color: var(--kb-aguardando); } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
-        .cor-deferida { background-color: var(--kb-deferida); } .borda-deferida { border-bottom-color: var(--kb-deferida); }
-        .cor-solic-bloq { background-color: var(--kb-solic-bloq); } .borda-solic-bloq { border-bottom-color: var(--kb-solic-bloq); }
-        .cor-bloqueado { background-color: var(--kb-bloqueado); } .borda-bloqueado { border-bottom-color: var(--kb-bloqueado); }
-        .cor-mandado { background-color: var(--kb-mandado); } .borda-mandado { border-bottom-color: var(--kb-mandado); }
-        .cor-tentando { background-color: var(--kb-tentando); color: #fff; } .borda-tentando { border-bottom-color: var(--kb-tentando); }
-        .cor-em-busca { background-color: var(--kb-em-busca); } .borda-em-busca { border-bottom-color: var(--kb-em-busca); }
-        .cor-localizado { background-color: var(--kb-localizado); } .borda-localizado { border-bottom-color: var(--kb-localizado); }
-        .cor-apreendido { background-color: var(--kb-apreendido); } .borda-apreendido { border-bottom-color: var(--kb-apreendido); }
-        .cor-acordo { background-color: var(--kb-acordo); } .borda-acordo { border-bottom-color: var(--kb-acordo); }
+        .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
+        .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
+        .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
+        .cor-deferida { background-color: var(--kb-deferida); color: white; } .borda-deferida { border-bottom-color: var(--kb-deferida); }
+        .cor-solic-bloq { background-color: var(--kb-solic-bloq); color: white; } .borda-solic-bloq { border-bottom-color: var(--kb-solic-bloq); }
+        .cor-bloqueado { background-color: var(--kb-bloqueado); color: white; } .borda-bloqueado { border-bottom-color: var(--kb-bloqueado); }
+        .cor-mandado { background-color: var(--kb-mandado); color: white; } .borda-mandado { border-bottom-color: var(--kb-mandado); }
+        .cor-tentando { background-color: var(--kb-tentando); color: white; } .borda-tentando { border-bottom-color: var(--kb-tentando); }
+        .cor-em-busca { background-color: var(--kb-em-busca); color: white; } .borda-em-busca { border-bottom-color: var(--kb-em-busca); }
+        .cor-localizado { background-color: var(--kb-localizado); color: white; } .borda-localizado { border-bottom-color: var(--kb-localizado); }
+        .cor-apreendido { background-color: var(--kb-apreendido); color: white; } .borda-apreendido { border-bottom-color: var(--kb-apreendido); }
+        .cor-acordo { background-color: var(--kb-acordo); color: white; } .borda-acordo { border-bottom-color: var(--kb-acordo); }
 
         .drop-hover { background-color: rgba(243, 112, 33, 0.05); border: 2px dashed var(--laranja); }
+        #loading { display: none; text-align: center; padding: 20px; color: var(--azul); font-weight: bold; width: 100%; margin: auto; }
     </style>
 </head>
 <body>
@@ -155,23 +156,23 @@
 <div id="auth-screen" class="auth-container">
     <div id="login-box" class="auth-box">
         <div style="font-size: 3rem; color: var(--laranja); font-weight: 900; letter-spacing: -2px; margin-bottom: 5px; line-height: 1;">omni</div>
-        <p style="color: var(--texto-claro); font-size: 0.9rem; margin-bottom: 25px;">Agente Omni</p>
+        <p style="color: var(--texto-claro); font-size: 0.9rem; margin-bottom: 25px;">Agente Omni (Nuvem)</p>
         <div class="form-group"><label>Usuário</label><input type="text" id="login-username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-password"></div>
-        <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px; padding: 12px;" onclick="doLogin()">Acessar Painel</button>
-        <div class="auth-toggle">Não tem uma conta? <a onclick="toggleAuth()">Criar conta</a></div>
+        <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
+        <div class="auth-toggle">Não tem uma conta? <a onclick="window.toggleAuth()">Criar conta</a></div>
     </div>
     
     <div id="register-box" class="auth-box" style="display: none;">
-        <h2>Criar Conta Teste</h2>
+        <h2>Criar Conta</h2>
         <div class="form-group"><label>Nome</label><input type="text" id="reg-name"></div>
         <div class="form-group"><label>Usuário</label><input type="text" id="reg-username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="reg-password"></div>
         <div class="form-group"><label>Perfil</label>
             <select id="reg-role"><option value="admin">Administrador (Ver Alertas IA)</option><option value="cadastro">Equipe Externa</option></select>
         </div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="doRegister()">Cadastrar</button>
-        <div class="auth-toggle">Já tem uma conta? <a onclick="toggleAuth()">Fazer Login</a></div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="window.doRegister()">Cadastrar</button>
+        <div class="auth-toggle">Já tem uma conta? <a onclick="window.toggleAuth()">Fazer Login</a></div>
     </div>
 </div>
 
@@ -188,31 +189,33 @@
             <div class="user-role" id="role-badge">Admin</div>
         </div>
         <nav>
-            <div class="nav-item active" onclick="switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
-            <div class="nav-item" onclick="switchTab('tab-casos')" id="nav-casos">📁 Casos e Andamentos</div>
-            <div class="nav-item" onclick="doLogout()" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);">🚪 Sair</div>
+            <div class="nav-item active" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
+            <div class="nav-item" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos e Andamentos</div>
+            <div class="nav-item" onclick="window.doLogout()" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);">🚪 Sair</div>
         </nav>
     </aside>
     
     <main>
         <!-- TOPO (NOTIFICAÇÕES) -->
         <header class="main-header">
-            <div style="font-size: 1.2rem; font-weight: 600; color: var(--azul);">SGI - Sistema de Gestão Interna</div>
+            <div style="font-size: 1.2rem; font-weight: 600; color: var(--azul);">SGI - Banco de Dados Online</div>
             <div style="display: flex; gap: 20px; align-items: center;">
                 <!-- Sino de Notificações do Copiloto IA -->
-                <div class="notif-bell admin-only" onclick="abrirModalCopiloto()" title="Copiloto IA - Alertas" style="display:none;">
+                <div class="notif-bell admin-only" onclick="window.abrirModalCopiloto()" title="Copiloto IA - Alertas" style="display:none;">
                     🤖 Copiloto <span class="notif-badge" id="notif-badge">0</span>
                 </div>
                 
-                <button class="btn btn-small btn-primary" style="border:none;" onclick="abrirModalNovoCaso()">➕ Novo Caso</button>
+                <button class="btn btn-small btn-primary" style="border:none;" onclick="window.abrirModalNovoCaso()">➕ Novo Caso</button>
             </div>
         </header>
+
+        <div id="loading">Sincronizando com a Nuvem...</div>
 
         <!-- ABA 0: KANBAN -->
         <div id="tab-kanban" class="tab-content kanban-active active">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2 style="font-size: 1.4rem;">Quadro de Fluxo (Kanban)</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases.</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases. Salvo na nuvem.</div>
             </div>
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
@@ -234,8 +237,8 @@
 <!-- MODAL: NOVO/EDITAR CASO -->
 <div id="modal-novo-caso" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>📄 Ficha do Processo</h3><button class="close-btn" onclick="closeModal('modal-novo-caso')">&times;</button></div>
-        <input type="hidden" id="novo-caso-id"> <!-- Se preenchido, é edição -->
+        <div class="modal-header"><h3>📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
+        <input type="hidden" id="novo-caso-id">
         
         <div class="grid-2">
             <div class="form-group"><label>Nº Contrato</label><input type="text" id="novo-contrato"></div>
@@ -265,16 +268,16 @@
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req"></div>
         </div>
         <div class="form-group"><label>Observações</label><textarea id="novo-obs"></textarea></div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="salvarCaso()">Salvar Ficha</button>
+        <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarCaso()">Salvar Ficha</button>
     </div>
 </div>
 
 <div id="modal-novo-andamento" class="modal">
     <div class="modal-content" style="max-width: 500px;">
-        <div class="modal-header"><h3>📝 Lançar Andamento</h3><button class="close-btn" onclick="closeModal('modal-novo-andamento')">&times;</button></div>
+        <div class="modal-header"><h3>📝 Lançar Andamento</h3><button class="close-btn" onclick="window.closeModal('modal-novo-andamento')">&times;</button></div>
         <input type="hidden" id="andamento-caso-id">
         <div class="form-group"><label>Descrição da Diligência</label><textarea id="nova-acao" placeholder="O que foi feito?"></textarea></div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="salvarAndamento()">Registrar Atividade</button>
+        <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarAndamento()">Registrar Atividade</button>
     </div>
 </div>
 
@@ -283,9 +286,9 @@
     <div class="modal-content" style="max-width: 800px;">
         <div class="modal-header">
             <h3 style="color: var(--azul); display: flex; align-items: center; gap: 10px;">🤖 Alertas Estratégicos - Copiloto IA</h3>
-            <button class="close-btn" onclick="closeModal('modal-notificacoes')">&times;</button>
+            <button class="close-btn" onclick="window.closeModal('modal-notificacoes')">&times;</button>
         </div>
-        <p style="font-size: 0.9rem; color: var(--texto-claro);">A Inteligência Artificial varreu seus processos e encontrou as seguintes oportunidades de atuação:</p>
+        <p style="font-size: 0.9rem; color: var(--texto-claro);">A Inteligência Artificial varreu seus processos na Nuvem e encontrou as seguintes oportunidades de atuação:</p>
         <div class="table-container">
             <table class="audit-table">
                 <thead><tr><th>Caso / Contrato</th><th>Dias no Status</th><th>Análise / Recomendação da IA</th></tr></thead>
@@ -295,13 +298,28 @@
     </div>
 </div>
 
-<script>
-    // BANCO DE DADOS LOCAL
-    let usuarios = JSON.parse(localStorage.getItem('db_usuarios_v4')) || [];
-    let casos = JSON.parse(localStorage.getItem('db_casos_v4')) || [];
-    let usuarioLogado = null;
+<!-- FIREBASE INTEGRATION (Módulo V10) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, doc, updateDoc, where } 
+    from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // Fases Kanban Ordem
+    // CHAVES DO SEU FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM",
+        authDomain: "sistema-andamentos.firebaseapp.com",
+        projectId: "sistema-andamentos",
+        storageBucket: "sistema-andamentos.firebasestorage.app",
+        messagingSenderId: "421431391255",
+        appId: "1:421431391255:web:fa23c4f9685b2ab2a15852"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    window.casosDb = [];
+    window.usuarioLogado = null;
+
     const STATUS_PHASES = [
         {id: 'Aguardando recolhimento das custas iniciais', cor: 'cor-custas', borda: 'borda-custas'},
         {id: 'Aguardando distribuição da ação', cor: 'cor-distribuicao', borda: 'borda-distribuicao'},
@@ -317,64 +335,92 @@
         {id: 'Acordo Realizado', cor: 'cor-acordo', borda: 'borda-acordo'}
     ];
 
-    // Auth
-    function toggleAuth() {
-        const lBox = document.getElementById('login-box'); const rBox = document.getElementById('register-box');
-        if (lBox.style.display === 'none') { lBox.style.display = 'block'; rBox.style.display = 'none'; } 
-        else { lBox.style.display = 'none'; rBox.style.display = 'block'; }
+    // Verifica Sessão
+    let sessao = localStorage.getItem('usuarioSessaoOmni');
+    if(sessao) {
+        window.usuarioLogado = JSON.parse(sessao);
+        mostrarPainel();
     }
 
-    function doRegister() {
+    // LISTENER EM TEMPO REAL: Casos
+    onSnapshot(query(collection(db, "casos_omni"), orderBy("timestamp", "desc")), (snapshot) => {
+        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if(window.usuarioLogado) {
+            window.renderizarGeral();
+            document.getElementById('loading').style.display = 'none';
+        }
+    });
+
+    window.toggleAuth = function() {
+        const l = document.getElementById('login-box'); const r = document.getElementById('register-box');
+        if(l.style.display === 'none') { l.style.display = 'block'; r.style.display = 'none'; }
+        else { l.style.display = 'none'; r.style.display = 'block'; }
+    };
+
+    window.doRegister = async function() {
         const nome = document.getElementById('reg-name').value.trim();
         const user = document.getElementById('reg-username').value.trim();
         const pass = document.getElementById('reg-password').value;
         const role = document.getElementById('reg-role').value;
+
         if (!nome || !user || !pass) return alert('Preencha todos os campos!');
-        if (usuarios.find(u => u.username === user)) return alert('Usuário já existe!');
-        usuarios.push({ nome, username: user, password: pass, role });
-        localStorage.setItem('db_usuarios_v4', JSON.stringify(usuarios));
-        alert('Conta criada!'); toggleAuth();
+        
+        const q = query(collection(db, "usuarios"), where("username", "==", user));
+        const qSnap = await getDocs(q);
+        if(!qSnap.empty) return alert('Este nome de usuário já está em uso na nuvem.');
+
+        await addDoc(collection(db, "usuarios"), { nome, username: user, password: pass, role });
+        alert('Conta criada na nuvem com sucesso! Faça login.');
+        window.toggleAuth();
+    };
+
+    window.doLogin = async function() {
+        const user = document.getElementById('login-username').value.trim();
+        const pass = document.getElementById('login-password').value;
+        
+        const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
+        const qSnap = await getDocs(q);
+        
+        if (!qSnap.empty) {
+            window.usuarioLogado = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+            localStorage.setItem('usuarioSessaoOmni', JSON.stringify(window.usuarioLogado));
+            mostrarPainel();
+        } else {
+            alert('Usuário ou senha incorretos no banco de dados!');
+        }
+    };
+
+    function mostrarPainel() {
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('app-screen').style.display = 'flex';
+        document.getElementById('user-display').innerText = window.usuarioLogado.nome;
+        document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
+        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe Externa';
+        
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = window.usuarioLogado.role === 'admin' ? 'flex' : 'none');
+        document.getElementById('loading').style.display = 'block';
+        
+        gerarColunasKanban();
     }
 
-    function doLogin() {
-        const user = document.getElementById('login-username').value.trim(); const pass = document.getElementById('login-password').value;
-        const validUser = usuarios.find(u => u.username === user && u.password === pass);
-        if (validUser) {
-            usuarioLogado = validUser;
-            document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
-            document.getElementById('user-display').innerText = usuarioLogado.nome;
-            document.getElementById('user-avatar').innerText = usuarioLogado.nome.charAt(0).toUpperCase();
-            document.getElementById('role-badge').innerText = usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe';
-            
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = usuarioLogado.role === 'admin' ? 'flex' : 'none');
-            
-            // Gerar colunas do Kanban
-            const kbContainer = document.getElementById('kanban-board-container');
-            kbContainer.innerHTML = STATUS_PHASES.map(fase => `
-                <div class="kanban-col" ondrop="dropKanban(event, '${fase.id}')" ondragover="allowDrop(event)" ondragleave="dragLeave(event)">
-                    <div class="kanban-header ${fase.borda}">${fase.id} <span class="k-count" id="count-${fase.id.replace(/\s+/g, '')}">0</span></div>
-                    <div class="kanban-cards" id="col-${fase.id.replace(/\s+/g, '')}"></div>
-                </div>
-            `).join('');
+    window.doLogout = function() {
+        window.usuarioLogado = null;
+        localStorage.removeItem('usuarioSessaoOmni');
+        location.reload();
+    };
 
-            renderizarGeral();
-        } else alert('Credenciais incorretas!');
-    }
-
-    function doLogout() { usuarioLogado = null; location.reload(); }
-
-    function switchTab(tabId) {
+    window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         document.getElementById(tabId).classList.add('active');
         document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
-    }
+    };
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function abrirModalCopiloto() { openModal('modal-notificacoes'); }
+    window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
+    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
+    window.abrirModalCopiloto = function() { window.openModal('modal-notificacoes'); };
 
-    function abrirModalNovoCaso() {
+    window.abrirModalNovoCaso = function() {
         document.getElementById('novo-caso-id').value = '';
         document.getElementById('novo-contrato').value = '';
         document.getElementById('novo-cliente').value = '';
@@ -382,11 +428,11 @@
         document.getElementById('novo-comarca-req').value = '';
         document.getElementById('novo-obs').value = '';
         document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais';
-        openModal('modal-novo-caso');
-    }
+        window.openModal('modal-novo-caso');
+    };
 
-    function abrirModalEditarCaso(idCaso) {
-        const c = casos.find(x => x.id === idCaso); if(!c) return;
+    window.abrirModalEditarCaso = function(idCaso) {
+        const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
         document.getElementById('novo-caso-id').value = c.id;
         document.getElementById('novo-contrato').value = c.contrato || ''; 
         document.getElementById('novo-cliente').value = c.cliente || '';
@@ -394,10 +440,10 @@
         document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
         document.getElementById('novo-obs').value = c.obs || ''; 
         document.getElementById('novo-status').value = c.status || 'Aguardando recolhimento das custas iniciais';
-        openModal('modal-novo-caso');
-    }
+        window.openModal('modal-novo-caso');
+    };
 
-    function salvarCaso() {
+    window.salvarCaso = async function() {
         const idCaso = document.getElementById('novo-caso-id').value;
         const payload = {
             contrato: document.getElementById('novo-contrato').value.trim(),
@@ -407,84 +453,96 @@
             obs: document.getElementById('novo-obs').value.trim(),
             status: document.getElementById('novo-status').value
         };
+        
         if (!payload.contrato || !payload.cliente) return alert('Preencha contrato e cliente!');
         
         if(idCaso) {
-            const index = casos.findIndex(c => c.id === idCaso);
-            if(casos[index].status !== payload.status) {
-                payload.dataStatus = Date.now();
-                payload.andamentos = casos[index].andamentos || [];
-                payload.andamentos.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: usuarioLogado.nome });
-            } else {
-                payload.dataStatus = casos[index].dataStatus;
-                payload.andamentos = casos[index].andamentos;
+            const cAtual = window.casosDb.find(x => x.id === idCaso);
+            let andamentos = cAtual.andamentos || [];
+            let dataStatus = cAtual.dataStatus;
+            
+            if(cAtual.status !== payload.status) {
+                dataStatus = Date.now();
+                andamentos.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
             }
-            casos[index] = { ...casos[index], ...payload };
+            
+            await updateDoc(doc(db, "casos_omni", idCaso), { ...payload, dataStatus, andamentos });
         } else {
-            payload.id = Date.now().toString();
-            payload.andamentos = [];
-            payload.dataStatus = Date.now(); // Dia que entrou no status
-            casos.unshift(payload);
+            await addDoc(collection(db, "casos_omni"), {
+                ...payload,
+                andamentos: [],
+                dataStatus: Date.now(),
+                timestamp: Date.now()
+            });
         }
         
-        localStorage.setItem('db_casos_v4', JSON.stringify(casos));
-        closeModal('modal-novo-caso');
-        renderizarGeral();
-    }
+        window.closeModal('modal-novo-caso');
+    };
 
-    function abrirModalAndamento(idCaso) { document.getElementById('andamento-caso-id').value = idCaso; document.getElementById('nova-acao').value = ''; openModal('modal-novo-andamento'); }
+    window.abrirModalAndamento = function(idCaso) { document.getElementById('andamento-caso-id').value = idCaso; document.getElementById('nova-acao').value = ''; window.openModal('modal-novo-andamento'); };
     
-    function salvarAndamento() {
-        const idCaso = document.getElementById('andamento-caso-id').value; const acaoText = document.getElementById('nova-acao').value.trim();
+    window.salvarAndamento = async function() {
+        const idCaso = document.getElementById('andamento-caso-id').value; 
+        const acaoText = document.getElementById('nova-acao').value.trim();
         if (!acaoText) return alert('Descreva!'); 
-        const index = casos.findIndex(c => c.id === idCaso);
-        casos[index].andamentos = casos[index].andamentos || [];
-        casos[index].andamentos.unshift({ id: Date.now(), descricao: acaoText, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: usuarioLogado.nome });
-        localStorage.setItem('db_casos_v4', JSON.stringify(casos));
-        closeModal('modal-novo-andamento'); renderizarGeral();
-    }
+        
+        const cAtual = window.casosDb.find(x => x.id === idCaso);
+        let andamentos = cAtual.andamentos || [];
+        andamentos.unshift({ id: Date.now(), descricao: acaoText, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+        
+        await updateDoc(doc(db, "casos_omni", idCaso), { andamentos });
+        window.closeModal('modal-novo-andamento');
+    };
 
     // KANBAN DRAG & DROP
-    function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); }
-    function dragLeave(ev) { ev.currentTarget.classList.remove('drop-hover'); }
-    function dragKanban(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); }
+    window.allowDrop = function(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
+    window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
+    window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
     
-    function dropKanban(ev, novoStatus) {
+    window.dropKanban = async function(ev, novoStatus) {
         ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
         const idCaso = ev.dataTransfer.getData("caseId");
-        const index = casos.findIndex(c => c.id === idCaso);
-        if(index === -1 || casos[index].status === novoStatus) return;
-
-        casos[index].status = novoStatus;
-        casos[index].dataStatus = Date.now(); // Reseta o tempo no status para a IA ler!
-        casos[index].andamentos = casos[index].andamentos || [];
-        casos[index].andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: usuarioLogado.nome });
+        const cAtual = window.casosDb.find(c => c.id === idCaso);
         
-        localStorage.setItem('db_casos_v4', JSON.stringify(casos));
-        renderizarGeral();
+        if(!cAtual || cAtual.status === novoStatus) return;
+
+        let andamentos = cAtual.andamentos || [];
+        andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+        
+        await updateDoc(doc(db, "casos_omni", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
+    };
+
+    function gerarColunasKanban() {
+        const kbContainer = document.getElementById('kanban-board-container');
+        kbContainer.innerHTML = STATUS_PHASES.map(fase => `
+            <div class="kanban-col" ondrop="window.dropKanban(event, '${fase.id}')" ondragover="window.allowDrop(event)" ondragleave="window.dragLeave(event)">
+                <div class="kanban-header ${fase.borda}">${fase.id} <span class="k-count" id="count-${fase.id.replace(/\s+/g, '')}">0</span></div>
+                <div class="kanban-cards" id="col-${fase.id.replace(/\s+/g, '')}"></div>
+            </div>
+        `).join('');
     }
 
-    function renderizarGeral() {
+    window.renderizarGeral = function() {
         renderizarKanban();
         renderizarCasos();
-        if(usuarioLogado && usuarioLogado.role === 'admin') analisarRegrasCopiloto();
-    }
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') analisarRegrasCopiloto();
+    };
 
     function renderizarKanban() {
         STATUS_PHASES.forEach(f => {
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) col.innerHTML = '';
         });
 
-        casos.forEach(c => {
+        window.casosDb.forEach(c => {
             const status = c.status || 'Aguardando recolhimento das custas iniciais';
             const col = document.getElementById('col-' + status.replace(/\s+/g, ''));
             if(col) {
-                const conf = STATUS_PHASES.find(x => x.id === status);
+                const conf = STATUS_PHASES.find(x => x.id === status) || STATUS_PHASES[0];
                 const dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
                 let diasHtml = dias > 0 ? `<span style="color:${dias > 5 ? 'var(--erro)' : 'var(--texto-claro)'};">⏱️ ${dias}d</span>` : '<span>✨ Novo</span>';
                 
                 col.innerHTML += `
-                    <div class="k-card" draggable="true" ondragstart="dragKanban(event, '${c.id}')" onclick="abrirModalEditarCaso('${c.id}')">
+                    <div class="k-card" draggable="true" ondragstart="window.dragKanban(event, '${c.id}')" onclick="window.abrirModalEditarCaso('${c.id}')">
                         <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${status}</div>
                         <h4>${c.cliente}</h4>
                         <p>${c.contrato}</p>
@@ -501,7 +559,7 @@
 
     function renderizarCasos() {
         const container = document.getElementById('cases-container'); container.innerHTML = '';
-        casos.forEach(c => {
+        window.casosDb.forEach(c => {
             const st = c.status || 'Aguardando recolhimento das custas iniciais'; const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
             let andHTML = (c.andamentos||[]).slice(0,3).map(a => `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data}:</strong> ${a.descricao}</div>`).join('');
             
@@ -514,8 +572,8 @@
                         <p style="margin:0; font-family:monospace; color:var(--laranja);">${c.contrato}</p>
                     </div>
                     <div style="text-align:right;">
-                        <button class="btn btn-small btn-outline" onclick="abrirModalEditarCaso('${c.id}')">✏️ Editar</button>
-                        <button class="btn btn-small btn-primary" onclick="abrirModalAndamento('${c.id}')">+ Lançar Ação</button>
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>
+                        <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">+ Lançar Ação</button>
                     </div>
                 </div>
                 <div style="background:#f8fafc; padding:10px; border-radius:8px;">${andHTML || '<span style="color:#94a3b8;font-size:0.85rem;">Sem andamentos.</span>'}</div>
@@ -524,18 +582,14 @@
         });
     }
 
-    // === REGRA DA INTELIGÊNCIA ARTIFICIAL (COPILOTO) ===
     function analisarRegrasCopiloto() {
         const hoje = Date.now();
         let alertas = [];
 
-        casos.forEach(c => {
-            // REGRA 1: GARGALO DE EXPEDIÇÃO
+        window.casosDb.forEach(c => {
             if((c.status || 'Aguardando recolhimento das custas iniciais') === 'Liminar Deferida') {
                 let ts = c.dataStatus || hoje;
-                let dias = Math.floor((hoje - ts) / 86400000); // 86400000 ms = 1 dia
-                
-                // Se estiver travado há 5 dias ou mais
+                let dias = Math.floor((hoje - ts) / 86400000); 
                 if(dias >= 5) {
                     alertas.push({
                         cliente: c.cliente,
