@@ -3,42 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle - SGI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>SGI - Agente Sete Lagoas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root {
-            --azul: #003986; 
-            --azul-escuro: #002255;
-            --laranja: #f37021; 
-            --laranja-hover: #d95e15;
-            --fundo: #f4f6f9;
+            /* Branding Agente Sete Lagoas */
+            --azul: #0f172a; 
+            --azul-escuro: #020617;
+            --laranja: #ea580c; 
+            --laranja-hover: #c2410c;
+            
+            /* UI Moderna */
+            --fundo: #f8fafc;
+            --fundo-card: #ffffff;
             --texto: #334155;
             --texto-claro: #64748b;
-            --branco: #ffffff;
             --borda: #e2e8f0;
+            
+            /* Semântica */
             --sucesso: #10b981;
             --alerta: #f59e0b;
             --erro: #ef4444;
+            --info: #3b82f6;
+            
+            /* Kanban Tags */
             --kb-custas: #ec4899;
             --kb-distribuicao: #06b6d4;
             --kb-aguardando: #94a3b8;
             --kb-deferida: #8b5cf6;
+            --kb-aguardando-mandado: #6366f1;
             --kb-solic-bloq: #f59e0b;
             --kb-bloqueado: #ef4444;
             --kb-mandado: #3b82f6;
             --kb-tentando: #eab308;
             --kb-em-busca: #f97316;
             --kb-localizado: #84cc16;
-            --kb-apreendido: #10b981;
-            --kb-acordo: #0ea5e9;
         }
         
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { margin: 0; background-color: var(--fundo); color: var(--texto); overflow: hidden; }
         
-        .btn { border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        /* Botoes */
+        .btn { border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 500; font-size: 0.85rem; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .btn-primary { background-color: var(--laranja); color: var(--branco); }
         .btn-primary:hover { background-color: var(--laranja-hover); }
@@ -46,221 +54,367 @@
         .btn-danger { background-color: #fee2e2; color: #991b1b; }
         .btn-outline { background: transparent; border: 1px solid var(--borda); color: var(--texto); }
         .btn-outline:hover { background: var(--fundo); }
-        .btn-small { padding: 6px 12px; font-size: 0.8rem; }
+        .btn-small { padding: 6px 12px; font-size: 0.75rem; }
+        .btn-icon { background: transparent; border: none; cursor: pointer; font-size: 1.1rem; color: var(--texto-claro); transition: 0.2s; padding: 2px; }
+        .btn-icon:hover { color: var(--laranja); }
         
-        .form-group { margin-bottom: 18px; text-align: left; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--azul); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid var(--borda); border-radius: 8px; font-size: 0.95rem; color: var(--texto); background: #f8fafc; transition: border 0.2s; }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--laranja); background: var(--branco); box-shadow: 0 0 0 3px rgba(243, 112, 33, 0.15); }
-        textarea { resize: vertical; min-height: 90px; }
+        /* Formulários */
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--azul); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select, textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--borda); border-radius: 6px; font-size: 0.9rem; color: var(--texto); background: #fff; transition: all 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--laranja); box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.1); }
+        textarea { resize: vertical; min-height: 80px; }
         .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
         
-        .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: linear-gradient(135deg, var(--azul) 0%, var(--azul-escuro) 100%); }
-        .auth-box { background: var(--branco); padding: 40px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 420px; text-align: center; margin: 15px; border-top: 5px solid var(--laranja); }
-        .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.8rem; font-weight: 700; }
-        .auth-toggle { margin-top: 20px; font-size: 0.9rem; color: #666; }
-        .auth-toggle a { color: var(--laranja); text-decoration: none; font-weight: 600; cursor: pointer; }
+        /* Toggle Switch */
+        .toggle-wrapper { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; color: var(--texto); font-weight: 500; background: #fff; padding: 6px 12px; border-radius: 20px; border: 1px solid var(--borda); }
+        .switch { position: relative; display: inline-block; width: 36px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--laranja); }
+        input:checked + .slider:before { transform: translateX(16px); }
         
+        /* Telas de Auth */
+        .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, var(--azul) 0%, var(--azul-escuro) 100%); }
+        .auth-box { background: var(--fundo-card); padding: 40px; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--laranja); }
+        .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.5rem; font-weight: 700; }
+        #error-msg { color: var(--erro); background: #fee2e2; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; display: none; text-align: left; }
+        
+        /* Layout Principal */
         #app-screen { display: none; height: 100vh; display: flex; width: 100vw; }
         
-        .sidebar { width: 280px; background: var(--azul); color: var(--branco); display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 10px rgba(0,0,0,0.1); z-index: 10; }
-        .sidebar-header { padding: 25px 20px; font-size: 1.5rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; }
-        .sidebar-header span { color: var(--laranja); }
-        .user-profile { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .avatar { width: 50px; height: 50px; background: var(--laranja); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; font-weight: 700; color: white; box-shadow: 0 4px 10px rgba(243, 112, 33, 0.4); }
-        .user-name { font-weight: 600; font-size: 1rem; margin-bottom: 3px; }
-        .user-role { font-size: 0.75rem; color: #cbd5e1; background: rgba(0,0,0,0.2); padding: 4px 10px; border-radius: 12px; display: inline-block; }
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--azul); color: #fff; display: flex; flex-direction: column; flex-shrink: 0; box-shadow: 4px 0 15px rgba(0,0,0,0.05); z-index: 10; }
+        .sidebar-header { padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .sidebar-header .logo { font-size: 1.6rem; color: #fff; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+        .sidebar-header .sublogo { color: var(--laranja); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         
-        nav { flex: 1; padding: 20px 0; display: flex; flex-direction: column; gap: 5px; overflow-y: auto; }
-        .nav-item { padding: 12px 25px; color: #cbd5e1; cursor: pointer; transition: all 0.2s; font-weight: 500; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; border-left: 4px solid transparent; }
-        .nav-item:hover { background: var(--azul-escuro); color: var(--branco); }
-        .nav-item.active { background: var(--azul-escuro); color: var(--branco); border-left-color: var(--laranja); }
+        .user-profile { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .avatar { width: 45px; height: 45px; background: rgba(234, 88, 12, 0.2); color: var(--laranja); border: 1px solid rgba(234, 88, 12, 0.5); border-radius: 12px; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; font-weight: 700; }
+        .user-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 3px; color: #f8fafc; }
+        .user-role { font-size: 0.7rem; color: #94a3b8; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; display: inline-block; border: 1px solid rgba(255,255,255,0.05); }
+        
+        nav { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+        .nav-item { padding: 10px 15px; color: #94a3b8; cursor: pointer; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 8px; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: var(--laranja); color: #fff; box-shadow: 0 4px 6px rgba(234, 88, 12, 0.2); }
         
         main { flex: 1; display: flex; flex-direction: column; background: var(--fundo); position: relative; overflow: hidden; }
         
-        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; background: var(--branco); border-bottom: 1px solid var(--borda); box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .notif-bell { position: relative; cursor: pointer; font-size: 1.5rem; padding: 5px; }
-        .notif-badge { position: absolute; top: 0; right: -5px; background: var(--erro); color: white; font-size: 0.65rem; font-weight: bold; width: 18px; height: 18px; border-radius: 50%; display: flex; justify-content: center; align-items: center; border: 2px solid white; display: none; }
+        .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #fff; border-bottom: 1px solid var(--borda); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .notif-badge-copiloto { background: var(--erro); color: white; font-size: 0.65rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; display: none; }
+        #loading { display: none; background: #fff3cd; color: #856404; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #ffeeba; }
         
-        .tab-content { display: none; animation: fadeIn 0.3s ease; padding: 30px 40px; overflow-y: auto; flex: 1; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; padding: 25px 30px; overflow-y: auto; flex: 1; }
         .tab-content.active { display: block; }
-        .tab-content.kanban-active.active { display: flex; flex-direction: column; overflow: hidden; }
+        
+        .tab-content.kanban-active { display: flex; flex-direction: column; padding: 20px 30px 0 30px; overflow: hidden; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .top-bar h2 { margin: 0; font-size: 1.6rem; color: var(--azul); font-weight: 700; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .top-bar h2 { margin: 0; font-size: 1.4rem; color: var(--azul); font-weight: 700; letter-spacing: -0.5px; }
         
-        .card { background: var(--branco); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 20px; border: 1px solid rgba(226, 232, 240, 0.8); }
-        .tag-status { padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        /* Cards (Lista) */
+        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; }
+        .tag-status { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
         
-        .kanban-wrapper { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; flex: 1; align-items: flex-start; }
-        .kanban-col { min-width: 280px; width: 280px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--borda); display: flex; flex-direction: column; max-height: 100%; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .kanban-header { padding: 12px 15px; font-weight: 600; border-bottom: 3px solid transparent; color: var(--texto); font-size: 0.9rem; display: flex; justify-content: space-between; align-items: center; border-radius: 12px 12px 0 0; background: #fff; }
-        .k-count { background: var(--fundo); color: var(--texto-claro); font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; }
-        .kanban-cards { padding: 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 150px; }
-        .k-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); cursor: grab; border: 1px solid var(--borda); transition: 0.2s; position: relative; }
-        .k-card:active { cursor: grabbing; box-shadow: 0 4px 8px rgba(0,0,0,0.15); transform: scale(0.98); }
-        .k-card:hover { border-color: var(--laranja); }
-        .k-card h4 { margin: 0 0 5px 0; color: var(--azul); font-size: 0.9rem; }
-        .k-card p { margin: 0; color: var(--texto-claro); font-size: 0.75rem; }
-        .k-card .k-meta { margin-top: 8px; font-size: 0.7rem; color: #94a3b8; display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 5px; }
+        .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; margin: 10px 0; border: 1px dashed var(--borda); font-size: 0.85rem; }
+        .info-grid strong { color: var(--azul); display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        
+        /* Obs Box Harmonizada */
+        .obs-box { background: #fefce8; border-left: 4px solid #facc15; padding: 12px 15px; border-radius: 4px; font-size: 0.85rem; color: #854d0e; margin: 15px 0; line-height: 1.5; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .obs-box strong { color: #a16207; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+        
+        .timeline { margin-top: 15px; border-left: 2px solid var(--borda); padding-left: 15px; position: relative; }
+        .tl-item { position: relative; margin-bottom: 12px; font-size: 0.85rem; color: var(--texto); }
+        .tl-item:last-child { margin-bottom: 0; }
+        .tl-item::before { content: ''; position: absolute; left: -21px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--borda); border: 2px solid #fff; }
+        .tl-item.recent::before { background: var(--laranja); }
+        .tl-meta { font-size: 0.7rem; color: var(--texto-claro); margin-top: 2px; }
+        
+        /* KANBAN BOARD */
+        .kanban-wrapper { 
+            display: flex; gap: 15px; overflow-x: auto; overflow-y: hidden; 
+            padding-bottom: 15px; align-items: stretch; height: calc(100vh - 160px); 
+            scroll-behavior: smooth; 
+        }
+        
+        .kanban-wrapper::-webkit-scrollbar { height: 10px; }
+        .kanban-wrapper::-webkit-scrollbar-track { background: var(--borda); border-radius: 10px; }
+        .kanban-wrapper::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        .kanban-wrapper::-webkit-scrollbar-thumb:hover { background: var(--laranja); }
+        
+        .kanban-col { min-width: 280px; width: 280px; background: #f1f5f9; border-radius: 10px; display: flex; flex-direction: column; max-height: 100%; border: 1px solid var(--borda); }
+        .kanban-header { padding: 12px 15px; font-weight: 600; border-bottom: 3px solid transparent; color: var(--azul); font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; border-radius: 10px 10px 0 0; background: #fff; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
+        .k-count { background: #e2e8f0; color: var(--texto-claro); font-size: 0.7rem; padding: 2px 8px; border-radius: 12px; font-weight: 700; }
+        .kanban-cards { padding: 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+        
+        .k-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--borda); transition: 0.2s; position: relative; }
+        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transform: scale(0.97) rotate(1deg); border-color: var(--laranja); z-index: 100; }
+        .k-card h4 { margin: 0 0 5px 0; color: var(--azul); font-size: 0.9rem; line-height: 1.2; }
+        .k-card .k-meta { margin-top: 8px; font-size: 0.7rem; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 8px; }
 
         .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 20px; }
         .dash-card { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); position: relative; overflow: hidden; border: 1px solid var(--borda); }
         .dash-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; }
-        .dash-card.primary::after { background: linear-gradient(90deg, var(--azul), #2563eb); }
+        .dash-card.primary::after { background: linear-gradient(90deg, #3b82f6, #2563eb); }
         .dash-card.success::after { background: linear-gradient(90deg, #10b981, #059669); }
         .dash-card.warning::after { background: linear-gradient(90deg, #f59e0b, #d97706); }
+        .dash-card.info::after { background: linear-gradient(90deg, #8b5cf6, #6d28d9); }
         .dash-card h4 { margin: 0 0 10px 0; color: var(--texto-claro); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .dash-card .number { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--azul); line-height: 1; }
+        
         .chart-container { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--borda); margin-bottom: 20px; }
-
+        
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 2px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; }
+        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 2px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
         td { padding: 12px 15px; border-bottom: 1px solid var(--borda); color: var(--texto); }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 34, 85, 0.7); backdrop-filter: blur(3px); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto; padding: 20px; }
-        .modal-content { background: var(--branco); padding: 30px; border-radius: 12px; width: 100%; max-width: 600px; margin: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-top: 5px solid var(--laranja); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--borda); padding-bottom: 10px; }
-        .modal-header h3 { margin: 0; color: var(--azul); font-size: 1.2rem; }
-        .close-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #64748b; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto; padding: 20px; }
+        .modal-content { background: var(--fundo-card); padding: 30px; border-radius: 12px; width: 100%; max-width: 650px; margin: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); position: relative; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--borda); }
+        .modal-header h3 { margin: 0; color: var(--azul); font-size: 1.2rem; font-weight: 700; }
+        .close-btn { background: #f1f5f9; border: none; width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: var(--texto-claro); display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .close-btn:hover { background: #e2e8f0; color: var(--erro); }
         
+        #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
+        #toast.show { visibility: visible; opacity: 1; }
+        
+        /* Cores das Colunas Kanban */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
         .cor-deferida { background-color: var(--kb-deferida); color: white; } .borda-deferida { border-bottom-color: var(--kb-deferida); }
+        .cor-aguardando-mandado { background-color: var(--kb-aguardando-mandado); color: white; } .borda-aguardando-mandado { border-bottom-color: var(--kb-aguardando-mandado); }
         .cor-solic-bloq { background-color: var(--kb-solic-bloq); color: white; } .borda-solic-bloq { border-bottom-color: var(--kb-solic-bloq); }
         .cor-bloqueado { background-color: var(--kb-bloqueado); color: white; } .borda-bloqueado { border-bottom-color: var(--kb-bloqueado); }
         .cor-mandado { background-color: var(--kb-mandado); color: white; } .borda-mandado { border-bottom-color: var(--kb-mandado); }
         .cor-tentando { background-color: var(--kb-tentando); color: white; } .borda-tentando { border-bottom-color: var(--kb-tentando); }
         .cor-em-busca { background-color: var(--kb-em-busca); color: white; } .borda-em-busca { border-bottom-color: var(--kb-em-busca); }
         .cor-localizado { background-color: var(--kb-localizado); color: white; } .borda-localizado { border-bottom-color: var(--kb-localizado); }
-        .cor-apreendido { background-color: var(--kb-apreendido); color: white; } .borda-apreendido { border-bottom-color: var(--kb-apreendido); }
-        .cor-acordo { background-color: var(--kb-acordo); color: white; } .borda-acordo { border-bottom-color: var(--kb-acordo); }
-
-        .drop-hover { background-color: rgba(243, 112, 33, 0.05); border: 2px dashed var(--laranja); }
-        #loading { display: none; text-align: center; padding: 20px; color: var(--azul); font-weight: bold; width: 100%; margin: auto; }
         
-        #error-msg { color: var(--erro); background: #fee2e2; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; display: none; text-align: left; }
+        .drop-hover { background-color: rgba(234, 88, 12, 0.05); border: 2px dashed var(--laranja); }
+        
+        /* Badge de caso encerrado */
+        .badge-encerrado { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
 <body>
 
+<div id="toast">Texto copiado para a área de transferência!</div>
+
+<!-- AUTENTICAÇÃO -->
 <div id="auth-screen" class="auth-container">
     <div id="login-box" class="auth-box">
-        <div style="font-size: 2.5rem; color: var(--laranja); font-weight: 900; letter-spacing: -2px; margin-bottom: 5px; line-height: 1;">SGI Web</div>
-        <p style="color: var(--texto-claro); font-size: 0.9rem; margin-bottom: 25px;">Acesso Integrado</p>
-        
-        <div class="form-group"><label>Usuário</label><input type="text" id="login-username"></div>
-        <div class="form-group"><label>Senha</label><input type="password" id="login-password"></div>
-        <button class="btn btn-primary" id="btn-login-submit" style="width: 100%; font-size: 1.1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
-        
+        <div style="font-size: 1.8rem; color: var(--azul); font-weight: 900; letter-spacing: -1px; margin-bottom: 5px;">
+            Agente <span style="color: var(--laranja);">Sete Lagoas</span>
+        </div>
+        <p style="color: var(--texto-claro); font-size: 0.85rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;">SGI - Acesso Restrito</p>
+        <div class="form-group"><label>Credencial de Acesso</label><input type="text" id="login-username" placeholder="Login ou Email"></div>
+        <div class="form-group"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
+        <button class="btn btn-primary" id="btn-login-submit" style="width: 100%; font-size: 1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
         <div id="error-msg"></div>
-        
-        <div class="auth-toggle">Não tem uma conta? <a onclick="window.toggleAuth()">Criar conta</a></div>
+    </div>
+
+    <div id="force-password-box" class="auth-box" style="display: none;">
+        <h2>Definir Senha</h2>
+        <p style="color: #64748b; font-size: 0.85rem; margin-bottom: 20px;">Por segurança, crie uma senha definitiva para substituir a temporária.</p>
+        <div class="form-group"><label>Nova Senha Pessoal</label><input type="password" id="nova-senha-input"></div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarNovaSenhaObrigatoria()">Salvar e Entrar</button>
     </div>
     
-    <div id="register-box" class="auth-box" style="display: none;">
-        <h2>Criar Conta</h2>
-        <div class="form-group"><label>Nome</label><input type="text" id="reg-name"></div>
-        <div class="form-group"><label>Usuário</label><input type="text" id="reg-username"></div>
-        <div class="form-group"><label>Senha</label><input type="password" id="reg-password"></div>
-        <div class="form-group"><label>Perfil</label>
-            <select id="reg-role"><option value="admin">Administrador (Total Acesso)</option><option value="cadastro">Equipe Externa</option></select>
-        </div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="window.doRegister()">Cadastrar</button>
-        <div class="auth-toggle">Já tem uma conta? <a onclick="window.toggleAuth()">Fazer Login</a></div>
+    <div id="master-admin-box" class="auth-box" style="display: none;">
+        <h2 style="color: var(--alerta);">Restauração Gestor</h2>
+        <div class="form-group"><label>Seu Nome</label><input type="text" id="master-nome"></div>
+        <div class="form-group"><label>Senha Mestra</label><input type="password" id="master-senha"></div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="window.criarAdminMestre()">Restaurar Acesso</button>
     </div>
 </div>
 
+<!-- PAINEL PRINCIPAL -->
 <div id="app-screen" style="display: none;">
+    <!-- SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <span style="font-size: 1.8rem; color: var(--laranja); font-weight: 900; letter-spacing: -1px;">SGI App</span>
+            <div class="logo">Agente<br><span style="color: var(--laranja);">Sete Lagoas</span></div>
         </div>
         <div class="user-profile">
-            <div class="avatar" id="user-avatar">U</div>
+            <div class="avatar" id="user-avatar">L</div>
             <div class="user-name" id="user-display">Usuário</div>
             <div class="user-role" id="role-badge">Admin</div>
         </div>
         <nav>
-            <div class="nav-item active" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
-            <div class="nav-item" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos e Andamentos</div>
-            <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">📊 Dashboard Gerencial</div>
-            <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">💰 Financeiro</div>
-            <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">👥 Gestão de Equipe</div>
-            <div class="nav-item" onclick="window.doLogout()" style="margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1);">🚪 Sair</div>
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-copiloto')" id="nav-copiloto" style="display: none; background-color: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.3); color: #38bdf8;">
+                <div>🤖 Copiloto IA</div>
+                <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
+            </div>
+            
+            <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">
+                <div>📁 Casos Ativos</div>
+            </div>
+            
+            <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban">
+                <div>📌 Visão Kanban</div>
+            </div>
+            
+            <div class="nav-item" onclick="window.switchTab('tab-encerrados')" id="nav-encerrados">
+                <div>🔒 Casos Encerrados</div>
+            </div>
+            
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">
+                <div>📊 Dashboard</div>
+            </div>
+            
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">
+                <div>💰 Financeiro</div>
+            </div>
+            
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">
+                <div>👥 Equipe</div>
+            </div>
         </nav>
+        <div style="padding: 20px;">
+            <button class="btn" style="width: 100%; background: rgba(255,255,255,0.05); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1);" onclick="window.doLogout()">🚪 Sair do Sistema</button>
+        </div>
     </aside>
     
     <main>
+        <!-- TOPO -->
         <header class="main-header">
-            <div style="font-size: 1.2rem; font-weight: 600; color: var(--azul);">SGI - Banco de Dados Online</div>
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <div class="notif-bell admin-only" onclick="window.abrirModalCopiloto()" title="Copiloto IA - Alertas" style="display:none;">
-                    🤖 Copiloto <span class="notif-badge" id="notif-badge">0</span>
-                </div>
-                <button class="btn btn-small btn-primary" style="border:none;" onclick="window.abrirModalNovoCaso()">➕ Novo Caso</button>
+            <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <button class="btn btn-primary" onclick="window.openModal('modal-novo-caso')">➕ Novo Processo</button>
             </div>
         </header>
 
-        <div id="loading">Conectando e Baixando Dados da Nuvem...</div>
+        <div id="loading">Baixando Dados da Nuvem...</div>
 
-        <div id="tab-kanban" class="tab-content kanban-active active">
-            <div class="top-bar" style="margin-bottom: 15px;">
-                <h2 style="font-size: 1.4rem;">Quadro de Fluxo (Kanban)</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases.</div>
+        <!-- ABA COPILOTO IA -->
+        <div id="tab-copiloto" class="tab-content">
+            <div class="top-bar">
+                <h2>🤖 Copiloto SGI - Recomendações do Dia</h2>
+                <div style="font-size: 0.85rem; color: var(--texto-claro);">A inteligência artificial identificou os seguintes pontos de atenção nos seus processos ativos.</div>
             </div>
-            <div class="kanban-wrapper" id="kanban-board-container"></div>
+            <div id="copiloto-container">
+                <!-- Cards de alertas do copiloto injetados via JS -->
+            </div>
         </div>
 
-        <div id="tab-casos" class="tab-content">
-            <div class="top-bar"><h2>Todos os Casos</h2></div>
+        <!-- ABA 1: CASOS ATIVOS (LISTA) -->
+        <div id="tab-casos" class="tab-content active">
+            <div class="top-bar">
+                <h2>Processos em Andamento</h2>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <div class="toggle-wrapper admin-only" style="display: none;">
+                        <span>Ocultar já vistos</span>
+                        <label class="switch">
+                            <input type="checkbox" id="filtro-pendentes-hoje" onchange="window.renderizarCasos()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 250px;">
+                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto;"><option value="todos">Todos os meses</option></select>
+                </div>
+            </div>
             <div id="cases-container"></div>
         </div>
 
-        <div id="tab-relatorios" class="tab-content">
-            <div class="top-bar">
-                <h2>Dashboard Gerencial</h2>
-                <button class="btn btn-outline" onclick="window.exportarRelatorioMestre()">📥 Exportar Relatório Excel</button>
+        <!-- ABA 0: KANBAN -->
+        <div id="tab-kanban" class="tab-content">
+            <div class="top-bar" style="margin-bottom: 15px;">
+                <h2>Quadro de Fluxo</h2>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
             </div>
-            <div class="dash-grid">
-                <div class="dash-card primary"><h4>Total de Casos</h4><p class="number" id="dash-total">0</p></div>
-                <div class="dash-card success"><h4>Mandados Expedidos</h4><p class="number" id="dash-mandados">0</p></div>
-                <div class="dash-card warning"><h4>Atenção (>7 dias parado)</h4><p class="number" id="dash-atencao">0</p></div>
-                <div class="dash-card" style="border-top-color: var(--erro);"><h4>Críticos (>15 dias parado)</h4><p class="number" id="dash-critico" style="color: var(--erro);">0</p></div>
-            </div>
-            <div class="grid-2">
-                <div class="chart-container"><h3 style="margin-top:0; font-size:1rem; color:var(--azul);">Saúde da Base</h3><div style="height:250px;"><canvas id="chartStatus"></canvas></div></div>
-                <div class="chart-container"><h3 style="margin-top:0; font-size:1rem; color:var(--azul);">Top Comarcas</h3><div style="height:250px;"><canvas id="chartComarcas"></canvas></div></div>
+            <div class="kanban-wrapper" id="kanban-board-container">
+                <!-- Colunas Geradas via JS -->
             </div>
         </div>
 
+        <!-- ABA NOVA: ENCERRADOS -->
+        <div id="tab-encerrados" class="tab-content">
+            <div class="top-bar">
+                <h2>Arquivo de Casos Encerrados</h2>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="search-encerrados" placeholder="🔍 Buscar caso encerrado..." onkeyup="window.renderizarEncerrados()" style="max-width: 250px;">
+                </div>
+            </div>
+            <div id="encerrados-container"></div>
+        </div>
+
+        <!-- ABA 2: DASHBOARD GERENCIAL -->
+        <div id="tab-relatorios" class="tab-content">
+            <div class="top-bar">
+                <h2>Performance Geral</h2>
+                <button class="btn btn-outline" style="border-color: var(--laranja); color: var(--laranja);" onclick="window.exportarRelatorioMestre()">📥 Exportar Relatório (Excel)</button>
+            </div>
+            
+            <div class="dash-grid">
+                <div class="dash-card primary">
+                    <h4>Processos Ativos</h4>
+                    <p class="number" id="dash-total">0</p>
+                </div>
+                <div class="dash-card info">
+                    <h4>Total de Processos Trabalhados</h4>
+                    <p class="number" id="dash-mandados">0</p>
+                    <p style="font-size:0.7rem;color:#64748b;margin-top:5px;">Mandado Expedido ou Superior</p>
+                </div>
+                <div class="dash-card success">
+                    <h4>Total de Casos Encerrados</h4>
+                    <p class="number" id="dash-apreendidos" style="color: var(--sucesso);">0</p>
+                </div>
+                <div class="dash-card warning">
+                    <h4>Taxa de Apreensão (Sucesso)</h4>
+                    <p class="number" id="dash-taxa">0%</p>
+                    <p style="font-size:0.7rem;color:#64748b;margin-top:5px;">Apreensões / Processos Trabalhados</p>
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="chart-container">
+                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📊 Fases (Ativos)</h3>
+                    <div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartStatus"></canvas></div>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">🏆 Motivos de Encerramento</h3>
+                    <div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartEncerramentos"></canvas></div>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📈 Top Comarcas</h3>
+                    <div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartComarcas"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ABA 3: FINANCEIRO -->
         <div id="tab-financeiro" class="tab-content">
             <div class="top-bar">
                 <h2>Faturamento e Comissões</h2>
                 <div style="display: flex; gap: 10px;">
-                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px; border-radius: 6px;"><option value="todos">Todos os meses</option></select>
+                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()"><option value="todos">Todos os meses</option></select>
                     <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
             </div>
             <div class="card" style="border-left: 5px solid var(--sucesso); display: flex; justify-content: space-between; align-items: center; padding: 20px;">
-                <div><h3 style="margin: 0; font-size: 1.1rem;">Comissões (Mandados Faturados)</h3></div>
+                <div><h3 style="margin: 0; font-size: 1.1rem; color: var(--texto-claro);">Comissões Aprovadas (Mês)</h3></div>
                 <span id="total-financeiro" style="color: var(--sucesso); font-size: 2.2rem; font-weight: 700;">R$ 0,00</span>
             </div>
             <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
         </div>
-
+        
+        <!-- ABA 4: EQUIPE -->
         <div id="tab-equipe" class="tab-content">
             <div class="top-bar"><h2>Gestão de Equipe</h2></div>
             <div class="card">
-                <h3 style="margin-top:0; font-size: 1rem;">➕ Novo Acesso</h3>
+                <h3 style="margin-top:0; font-size: 1rem;">➕ Adicionar Colaborador</h3>
                 <div class="grid-2">
-                    <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome"></div>
-                    <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha"></div>
-                    <div class="form-group" style="grid-column:span 2;"><label>Perfil</label>
-                        <select id="novo-membro-role"><option value="cadastro">Equipe Externa</option><option value="admin">Administrador</option></select>
+                    <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome" placeholder="Ex: João Silva"></div>
+                    <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha" placeholder="Ex: 1234"></div>
+                    <div class="form-group" style="grid-column:span 2;"><label>Perfil de Acesso</label>
+                        <select id="novo-membro-role"><option value="cadastro">Equipe (Analista - Leitura e Cadastro)</option><option value="admin">Administrador (Acesso Total)</option></select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
@@ -270,38 +424,45 @@
     </main>
 </div>
 
-<!-- MODAIS -->
+<!-- === MODAIS === -->
 <div id="modal-novo-caso" class="modal">
     <div class="modal-content">
         <div class="modal-header"><h3>📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
         <input type="hidden" id="novo-caso-id">
+        
         <div class="grid-2">
-            <div class="form-group"><label>Nº Contrato</label><input type="text" id="novo-contrato"></div>
-            <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente"></div>
+            <div class="form-group"><label>Nº Contrato</label><input type="text" id="novo-contrato" placeholder="Ex: 101593..."></div>
+            <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div>
         </div>
+        
+        <div class="grid-2">
+            <div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div>
+            <div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div>
+        </div>
+        
         <div class="form-group">
-            <label>Status Inicial / Fase Atual</label>
+            <label>Status / Fase Atual</label>
             <select id="novo-status">
                 <option value="Aguardando recolhimento das custas iniciais">Aguardando recolhimento das custas iniciais</option>
                 <option value="Aguardando distribuição da ação">Aguardando distribuição da ação</option>
                 <option value="Aguardando Liminar">Aguardando Liminar</option>
                 <option value="Liminar Deferida">Liminar Deferida</option>
+                <option value="Aguardando Mandado">Aguardando Mandado</option>
                 <option value="Solicitado Bloqueio">Solicitado Bloqueio</option>
                 <option value="Bloqueado">Bloqueado</option>
                 <option value="Mandado Expedido">Mandado Expedido</option>
                 <option value="Tentando Localização">Tentando Localização</option>
                 <option value="Em Busca">Em Busca</option>
                 <option value="Veículo Localizado">Veículo Localizado</option>
-                <option value="Apreendido">Apreendido</option>
-                <option value="Acordo Realizado">Acordo Realizado</option>
             </select>
         </div>
+
         <div class="grid-2">
-            <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem"></div>
-            <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req"></div>
+            <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
+            <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
-        <div class="form-group"><label>Observações</label><textarea id="novo-obs"></textarea></div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarCaso()">Salvar Ficha</button>
+        <div class="form-group"><label>Observações Iniciais</label><textarea id="novo-obs" placeholder="Detalhes adicionais do caso..."></textarea></div>
+        <button class="btn btn-primary" style="width: 100%; padding: 12px;" id="btn-salvar-caso" onclick="window.salvarCasoFull()">Salvar Ficha</button>
     </div>
 </div>
 
@@ -309,8 +470,45 @@
     <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header"><h3>📝 Lançar Andamento</h3><button class="close-btn" onclick="window.closeModal('modal-novo-andamento')">&times;</button></div>
         <input type="hidden" id="andamento-caso-id">
+        
+        <div class="form-group" id="div-responsavel-andamento" style="display: none; background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba;">
+            <label style="color: #856404;">Responsável pela Diligência</label>
+            <select id="nova-acao-responsavel" style="border-color: #ffeeba;">
+                <option value="Lucas">Lucas</option>
+                <option value="Bárbara">Bárbara</option>
+                <option value="Equipe Externa">Equipe Externa</option>
+            </select>
+        </div>
+
         <div class="form-group"><label>Descrição da Diligência</label><textarea id="nova-acao" placeholder="O que foi feito?"></textarea></div>
         <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarAndamento()">Registrar Atividade</button>
+    </div>
+</div>
+
+<div id="modal-encerrar" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+            <h3>🔒 Encerrar Processo</h3>
+            <button class="close-btn" onclick="window.closeModal('modal-encerrar')">&times;</button>
+        </div>
+        <input type="hidden" id="encerrar-caso-id">
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0;">O caso será movido para o arquivo de Encerrados e atualizará as estatísticas de desfecho.</p>
+        
+        <div class="form-group">
+            <label>Motivo do Encerramento</label>
+            <select id="encerrar-motivo">
+                <option value="Apreensão">Apreensão</option>
+                <option value="Entrega Amigável">Entrega Amigável</option>
+                <option value="Acordo Realizado">Acordo Realizado</option>
+                <option value="Quitado">Quitado</option>
+                <option value="Pagou parcelas em atraso (Purgação da Mora)">Pagou parcelas em atraso (Purgação da Mora)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Observação Final (Opcional)</label>
+            <textarea id="encerrar-obs" placeholder="Descreva os detalhes do encerramento (opcional)..."></textarea>
+        </div>
+        <button class="btn btn-danger" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="window.confirmarEncerramento()">Finalizar e Arquivar Caso</button>
     </div>
 </div>
 
@@ -325,256 +523,184 @@
     </div>
 </div>
 
-<div id="modal-notificacoes" class="modal">
-    <div class="modal-content" style="max-width: 800px;">
-        <div class="modal-header">
-            <h3 style="color: var(--azul); display: flex; align-items: center; gap: 10px;">🤖 Alertas Estratégicos - Copiloto IA</h3>
-            <button class="close-btn" onclick="window.closeModal('modal-notificacoes')">&times;</button>
-        </div>
-        <p style="font-size: 0.9rem; color: var(--texto-claro);">A Inteligência Artificial varreu seus processos na Nuvem e encontrou as seguintes oportunidades de atuação:</p>
-        <div class="table-container">
-            <table class="audit-table">
-                <thead><tr><th>Caso / Contrato</th><th>Dias no Status</th><th>Análise / Recomendação da IA</th></tr></thead>
-                <tbody id="notif-tbody"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, where } 
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // AS CHAVES ESTÃO INJETADAS AQUI EXATAMENTE COMO VOCÊ MANDOU
-    const firebaseConfig = {
-        apiKey: "AIzaSyAWjjd2SdSRQ1Pwm68m3LBj4uaC4k4enlM",
-        authDomain: "sistema-andamentos.firebaseapp.com",
-        projectId: "sistema-andamentos",
-        storageBucket: "sistema-andamentos.firebasestorage.app",
-        messagingSenderId: "421431391255",
-        appId: "1:421431391255:web:fa23c4f9685b2ab2a15852"
+    // AS CHAVES EXATAS INJETADAS AQUI
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAWjjd2SdSRQ1Pwm68m3LBj4uaC4k4enlM", 
+        authDomain: "sistema-andamentos.firebaseapp.com", 
+        projectId: "sistema-andamentos", 
+        storageBucket: "sistema-andamentos.firebasestorage.app", 
+        messagingSenderId: "421431391255", 
+        appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" 
     };
+    
+    const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    window.casosDb = []; window.usuariosDb = []; window.usuarioLogado = null;
-    let chartStatusInstance = null; let chartComarcasInstance = null;
+    window.casosDb = []; window.usuariosDb = []; window.usuarioLogado = null; window.usuarioPendenteTrocaSenha = null;
+    let chartStatusInstance = null; let chartComarcasInstance = null; let chartEncerramentosInstance = null;
 
     const STATUS_PHASES = [
         {id: 'Aguardando recolhimento das custas iniciais', cor: 'cor-custas', borda: 'borda-custas'},
         {id: 'Aguardando distribuição da ação', cor: 'cor-distribuicao', borda: 'borda-distribuicao'},
         {id: 'Aguardando Liminar', cor: 'cor-aguardando', borda: 'borda-aguardando'},
         {id: 'Liminar Deferida', cor: 'cor-deferida', borda: 'borda-deferida'},
+        {id: 'Aguardando Mandado', cor: 'cor-aguardando-mandado', borda: 'borda-aguardando-mandado'},
         {id: 'Solicitado Bloqueio', cor: 'cor-solic-bloq', borda: 'borda-solic-bloq'},
         {id: 'Bloqueado', cor: 'cor-bloqueado', borda: 'borda-bloqueado'},
         {id: 'Mandado Expedido', cor: 'cor-mandado', borda: 'borda-mandado'},
         {id: 'Tentando Localização', cor: 'cor-tentando', borda: 'borda-tentando'},
         {id: 'Em Busca', cor: 'cor-em-busca', borda: 'borda-em-busca'},
-        {id: 'Veículo Localizado', cor: 'cor-localizado', borda: 'borda-localizado'},
-        {id: 'Apreendido', cor: 'cor-apreendido', borda: 'borda-apreendido'},
-        {id: 'Acordo Realizado', cor: 'cor-acordo', borda: 'borda-acordo'}
+        {id: 'Veículo Localizado', cor: 'cor-localizado', borda: 'borda-localizado'}
     ];
 
-    let sessao = localStorage.getItem('usuarioSessaoSGI');
-    if(sessao) { window.usuarioLogado = JSON.parse(sessao); mostrarPainel(); }
-
-    onSnapshot(collection(db, "casos"), (snapshot) => {
-        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-        if(window.usuarioLogado) { 
-            document.getElementById('loading').style.display = 'none'; // GARANTE QUE A TELA DE CARREGAMENTO SUMA
-            try { window.renderizarGeral(); } catch(e) { console.error("Erro renderizarGeral:", e); }
-        }
-    }, (error) => {
-        console.error("Firebase Sync Error (Casos):", error);
-        document.getElementById('loading').innerHTML = `<span style="color:var(--erro);">Falha ao baixar dados. O Firebase recusou a leitura (Erro de Permissão).</span>`;
-    });
-    
-    onSnapshot(collection(db, "usuarios"), (s) => { 
-        window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); 
-        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') {
-            try { window.desenharTabelaEquipe(); } catch(e) { console.error("Erro desenhar Equipe:", e); }
-        }
-    }, (error) => {
-        console.error("Firebase Sync Error (Usuarios):", error);
-    });
-
-    window.toggleAuth = function() {
-        const l = document.getElementById('login-box'); const r = document.getElementById('register-box');
-        if(l.style.display === 'none') { l.style.display = 'block'; r.style.display = 'none'; }
-        else { l.style.display = 'none'; r.style.display = 'block'; }
+    window.copiarTexto = function(texto) {
+        if(!texto) return;
+        navigator.clipboard.writeText(texto).then(() => {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+        });
     };
 
-    window.doRegister = async function() {
-        const nome = document.getElementById('reg-name').value.trim();
-        const user = document.getElementById('reg-username').value.trim();
-        const pass = document.getElementById('reg-password').value;
-        const role = document.getElementById('reg-role').value;
-        if (!nome || !user || !pass) return alert('Preencha todos os campos!');
-        
-        try {
-            const q = query(collection(db, "usuarios"), where("username", "==", user));
-            const qSnap = await getDocs(q);
-            if(!qSnap.empty) return alert('Este nome de usuário já está em uso na nuvem.');
-            await addDoc(collection(db, "usuarios"), { nome, username: user, password: pass, role });
-            alert('Conta criada na nuvem com sucesso! Faça login.'); window.toggleAuth();
-        } catch (e) {
-            alert('Erro de Permissão (Firebase Rules).');
-            console.error(e);
-        }
+    window.abrirCriarAdminMestre = function() { document.getElementById('login-box').style.display = 'none'; document.getElementById('master-admin-box').style.display = 'block'; };
+    window.voltarLogin = function() { document.getElementById('master-admin-box').style.display = 'none'; document.getElementById('login-box').style.display = 'block'; };
+    
+    window.criarAdminMestre = async function() {
+        const nome = document.getElementById('master-nome').value.trim();
+        const senha = document.getElementById('master-senha').value;
+        if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
+        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const usernameGerado = "1593" + primeiroNome;
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
+        if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
+        await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
+        alert(`✅ Restauração Concluída!
+
+Seu Login: ${usernameGerado}
+Sua Senha: ${senha}
+
+Guarde essas informações.`);
+        document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
+        window.voltarLogin();
     };
 
     window.doLogin = async function() {
         const btn = document.getElementById('btn-login-submit');
         const err = document.getElementById('error-msg');
-        const user = document.getElementById('login-username').value.trim(); 
+        const userRaw = document.getElementById('login-username').value.trim(); 
         const pass = document.getElementById('login-password').value;
+        
+        if (userRaw.toUpperCase() === 'RESGATE') { window.abrirCriarAdminMestre(); return; }
+        if(!userRaw || !pass) return alert("Preencha as credenciais.");
+        if (userRaw.toLowerCase() !== 'lucaslacerdamatos@hotmail.com' && !userRaw.toUpperCase().startsWith('1593')) return alert('Acesso Negado 🛑');
         
         btn.innerText = "Conectando..."; err.style.display = 'none';
         
         try {
-            const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
-            const qSnap = await getDocs(q);
+            let qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw), where("password", "==", pass)));
+            if(qSnap.empty) qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toLowerCase()), where("password", "==", pass)));
+            if(qSnap.empty) qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toUpperCase()), where("password", "==", pass)));
             
             if (!qSnap.empty) {
-                window.usuarioLogado = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
-                localStorage.setItem('usuarioSessaoSGI', JSON.stringify(window.usuarioLogado)); 
-                mostrarPainel();
+                const uData = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+                if (uData.precisaTrocarSenha) { 
+                    window.usuarioPendenteTrocaSenha = uData; 
+                    document.getElementById('login-box').style.display='none'; 
+                    document.getElementById('force-password-box').style.display='block'; 
+                } else { 
+                    window.usuarioLogado = uData; 
+                    localStorage.setItem('usuarioSessao', JSON.stringify(uData)); 
+                    mostrarPainel(); 
+                }
             } else {
-                err.innerHTML = "<b>Credenciais inválidas!</b><br>Verifique se o usuário ou a senha estão corretos.";
+                err.innerHTML = "<b>Credenciais incorretas!</b>";
                 err.style.display = 'block';
             }
-        } catch (e) {
+        } catch(e) {
             console.error("ERRO FIREBASE:", e);
-            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Detalhe técnico: ${e.message}`;
+            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Verifique se a aba <b>Regras</b> do seu banco está como <i>allow read, write: if true;</i>`;
             err.style.display = 'block';
         }
         btn.innerText = "Acessar Painel";
     };
 
+    window.salvarNovaSenhaObrigatoria = async function() {
+        const novaSenha = document.getElementById('nova-senha-input').value.trim();
+        if(novaSenha.length < 4) { alert("Sua nova senha precisa ter pelo menos 4 caracteres."); return; }
+        await updateDoc(doc(db, "usuarios", window.usuarioPendenteTrocaSenha.id), { password: novaSenha, precisaTrocarSenha: false });
+        window.usuarioPendenteTrocaSenha.password = novaSenha;
+        window.usuarioPendenteTrocaSenha.precisaTrocarSenha = false;
+        window.usuarioLogado = window.usuarioPendenteTrocaSenha;
+        localStorage.setItem('usuarioSessao', JSON.stringify(window.usuarioLogado));
+        document.getElementById('force-password-box').style.display = 'none';
+        mostrarPainel();
+    };
+
+    window.doLogout = function() { 
+        window.usuarioLogado = null; 
+        localStorage.removeItem('usuarioSessao'); 
+        document.getElementById('app-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
+        document.getElementById('login-box').style.display = 'block';
+        document.getElementById('master-admin-box').style.display = 'none';
+        document.getElementById('force-password-box').style.display = 'none';
+        document.getElementById('login-username').value = ''; document.getElementById('login-password').value = '';
+    };
+
+    window.criarMembroEquipe = async function() {
+        const nomeCompleto = document.getElementById('novo-membro-nome').value.trim();
+        const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
+        const role = document.getElementById('novo-membro-role').value;
+        if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
+        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const usernameGerado = "1593" + primeiroNome;
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
+        if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
+        await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
+        alert(`✅ Conta gerada com sucesso!
+
+LOGIN: ${usernameGerado}
+SENHA TEMP: ${senhaTemp}`);
+        document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
+    };
+
+    window.excluirMembroEquipe = async function(idUsuario, nomeUsuario) {
+        if(confirm(`Bloquear e apagar o acesso de ${nomeUsuario}?`)) await deleteDoc(doc(db, "usuarios", idUsuario));
+    };
+
+    window.desenharTabelaEquipe = function() {
+        if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
+        const tbody = document.getElementById('lista-equipe-container'); if(!tbody) return;
+        let html = '';
+        window.usuariosDb.forEach(u => {
+            const perfilBadge = u.role === 'admin' ? '<span class="badge" style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;">Admin</span>' : '<span class="badge" style="background:#f1f5f9;color:#475569;padding:4px 8px;border-radius:12px;">Analista</span>';
+            let btnExcluir = window.usuarioLogado.id !== u.id ? `<button class="btn btn-small btn-danger" style="padding:4px 8px;" onclick="window.excluirMembroEquipe('${u.id}', '${u.nome}')">Bloquear</button>` : `<span style="color: #94a3b8; font-size: 0.8rem;">(Você)</span>`;
+            html += `<tr><td><strong>${u.nome}</strong></td><td style="font-family: monospace; color: var(--laranja); font-size: 1rem;">${u.username}</td><td>${perfilBadge}</td><td>${btnExcluir}</td></tr>`;
+        });
+        tbody.innerHTML = html;
+    };
+
+    // INTERFACE CORE E COPILOTO
     function mostrarPainel() {
-        document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
-        document.getElementById('user-display').innerText = window.usuarioLogado.nome || 'Usuário';
-        document.getElementById('user-avatar').innerText = (window.usuarioLogado.nome || 'U').charAt(0).toUpperCase();
-        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe Externa';
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = window.usuarioLogado.role === 'admin' ? 'flex' : 'none');
+        document.getElementById('auth-screen').style.display = 'none'; 
+        document.getElementById('app-screen').style.display = 'flex';
+        document.getElementById('user-display').innerText = window.usuarioLogado.nome;
+        document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
+        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Gestor' : 'Equipe';
+        
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'flex' : 'none');
+        document.querySelector('.toggle-wrapper.admin-only').style.display = isAdmin ? 'flex' : 'none';
+        
+        document.getElementById('kb-subtitle').innerText = isAdmin ? "Arraste os cartões para atualizar as fases." : "Modo leitura (Apenas Gestão move os cartões).";
         document.getElementById('loading').style.display = 'block';
-        try { gerarColunasKanban(); window.atualizarFiltros(); } catch(e){ console.error(e); }
-    }
 
-    window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessaoSGI'); location.reload(); };
-
-    window.switchTab = function(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active'); document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
-        if(tabId === 'tab-relatorios') setTimeout(window.renderizarRelatorios, 100);
-    };
-
-    window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
-    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
-    window.abrirModalCopiloto = function() { window.openModal('modal-notificacoes'); };
-    window.abrirModalMandado = function(idCaso) { document.getElementById('mandado-caso-id').value = idCaso; document.getElementById('mandado-valor').value = "30.00"; window.openModal('modal-mandado'); };
-
-    window.abrirModalNovoCaso = function() {
-        document.getElementById('novo-caso-id').value = ''; document.getElementById('novo-contrato').value = '';
-        document.getElementById('novo-cliente').value = ''; document.getElementById('novo-comarca-origem').value = '';
-        document.getElementById('novo-comarca-req').value = ''; document.getElementById('novo-obs').value = '';
-        document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais';
-        window.openModal('modal-novo-caso');
-    };
-
-    window.abrirModalEditarCaso = function(idCaso) {
-        const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
-        document.getElementById('novo-caso-id').value = c.id; document.getElementById('novo-contrato').value = c.contrato || ''; 
-        document.getElementById('novo-cliente').value = c.cliente || ''; document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; 
-        document.getElementById('novo-comarca-req').value = c.comarcaReq || ''; document.getElementById('novo-obs').value = c.obs || ''; 
-        
-        const validStatus = STATUS_PHASES.find(f => f.id === c.status);
-        document.getElementById('novo-status').value = validStatus ? validStatus.id : 'Aguardando recolhimento das custas iniciais';
-        
-        window.openModal('modal-novo-caso');
-    };
-
-    window.salvarCaso = async function() {
-        const idCaso = document.getElementById('novo-caso-id').value;
-        const payload = {
-            contrato: document.getElementById('novo-contrato').value.trim(),
-            cliente: document.getElementById('novo-cliente').value.trim().toUpperCase(),
-            comarcaOrigem: document.getElementById('novo-comarca-origem').value.trim(),
-            comarcaReq: document.getElementById('novo-comarca-req').value.trim(),
-            obs: document.getElementById('novo-obs').value.trim(),
-            status: document.getElementById('novo-status').value
-        };
-        
-        if (!payload.contrato || !payload.cliente) return alert('Preencha contrato e cliente!');
-        
-        if(idCaso) {
-            const cAtual = window.casosDb.find(x => x.id === idCaso);
-            let andamentos = Array.isArray(cAtual.andamentos) ? cAtual.andamentos : []; 
-            let dataStatus = cAtual.dataStatus;
-            
-            if(cAtual.status !== payload.status) {
-                dataStatus = Date.now();
-                andamentos.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-            }
-            await updateDoc(doc(db, "casos", idCaso), { ...payload, dataStatus, andamentos });
-        } else {
-            await addDoc(collection(db, "casos"), {
-                ...payload, andamentos: [], dataStatus: Date.now(), timestamp: Date.now(), mandadoExpedido: false, mesRegistro: new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' })
-            });
-        }
-        window.closeModal('modal-novo-caso');
-    };
-
-    window.excluirCaso = async function(idCaso) {
-        if(confirm("Deseja apagar este caso da nuvem?")) await deleteDoc(doc(db, "casos", idCaso));
-    };
-
-    window.abrirModalAndamento = function(idCaso) { document.getElementById('andamento-caso-id').value = idCaso; document.getElementById('nova-acao').value = ''; window.openModal('modal-novo-andamento'); };
-    
-    window.salvarAndamento = async function() {
-        const idCaso = document.getElementById('andamento-caso-id').value; const acaoText = document.getElementById('nova-acao').value.trim();
-        if (!acaoText) return alert('Descreva!'); 
-        const cAtual = window.casosDb.find(x => x.id === idCaso); 
-        let andamentos = Array.isArray(cAtual.andamentos) ? cAtual.andamentos : [];
-        andamentos.unshift({ id: Date.now(), descricao: acaoText, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos", idCaso), { andamentos }); window.closeModal('modal-novo-andamento');
-    };
-
-    window.salvarMandado = async function() {
-        const idCaso = document.getElementById('mandado-caso-id').value; const valor = parseFloat(document.getElementById('mandado-valor').value);
-        if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
-        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); 
-        let andamentosAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-        andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
-        await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
-        window.closeModal('modal-mandado');
-    };
-
-    window.desfazerMandado = async function(idCaso) {
-        if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório financeiro.")) {
-            const casoAtual = window.casosDb.find(c => c.id === idCaso); 
-            let arr = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-            const novosAndamentos = arr.filter(a => a.responsavel !== "SISTEMA");
-            await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
-        }
-    };
-
-    window.allowDrop = function(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
-    window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
-    window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
-    window.dropKanban = async function(ev, novoStatus) {
-        ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
-        const idCaso = ev.dataTransfer.getData("caseId"); const cAtual = window.casosDb.find(c => c.id === idCaso);
-        if(!cAtual || cAtual.status === novoStatus) return;
-        let andamentos = Array.isArray(cAtual.andamentos) ? cAtual.andamentos : [];
-        andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
-    };
-
-    function gerarColunasKanban() {
         const kbContainer = document.getElementById('kanban-board-container');
         kbContainer.innerHTML = STATUS_PHASES.map(fase => `
             <div class="kanban-col" ondrop="window.dropKanban(event, '${fase.id}')" ondragover="window.allowDrop(event)" ondragleave="window.dragLeave(event)">
@@ -582,41 +708,331 @@
                 <div class="kanban-cards" id="col-${fase.id.replace(/\s+/g, '')}"></div>
             </div>
         `).join('');
+
+        window.switchTab('tab-casos'); window.atualizarFiltros(); 
+        try { window.renderizarGeral(); } catch(e){ console.error(e); }
+        if(isAdmin) window.desenharTabelaEquipe();
     }
 
-    window.renderizarGeral = function() {
-        try { renderizarKanban(); } catch(e) { console.error("Erro no Kanban", e); }
-        try { renderizarCasos(); } catch(e) { console.error("Erro nos Casos", e); }
+    window.switchTab = function(tabId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         
-        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { 
-            try { analisarRegrasCopiloto(); } catch(e){} 
-            try { window.renderizarFinanceiro(); } catch(e){}
-            try { window.renderizarRelatorios(); } catch(e){} 
+        const content = document.getElementById(tabId);
+        content.classList.add('active');
+        if (tabId === 'tab-kanban') content.classList.add('kanban-active');
+        else document.getElementById('tab-kanban').classList.remove('kanban-active');
+
+        const trigger = document.getElementById('nav-' + tabId.split('-')[1]); if(trigger) trigger.classList.add('active');
+        if(tabId === 'tab-relatorios') setTimeout(window.renderizarRelatorios, 100);
+    };
+
+    window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
+    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
+
+    window.renderizarGeral = function() {
+        window.renderizarCasos();
+        window.renderizarEncerrados();
+        window.renderizarKanban();
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
+    };
+
+    // --- REGRAS DO COPILOTO IA ---
+    window.renderizarCopiloto = function() {
+        if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
+        const container = document.getElementById('copiloto-container');
+        container.innerHTML = '';
+        let alertas = [];
+
+        window.casosDb.forEach(c => {
+            if(c.encerrado) return;
+
+            let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
+            let diasUltimoAndamento = (c.andamentos && c.andamentos.length > 0) 
+                ? Math.floor((Date.now() - c.andamentos[0].id) / 86400000) 
+                : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
+
+            if (c.status === 'Aguardando Liminar' && diasStatus >= 10) {
+                alertas.push({ caso: c, tipo: 'alerta', titulo: 'Liminar Atrasada', msg: `Aguardando liminar há ${diasStatus} dias. Peticione reiteração ou contate a Vara.`});
+            }
+            if (c.status === 'Em Busca' && diasStatus >= 15) {
+                alertas.push({ caso: c, tipo: 'alerta', titulo: 'Mandado sem Retorno', msg: `Oficial de Justiça com o mandado há ${diasStatus} dias sem atualização. Contate a Central de Mandados.`});
+            }
+            if (c.status === 'Bloqueado' && diasStatus >= 30) {
+                alertas.push({ caso: c, tipo: 'aviso', titulo: 'Bloqueio Ineficaz', msg: `Veículo bloqueado há ${diasStatus} dias sem apreensão. Avalie oficiar PM/PRF ou Execução.`});
+            }
+            if (diasUltimoAndamento >= 45) {
+                alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de intimação para dar andamento sob pena de extinção (Art. 485, III, CPC).`});
+            }
+
+            if (c.andamentos && c.andamentos.length > 0) {
+                let textAndamentos = c.andamentos.map(a => a.descricao.toLowerCase()).join(' ');
+                let ultimoAndamentoText = c.andamentos[0].descricao.toLowerCase();
+                
+                if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) {
+                    alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione IMEDIATAMENTE com ofício liberatório para estancar diárias.`});
+                }
+                
+                let countNegativas = (textAndamentos.match(/negativa|não encontrad|mudou|endereço incorreto/g) || []).length;
+                if (ultimoAndamentoText.match(/(negativa|não encontrad|mudou|endereço incorreto)/)) {
+                    alertas.push({ caso: c, tipo: 'aviso', titulo: 'Diligência Negativa Recente', msg: `Diligência falhou recentemente. Peça Sisbajud/Infojud/Renajud para novos endereços e bloqueio de circulação.`});
+                }
+                
+                if (countNegativas >= 3 && !textAndamentos.includes('edital')) {
+                    alertas.push({ caso: c, tipo: 'alerta', titulo: 'Esgotamento de Endereços', msg: `Detectadas múltiplas diligências negativas. Avalie requerer Citação por Edital.`});
+                }
+            }
+        });
+
+        const notifBadge = document.getElementById('notif-badge-copiloto');
+        if(notifBadge) {
+            notifBadge.innerText = alertas.length;
+            notifBadge.style.display = alertas.length > 0 ? 'flex' : 'none';
+        }
+
+        if(alertas.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🤖</div><h3>Tudo sob controle!</h3><p>A IA não encontrou nenhum gargalo nos seus processos ativos no momento.</p></div>`;
+            return;
+        }
+
+        let html = '<div class="grid-2">';
+        alertas.forEach(a => {
+            let corBorda = '#3b82f6'; let bgIcon = '#eff6ff'; let icon = '💡';
+            if(a.tipo === 'aviso') { corBorda = '#f59e0b'; bgIcon = '#fef3c7'; icon = '⚠️'; }
+            if(a.tipo === 'alerta') { corBorda = '#ea580c'; bgIcon = '#ffedd5'; icon = '⏰'; }
+            if(a.tipo === 'erro') { corBorda = '#ef4444'; bgIcon = '#fee2e2'; icon = '🚨'; }
+            if(a.tipo === 'sucesso') { corBorda = '#10b981'; bgIcon = '#d1fae5'; icon = '✅'; }
+            
+            html += `
+            <div class="card" style="border-left: 4px solid ${corBorda}; padding: 15px; margin-bottom: 0;">
+                <div style="display: flex; gap: 15px;">
+                    <div style="font-size: 1.5rem; background: ${bgIcon}; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink: 0;">${icon}</div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; color: var(--azul); font-size: 1rem;">${a.titulo}</h4>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><strong>${a.caso.cliente}</strong> (Contrato: ${a.caso.contrato})</div>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--texto); line-height: 1.4;">${a.msg}</p>
+                        <div style="margin-top: 10px; display: flex; gap: 8px;">
+                            <button class="btn btn-outline btn-small" onclick="window.abrirModalAndamento('${a.caso.id}')">Lançar Ação</button>
+                            <button class="btn btn-outline btn-small" onclick="window.abrirModalEditarCaso('${a.caso.id}')">Ver Ficha</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
+    };
+
+    window.salvarCasoFull = async function() {
+        const btn = document.getElementById('btn-salvar-caso');
+        btn.innerText = "Salvando..."; btn.disabled = true;
+
+        const idCaso = document.getElementById('novo-caso-id').value;
+        const payload = {
+            contrato: document.getElementById('novo-contrato').value.trim(),
+            cliente: document.getElementById('novo-cliente').value.trim().toUpperCase(),
+            processo: document.getElementById('novo-processo').value.trim(),
+            vara: document.getElementById('novo-vara').value.trim(),
+            comarcaOrigem: document.getElementById('novo-comarca-origem').value.trim(),
+            comarcaReq: document.getElementById('novo-comarca-req').value.trim(),
+            obs: document.getElementById('novo-obs').value.trim(),
+            status: document.getElementById('novo-status').value
+        };
+        
+        if (!payload.contrato || !payload.cliente) { 
+            alert('Preencha contrato e cliente!'); btn.innerText = "Salvar Ficha"; btn.disabled = false; return; 
+        }
+        
+        try {
+            if(idCaso) {
+                const casoAtual = window.casosDb.find(c => c.id === idCaso);
+                if(casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
+                    payload.dataStatus = Date.now();
+                    let hist = casoAtual.andamentos || [];
+                    hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    payload.andamentos = hist;
+                }
+                await updateDoc(doc(db, "casos", idCaso), payload);
+            } else {
+                payload.mesRegistro = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                payload.criadoPor = window.usuarioLogado.nome; payload.mandadoExpedido = false; payload.valorComissao = 0; payload.ultimaAnaliseData = ""; payload.andamentos = []; payload.timestamp = Date.now(); payload.dataStatus = Date.now();
+                payload.encerrado = false;
+                await addDoc(collection(db, "casos"), payload);
+            }
+            
+            document.getElementById('novo-contrato').value = ''; document.getElementById('novo-cliente').value = '';
+            document.getElementById('novo-processo').value = ''; document.getElementById('novo-vara').value = '';
+            document.getElementById('novo-comarca-origem').value = ''; document.getElementById('novo-comarca-req').value = '';
+            document.getElementById('novo-obs').value = '';
+            window.closeModal('modal-novo-caso');
+        } catch(e) { alert("Erro ao salvar. Verifique a conexão."); }
+        btn.innerText = "Salvar Ficha"; btn.disabled = false;
+    };
+
+    window.abrirModalEditarCaso = function(idCaso) {
+        const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
+        document.getElementById('novo-caso-id').value = c.id;
+        document.getElementById('novo-contrato').value = c.contrato || ''; document.getElementById('novo-cliente').value = c.cliente || '';
+        document.getElementById('novo-processo').value = c.processo || ''; document.getElementById('novo-vara').value = c.vara || '';
+        document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
+        document.getElementById('novo-obs').value = c.obs || ''; 
+        
+        const validStatus = STATUS_PHASES.find(f => f.id === c.status);
+        document.getElementById('novo-status').value = validStatus ? validStatus.id : 'Aguardando recolhimento das custas iniciais';
+        
+        document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
+        window.openModal('modal-novo-caso');
+    };
+
+    window.excluirCaso = async function(idCaso) { if(confirm("Tem certeza que deseja APAGAR este processo definitivamente?")) await deleteDoc(doc(db, "casos", idCaso)); };
+    
+    // ENCERRAMENTO E ARQUIVAMENTO DE CASOS
+    window.abrirModalEncerrar = function(idCaso) {
+        document.getElementById('encerrar-caso-id').value = idCaso;
+        document.getElementById('encerrar-obs').value = '';
+        window.openModal('modal-encerrar');
+    };
+
+    window.confirmarEncerramento = async function() {
+        const idCaso = document.getElementById('encerrar-caso-id').value;
+        const motivo = document.getElementById('encerrar-motivo').value;
+        const obs = document.getElementById('encerrar-obs').value.trim();
+        
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andAtuais = casoAtual.andamentos || [];
+        
+        let msgEncerramento = `🔒 CASO ENCERRADO: ${motivo}.`;
+        if (obs) msgEncerramento += ` Obs: ${obs}`;
+
+        andAtuais.unshift({ 
+            id: Date.now(), 
+            descricao: msgEncerramento, 
+            data: now.toLocaleDateString('pt-BR'), 
+            hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 
+            responsavel: window.usuarioLogado.nome 
+        });
+        
+        await updateDoc(doc(db, "casos", idCaso), { 
+            encerrado: true,
+            motivoEncerramento: motivo,
+            status: 'Encerrado',
+            andamentos: andAtuais,
+            dataEncerramento: now.toLocaleDateString('pt-BR'),
+            ultimaAnaliseData: now.toLocaleDateString('pt-BR')
+        });
+        
+        window.closeModal('modal-encerrar');
+    };
+
+    window.reabrirCaso = async function(idCaso) {
+        if(confirm("Deseja reativar este processo? Ele voltará para a fila de 'Aguardando Liminar' e aparecerá no Kanban novamente.")) {
+            const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            let andAtuais = casoAtual.andamentos || [];
+            
+            andAtuais.unshift({ 
+                id: Date.now(), 
+                descricao: `🔓 CASO REABERTO pelo administrador.`, 
+                data: now.toLocaleDateString('pt-BR'), 
+                hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 
+                responsavel: window.usuarioLogado.nome 
+            });
+            
+            await updateDoc(doc(db, "casos", idCaso), { 
+                encerrado: false,
+                motivoEncerramento: null,
+                status: 'Aguardando Liminar',
+                dataStatus: Date.now(),
+                andamentos: andAtuais
+            });
         }
     };
 
-    function renderizarKanban() {
-        STATUS_PHASES.forEach(f => { const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) col.innerHTML = ''; });
-        window.casosDb.forEach(c => {
+    // ANDAMENTOS E SELEÇÃO DE RESPONSÁVEL
+    window.abrirModalAndamento = function(idCaso) { 
+        document.getElementById('andamento-caso-id').value = idCaso; 
+        document.getElementById('nova-acao').value = ''; 
+        
+        if(window.usuarioLogado.role === 'admin') {
+            document.getElementById('div-responsavel-andamento').style.display = 'block';
+            document.getElementById('nova-acao-responsavel').value = window.usuarioLogado.nome.toUpperCase().includes('LUCAS') ? 'Lucas' : 'Bárbara';
+        } else {
+            document.getElementById('div-responsavel-andamento').style.display = 'none';
+        }
+        window.openModal('modal-novo-andamento'); 
+    };
+
+    window.salvarAndamento = async function() {
+        const idCaso = document.getElementById('andamento-caso-id').value; 
+        const acaoText = document.getElementById('nova-acao').value.trim();
+        
+        if (!acaoText) return alert('Descreva o andamento!'); 
+        
+        let responsavelDaAcao = window.usuarioLogado.nome;
+        if(window.usuarioLogado.role === 'admin') { responsavelDaAcao = document.getElementById('nova-acao-responsavel').value; }
+
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andAtuais = casoAtual.andamentos || [];
+        
+        andAtuais.unshift({ id: Date.now(), descricao: acaoText, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: responsavelDaAcao });
+        await updateDoc(doc(db, "casos", idCaso), { andamentos: andAtuais, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
+        window.closeModal('modal-novo-andamento');
+    };
+    
+    window.excluirAndamento = async function(id, idA) { if(confirm("Deletar andamento?")){ const c = window.casosDb.find(x=>x.id===id); await updateDoc(doc(db,"casos",id),{andamentos: c.andamentos.filter(a=>a.id!==idA)}); } };
+
+    window.marcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: new Date().toLocaleDateString('pt-BR') }); };
+    window.desmarcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: "" }); };
+
+    // KANBAN DRAG & DROP
+    window.allowDrop = function(ev) { if(window.usuarioLogado.role !== 'admin') return; ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
+    window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
+    window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
+    window.dropKanban = async function(ev, novoStatus) {
+        if(window.usuarioLogado.role !== 'admin') return;
+        ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
+        const idCaso = ev.dataTransfer.getData("caseId"); const caso = window.casosDb.find(c => c.id === idCaso);
+        if(!caso || caso.status === novoStatus) return;
+
+        let andamentos = caso.andamentos || []; const now = new Date();
+        andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
+    };
+
+    window.renderizarKanban = function() {
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        STATUS_PHASES.forEach(f => {
+            const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
+            if(col) col.innerHTML = '';
+            document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
+        });
+
+        // Filtrar apenas casos NÃO ENCERRADOS para o Kanban
+        window.casosDb.filter(c => c.encerrado !== true).forEach(c => {
             const statusStr = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
             const col = document.getElementById('col-' + statusStr.replace(/\s+/g, ''));
             
             if(col) {
                 const conf = STATUS_PHASES.find(x => x.id === statusStr) || STATUS_PHASES[0];
                 const dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
-                let diasHtml = dias > 0 ? `<span style="color:${dias > 5 ? 'var(--erro)' : 'var(--texto-claro)'};">⏱️ ${dias}d</span>` : '<span>✨ Novo</span>';
+                let diasHtml = dias > 0 ? `<span style="color:${dias > 5 ? 'var(--erro)' : 'var(--texto-claro)'}; font-weight: 600;">⏱️ ${dias}d</span>` : '<span>✨ Novo</span>';
                 
+                let dragAttr = isAdmin ? `draggable="true" ondragstart="window.dragKanban(event, '${c.id}')"` : '';
+                let cursorStyle = isAdmin ? 'cursor: grab;' : 'cursor: default;';
+                
+                let origKb = c.comarcaOrigem ? `Orig: ${c.comarcaOrigem}` : '';
+                let reqKb = c.comarcaReq ? `Req: ${c.comarcaReq}` : '';
+                let kbComarcas = (origKb && reqKb) ? `${origKb} | ${reqKb}` : (origKb || reqKb || 'N/A');
+
                 const clienteFormatado = c.cliente || 'Sem Cliente';
                 const contratoFormatado = c.contrato || 'Sem Contrato';
-                const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
-                const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
-                const comarcaFinal = comReq || comOri || 'N/A';
 
                 col.innerHTML += `
-                    <div class="k-card" draggable="true" ondragstart="window.dragKanban(event, '${c.id}')" onclick="window.abrirModalEditarCaso('${c.id}')">
+                    <div class="k-card ${isAdmin ? 'draggable' : ''}" ${dragAttr} style="${cursorStyle}">
                         <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${statusStr}</div>
-                        <h4>${clienteFormatado}</h4><p>${contratoFormatado}</p>
-                        <div class="k-meta"><span>${comarcaFinal}</span>${diasHtml}</div>
+                        <h4 onclick="window.abrirModalEditarCaso('${c.id}')" style="cursor:pointer;">${clienteFormatado}</h4>
+                        <p>${contratoFormatado}</p>
+                        ${c.processo ? `<p style="color:var(--info); font-size:0.7rem; margin-top:2px;">${c.processo} <span style="cursor:pointer" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span></p>` : ''}
+                        <div class="k-meta"><span>📍 ${kbComarcas}</span>${diasHtml}</div>
                     </div>`;
             }
         });
@@ -624,54 +1040,205 @@
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
             if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length;
         });
-    }
+    };
 
-    function renderizarCasos() {
+    window.atualizarFiltros = function() {
+        const selCasos = document.getElementById('filtro-mes'); const selFin = document.getElementById('filtro-mes-fin');
+        const mCasos = [...new Set(window.casosDb.map(c => c.mesRegistro))].sort().reverse();
+        const mFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))].sort().reverse();
+        const aCasos = selCasos.value; const aFin = selFin.value;
+
+        selCasos.innerHTML = '<option value="todos">Todos os meses</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; });
+        selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
+        if(mCasos.includes(aCasos)) selCasos.value = aCasos; if(mFin.includes(aFin)) selFin.value = aFin;
+    };
+
+    // RENDERIZAR CASOS ATIVOS
+    window.renderizarCasos = function() {
         const container = document.getElementById('cases-container'); container.innerHTML = '';
+        const termoBusca = document.getElementById('search-input').value.toLowerCase();
         const isAdmin = window.usuarioLogado.role === 'admin';
-        window.casosDb.forEach(c => {
+        const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+        // Filtrar para remover os encerrados
+        let base = window.casosDb.filter(c => c.encerrado !== true);
+        
+        if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
+        if(document.getElementById('filtro-mes').value !== 'todos') base = base.filter(c => c.mesRegistro === document.getElementById('filtro-mes').value);
+        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+
+        if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🧹</div><h3>Nenhum processo ativo encontrado!</h3></div>`;
+
+        base.forEach(c => {
             const st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
             const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
+
+            let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
             
-            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            let andHTML = arr.slice(0,3).map(a => `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data || ''}:</strong> ${a.descricao || ''}</div>`).join('');
-            
-            let btnFaturar = ''; let btnExcluir = '';
             if(isAdmin) {
-                btnExcluir = `<button class="btn btn-small btn-danger" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>`;
-                btnFaturar = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Faturar</button>` : `<span class="tag-status" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:0.75rem;">Faturado</span>`;
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>
+                             <button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')" title="Finalizar e Arquivar">🔒 Encerrar</button>`;
+                badgeFin = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Aprovar PG</button>` : `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;">Comissão Paga</span>`;
+                bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`;
+                btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
             }
             
+            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
+            let andHTML = arr.slice(0,4).map((a, i) => {
+                let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}', ${a.id})" title="Excluir">✖</span>` : '';
+                let isRecent = i === 0 ? 'recent' : '';
+                
+                let descFormatada = a.descricao || '';
+                if(!isAdmin && descFormatada.includes('Comissão autorizada:')) {
+                    descFormatada = descFormatada.replace(/Comissão autorizada: R\$ [0-9,.]+/, '(Valor oculto - Restrito à Gestão)');
+                }
+                
+                return `<div class="tl-item ${isRecent}">
+                    <div><strong>${descFormatada}</strong> ${dBtn}</div>
+                    <div class="tl-meta">${a.data || ''} às ${a.hora || ''} • 👤 ${a.responsavel || ''}</div>
+                </div>`;
+            }).join('');
+            
+            let obsHtml = c.obs ? `<div class="obs-box"><strong>📝 Observações Iniciais:</strong> ${c.obs}</div>` : '';
+
+            let infoProcessoHtml = '';
+            if(c.processo || c.vara) {
+                let txtP = c.processo ? `${c.processo} <span style="cursor:pointer; font-size:1rem;" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span>` : '-';
+                let txtV = c.vara || '-';
+                infoProcessoHtml = `<div class="info-grid">
+                    <div><strong>Nº Processo CNJ</strong>${txtP}</div>
+                    <div><strong>Vara de Tramitação</strong>${txtV}</div>
+                </div>`;
+            }
+
+            let origText = c.comarcaOrigem ? `📍 <strong>Origem:</strong> ${c.comarcaOrigem}` : '';
+            let reqText = c.comarcaReq ? `📨 <strong>Req:</strong> ${c.comarcaReq}` : '';
+            let infoComarcas = (origText && reqText) ? `${origText} &nbsp;|&nbsp; ${reqText}` : (origText || reqText || '📍 Comarca não informada');
+
             const clienteFormatado = c.cliente || 'Sem Cliente';
             const contratoFormatado = c.contrato || 'Sem Contrato';
 
             let div = document.createElement('div'); div.className = 'card';
             div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
                     <div>
-                        <span class="tag-status ${conf.cor}">${st}</span>
-                        <h3 style="margin:10px 0 5px; color:var(--azul);">${clienteFormatado}</h3>
-                        <p style="margin:0; font-family:monospace; color:var(--laranja);">${contratoFormatado}</p>
+                        <span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span>
+                        <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${clienteFormatado}</h3>
+                        <p style="margin:0; font-family:monospace; color:var(--laranja); font-weight:600;">Contrato: ${contratoFormatado}</p>
                     </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        ${btnFaturar}
-                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>
-                        <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">+ Lançar Ação</button>
-                        ${btnExcluir}
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados</button>
+                        ${btnLancar}
+                        ${btnsAdmin}
                     </div>
                 </div>
-                <div style="background:#f8fafc; padding:10px; border-radius:8px;">${andHTML || '<span style="color:#94a3b8;font-size:0.85rem;">Sem andamentos.</span>'}</div>
+                
+                ${obsHtml}
+                ${infoProcessoHtml}
+                
+                <div class="timeline">${andHTML || '<div class="tl-item"><span style="color:#94a3b8;">Sem diligências registradas.</span></div>'}</div>
+                
+                <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--borda); padding-top: 15px;">
+                    <div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div>
+                    <div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div>
+                </div>
             `;
             container.appendChild(div);
         });
-    }
+    };
 
-    window.atualizarFiltros = function() {
-        const selFin = document.getElementById('filtro-mes-fin');
-        const mFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))].sort().reverse();
-        const aFin = selFin.value;
-        selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
-        if(mFin.includes(aFin)) selFin.value = aFin;
+    // RENDERIZAR CASOS ENCERRADOS (NOVA ABA)
+    window.renderizarEncerrados = function() {
+        const container = document.getElementById('encerrados-container'); container.innerHTML = '';
+        const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
+        const isAdmin = window.usuarioLogado.role === 'admin';
+
+        let base = window.casosDb.filter(c => c.encerrado === true);
+        
+        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+
+        if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">📁</div><h3>Nenhum caso no arquivo morto.</h3></div>`;
+
+        base.forEach(c => {
+            let btnsAdmin = '';
+            if(isAdmin) {
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>
+                             <button class="btn btn-small btn-outline" style="color:var(--sucesso); border-color:var(--sucesso);" onclick="window.reabrirCaso('${c.id}')">🔓 Reabrir Processo</button>`;
+            }
+            
+            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
+            let andHTML = arr.slice(0,5).map((a, i) => {
+                let isRecent = i === 0 ? 'recent' : '';
+                return `<div class="tl-item ${isRecent}">
+                    <div><strong>${a.descricao || ''}</strong></div>
+                    <div class="tl-meta">${a.data || ''} às ${a.hora || ''} • 👤 ${a.responsavel || ''}</div>
+                </div>`;
+            }).join('');
+            
+            let infoProcessoHtml = '';
+            if(c.processo || c.vara) {
+                let txtP = c.processo ? `${c.processo}` : '-';
+                let txtV = c.vara || '-';
+                infoProcessoHtml = `<div class="info-grid" style="background:#f1f5f9;">
+                    <div><strong>Nº Processo CNJ</strong>${txtP}</div>
+                    <div><strong>Vara de Tramitação</strong>${txtV}</div>
+                </div>`;
+            }
+
+            let motivoColor = "#10b981"; // verde padrão para exito
+            if(c.motivoEncerramento === "Quitado") motivoColor = "#059669";
+            if(c.motivoEncerramento && c.motivoEncerramento.includes("Mora")) motivoColor = "#0284c7";
+
+            const clienteFormatado = c.cliente || 'Sem Cliente';
+            const contratoFormatado = c.contrato || 'Sem Contrato';
+
+            let div = document.createElement('div'); div.className = 'card';
+            div.style.backgroundColor = "#fafbfc";
+            div.innerHTML = `
+                <div class="badge-encerrado">🔒 Arquivado</div>
+                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div style="margin-top: 15px;">
+                        <span class="tag-status" style="background-color:${motivoColor}; margin-bottom:8px; display:inline-block;">Finalizado: ${c.motivoEncerramento || 'Não informado'}</span>
+                        <h3 style="margin:5px 0; color:var(--texto); font-size: 1.3rem;">${clienteFormatado}</h3>
+                        <p style="margin:0; font-family:monospace; color:#64748b; font-weight:600;">Contrato: ${contratoFormatado}</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar Ficha</button>
+                        ${btnsAdmin}
+                    </div>
+                </div>
+                
+                ${infoProcessoHtml}
+                
+                <div class="timeline">${andHTML}</div>
+            `;
+            container.appendChild(div);
+        });
+    };
+
+    // FINANCEIRO
+    window.abrirModalMandado = function(idCaso) { document.getElementById('mandado-caso-id').value = idCaso; window.openModal('modal-mandado'); };
+    window.salvarMandado = async function() {
+        const idCaso = document.getElementById('mandado-caso-id').value;
+        const valor = parseFloat(document.getElementById('mandado-valor').value);
+        if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
+
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andamentosAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+        andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
+
+        await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
+        window.closeModal('modal-mandado');
+    };
+    
+    window.desfazerMandado = async function(idCaso) {
+        if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório.")) {
+            const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            let arr = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+            const novosAndamentos = arr.filter(a => a.responsavel !== "SISTEMA");
+            await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+        }
     };
 
     window.renderizarFinanceiro = function() {
@@ -681,12 +1248,13 @@
 
         let t = 0;
         if(base.length === 0) {
-            document.getElementById('total-financeiro').innerText = `R$ 0,00`; return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">Fila financeira vazia.</td></tr>';
+            document.getElementById('total-financeiro').innerText = `R$ 0,00`;
+            return tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Fila financeira vazia.</td></tr>';
         }
         base.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); t += v;
             let btn = `<button class="btn btn-outline btn-small" style="color:var(--erro); border-color:var(--erro);" onclick="window.desfazerMandado('${c.id}')">Estornar</button>`;
-            tbody.innerHTML += `<tr><td>${c.dataExpedicao}</td><td style="font-family:monospace;">${c.contrato}</td><td><strong>${c.cliente}</strong></td><td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td><td>${btn}</td></tr>`;
+            tbody.innerHTML += `<tr><td>${c.dataExpedicao}</td><td style="font-family:monospace;">${c.contrato || ''}</td><td><strong>${c.cliente || ''}</strong></td><td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td><td>${btn}</td></tr>`;
         });
         document.getElementById('total-financeiro').innerText = `R$ ${t.toFixed(2).replace('.',',')}`;
     };
@@ -697,7 +1265,7 @@
         if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
         if(casosFin.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;COMARCA;VALOR_COMISSAO
+        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO
 `;
         let total = 0;
         casosFin.forEach(c => {
@@ -705,46 +1273,16 @@
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq || comOri || '';
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato};${c.cliente};${comarca};${v.toFixed(2).replace('.', ',')}
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}
 `;
         });
-        csv += `;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
+        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
 `;
         const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
     };
 
-    window.renderizarRelatorios = function() {
-        let total = window.casosDb.length;
-        let expedidos = 0, agil = 0, atencao = 0, criticos = 0; let comarcasMap = {};
-
-        window.casosDb.forEach(c => {
-            if(c.mandadoExpedido) expedidos++;
-            let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
-            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq.trim() : '';
-            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem.trim() : '';
-            let comarcaNome = comReq || comOri || 'Sem Comarca';
-            
-            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
-            comarcasMap[comarcaNome].total++;
-            if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
-        });
-
-        document.getElementById('dash-total').innerText = total; document.getElementById('dash-mandados').innerText = expedidos;
-        document.getElementById('dash-atencao').innerText = atencao; document.getElementById('dash-critico').innerText = criticos;
-
-        let topVol = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total })).sort((a,b) => b.casos - a.casos).slice(0, 5);
-        const ctxStatus = document.getElementById('chartStatus'); const ctxComarcas = document.getElementById('chartComarcas');
-        if(chartStatusInstance) chartStatusInstance.destroy(); if(chartComarcasInstance) chartComarcasInstance.destroy();
-
-        if(ctxStatus && total > 0) {
-            chartStatusInstance = new Chart(ctxStatus, { type: 'doughnut', data: { labels: ['Ageis', 'Atenção', 'Críticos'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right' } } } });
-        }
-        if(ctxComarcas && topVol.length > 0) {
-            chartComarcasInstance = new Chart(ctxComarcas, { type: 'bar', data: { labels: topVol.map(c => c.nome.split(' ')[0]), datasets: [{ label: 'Processos', data: topVol.map(c => c.casos), backgroundColor: '#003986', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } });
-        }
-    };
-
+    // RELATÓRIOS E DASHBOARD
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
@@ -752,67 +1290,124 @@
 Gerado em:;${dataHoje}
 Base total:;${window.casosDb.length} processos
 
-CONTRATO;CLIENTE;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
+CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
 `;
         window.casosDb.forEach(c => {
-            let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
+            let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato};${c.cliente};${comarca};${c.status};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${c.status||''};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
 `;
         });
         const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
-    window.criarMembroEquipe = async function() {
-        const nome = document.getElementById('novo-membro-nome').value.trim();
-        const senha = document.getElementById('novo-membro-senha').value.trim();
-        const role = document.getElementById('novo-membro-role').value;
-        if(!nome || !senha) return alert("Preencha o nome e a senha temporária.");
-        const usernameGerado = "1593" + nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
-        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
-        const qSnap = await getDocs(q);
-        if(!qSnap.empty) return alert(`O login ${usernameGerado} já existe na base.`);
-        await addDoc(collection(db, "usuarios"), { nome, username: usernameGerado, password: senha, role });
-        alert(`Conta gerada!
-LOGIN: ${usernameGerado}
-SENHA: ${senha}`);
-        document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
-    };
+    window.renderizarRelatorios = function() {
+        if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
+        
+        let ativos = window.casosDb.filter(c => c.encerrado !== true);
+        let totalAtivos = ativos.length;
+        
+        let faseMandadoId = STATUS_PHASES.findIndex(f => f.id === 'Mandado Expedido');
+        let expedidos = 0; 
+        let agil = 0, atencao = 0, criticos = 0; 
+        let comarcasMap = {};
+        
+        let motivosCount = { 'Apreensão': 0, 'Entrega Amigável': 0, 'Acordo Realizado': 0, 'Quitado': 0, 'Pagou parcelas em atraso (Purgação da Mora)': 0 };
 
-    window.desenharTabelaEquipe = function() {
-        const tbody = document.getElementById('lista-equipe-container'); if(!tbody) return;
-        let html = '';
-        window.usuariosDb.forEach(u => {
-            const badge = u.role === 'admin' ? '<span class="tag-status" style="background:#dcfce7;color:#166534;">Admin</span>' : '<span class="tag-status" style="background:#f1f5f9;color:#475569;">Equipe</span>';
-            let btnExcluir = window.usuarioLogado.id !== u.id ? `<button class="btn btn-small btn-danger" onclick="window.excluirMembroEquipe('${u.id}', '${u.nome}')">Remover</button>` : `<span style="color: #94a3b8; font-size: 0.8rem;">(Você)</span>`;
-            html += `<tr><td><strong>${u.nome}</strong></td><td style="color: var(--laranja); font-weight:600;">${u.username}</td><td>${badge}</td><td>${btnExcluir}</td></tr>`;
-        });
-        tbody.innerHTML = html;
-    };
-
-    window.excluirMembroEquipe = async function(id, nome) {
-        if(confirm(`Bloquear e apagar o acesso de ${nome}?`)) await deleteDoc(doc(db, "usuarios", id));
-    };
-
-    function analisarRegrasCopiloto() {
-        const hoje = Date.now(); let alertas = [];
         window.casosDb.forEach(c => {
-            if((c.status || 'Aguardando recolhimento das custas iniciais') === 'Liminar Deferida') {
-                let ts = c.dataStatus || hoje; let dias = Math.floor((hoje - ts) / 86400000); 
-                if(dias >= 5) { alertas.push({ cliente: c.cliente, contrato: c.contrato, dias: dias, tipo: "🚨 Gargalo de Cartório", mensagem: "O juiz defere a liminar, mas o cartório demora a emitir. Despache com o escrivão ou chefe de secretaria para acelerar a expedição do mandado." }); }
+            let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === c.status);
+            
+            if(c.encerrado !== true) {
+                if(idxFaseAtual >= faseMandadoId) expedidos++;
+                let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
+                if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
+            } else {
+                expedidos++; // Todos os encerrados já passaram pela esteira
+                if(c.motivoEncerramento && motivosCount[c.motivoEncerramento] !== undefined) {
+                    motivosCount[c.motivoEncerramento]++;
+                } else if(c.motivoEncerramento && c.motivoEncerramento.includes('Apreens')) {
+                    motivosCount['Apreensão']++; // fallback
+                }
             }
+            
+            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq.trim() : '';
+            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem.trim() : '';
+            let comarcaNome = comReq || comOri || 'Sem Comarca';
+            
+            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
+            comarcasMap[comarcaNome].total++;
         });
-        const bell = document.getElementById('notif-badge'); const tbody = document.getElementById('notif-tbody');
-        if(alertas.length > 0) {
-            bell.style.display = 'flex'; bell.innerText = alertas.length;
-            tbody.innerHTML = alertas.map(a => `<tr><td><strong>${a.cliente}</strong><br><span style="font-size:0.75rem;color:#64748b;">${a.contrato}</span></td><td style="color:var(--erro); font-weight:bold; font-size:1.1rem; text-align:center;">${a.dias}</td><td><div style="color:var(--alerta); font-weight:bold; margin-bottom:5px;">${a.tipo}</div><div style="font-size: 0.85rem; color:var(--texto);">${a.mensagem}</div></td></tr>`).join('');
-        } else {
-            bell.style.display = 'none'; tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--sucesso); font-weight:bold;">Tudo em dia! Sem gargalos nos processos. ✅</td></tr>';
+
+        let totalEncerramentosExito = Object.values(motivosCount).reduce((a,b)=>a+b, 0);
+
+        document.getElementById('dash-total').innerText = totalAtivos; 
+        document.getElementById('dash-mandados').innerText = expedidos;
+        document.getElementById('dash-apreendidos').innerText = totalEncerramentosExito;
+        
+        let taxaApreensao = expedidos > 0 ? ((motivosCount['Apreensão'] / expedidos) * 100).toFixed(1) : 0;
+        document.getElementById('dash-taxa').innerText = `${taxaApreensao}%`;
+
+        let listaComarcas = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total }));
+        let topVol = [...listaComarcas].sort((a,b) => b.casos - a.casos).slice(0, 5);
+
+        const ctxStatus = document.getElementById('chartStatus'); const ctxEncerramentos = document.getElementById('chartEncerramentos'); const ctxComarcas = document.getElementById('chartComarcas');
+        
+        if(chartStatusInstance) chartStatusInstance.destroy(); 
+        if(chartEncerramentosInstance) chartEncerramentosInstance.destroy(); 
+        if(chartComarcasInstance) chartComarcasInstance.destroy();
+
+        if(ctxStatus && totalAtivos > 0) {
+            chartStatusInstance = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: { labels: ['No Prazo', 'Atenção (>7d)', 'Crítico (>15d)'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right' } } }
+            });
         }
-    }
+        
+        if(ctxEncerramentos && totalEncerramentosExito > 0) {
+            chartEncerramentosInstance = new Chart(ctxEncerramentos, {
+                type: 'pie',
+                data: { labels: ['Apreensão', 'Amigável', 'Acordo', 'Quitado', 'Mora'], datasets: [{ data: [motivosCount['Apreensão'], motivosCount['Entrega Amigável'], motivosCount['Acordo Realizado'], motivosCount['Quitado'], motivosCount['Pagou parcelas em atraso (Purgação da Mora)']], backgroundColor: ['#10b981', '#14b8a6', '#0ea5e9', '#059669', '#0284c7'], borderWidth: 1 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 11} } } } }
+            });
+        }
+
+        if(ctxComarcas && listaComarcas.length > 0) {
+            chartComarcasInstance = new Chart(ctxComarcas, {
+                type: 'bar',
+                data: { labels: topVol.map(c => c.nome.split(' ')[0]), datasets: [{ label: 'Processos', data: topVol.map(c => c.casos), backgroundColor: '#ea580c', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+        }
+    };
+
+    onSnapshot(collection(db, "usuarios"), (s) => { 
+        window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); 
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') {
+            try { window.desenharTabelaEquipe(); } catch(e) { console.error("Erro desenhar Equipe:", e); }
+        }
+    }, (error) => {
+        console.error("Firebase Sync Error (Usuarios):", error);
+    });
+    
+    onSnapshot(collection(db, "casos"), (snapshot) => {
+        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        if(window.usuarioLogado) { 
+            const loadEl = document.getElementById('loading');
+            if(loadEl) loadEl.style.display = 'none';
+            try { window.renderizarGeral(); } catch(e) { console.error("Erro renderizarGeral:", e); }
+        }
+    }, (error) => {
+        console.error("Firebase Sync Error (Casos):", error);
+        const loadEl = document.getElementById('loading');
+        if(loadEl) loadEl.innerHTML = `<span style="color:var(--erro);">Falha ao baixar dados. O Firebase recusou a leitura (Erro de Permissão). Verifique as regras.</span>`;
+    });
+
+    let s = localStorage.getItem('usuarioSessao');
+    if(s) { window.usuarioLogado = JSON.parse(s); mostrarPainel(); }
 </script>
 </body>
 </html>
