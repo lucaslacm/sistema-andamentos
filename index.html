@@ -80,7 +80,6 @@
         .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, var(--azul) 0%, var(--azul-escuro) 100%); }
         .auth-box { background: var(--fundo-card); padding: 40px; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--laranja); }
         .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.5rem; font-weight: 700; }
-        #error-msg { color: var(--erro); background: #fee2e2; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; display: none; text-align: left; }
         
         /* Layout Principal */
         #app-screen { display: none; height: 100vh; display: flex; width: 100vw; }
@@ -105,7 +104,6 @@
         
         .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #fff; border-bottom: 1px solid var(--borda); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
         .notif-badge-copiloto { background: var(--erro); color: white; font-size: 0.65rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; display: none; }
-        #loading { display: none; background: #fff3cd; color: #856404; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #ffeeba; }
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; padding: 25px 30px; overflow-y: auto; flex: 1; }
         .tab-content.active { display: block; }
@@ -171,7 +169,7 @@
         
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 2px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 1px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
         td { padding: 12px 15px; border-bottom: 1px solid var(--borda); color: var(--texto); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto; padding: 20px; }
@@ -184,7 +182,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban */
+        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -201,6 +199,8 @@
         
         /* Badge de caso encerrado */
         .badge-encerrado { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 5px; }
+        
+        #loading { display: none; background: #fff3cd; color: #856404; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #ffeeba; }
     </style>
 </head>
 <body>
@@ -291,7 +291,7 @@
             </div>
         </header>
 
-        <div id="loading">Baixando Dados da Nuvem...</div>
+        <div id="loading">Conectando e Baixando Dados da Nuvem...</div>
 
         <!-- ABA COPILOTO IA -->
         <div id="tab-copiloto" class="tab-content">
@@ -528,7 +528,7 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // AS CHAVES EXATAS INJETADAS AQUI
+    // AS CHAVES EXATAS FORNECIDAS MANTIDAS INTACTAS
     const firebaseConfig = { 
         apiKey: "AIzaSyAWjjd2SdSRQ1Pwm68m3LBj4uaC4k4enlM", 
         authDomain: "sistema-andamentos.firebaseapp.com", 
@@ -748,8 +748,10 @@ SENHA TEMP: ${senhaTemp}`);
             if(c.encerrado) return;
 
             let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
-            let diasUltimoAndamento = (c.andamentos && c.andamentos.length > 0) 
-                ? Math.floor((Date.now() - c.andamentos[0].id) / 86400000) 
+            
+            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
+            let diasUltimoAndamento = (arr.length > 0) 
+                ? Math.floor((Date.now() - arr[0].id) / 86400000) 
                 : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
 
             if (c.status === 'Aguardando Liminar' && diasStatus >= 10) {
@@ -765,9 +767,9 @@ SENHA TEMP: ${senhaTemp}`);
                 alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de intimação para dar andamento sob pena de extinção (Art. 485, III, CPC).`});
             }
 
-            if (c.andamentos && c.andamentos.length > 0) {
-                let textAndamentos = c.andamentos.map(a => a.descricao.toLowerCase()).join(' ');
-                let ultimoAndamentoText = c.andamentos[0].descricao.toLowerCase();
+            if (arr.length > 0) {
+                let textAndamentos = arr.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
+                let ultimoAndamentoText = arr[0].descricao ? arr[0].descricao.toLowerCase() : '';
                 
                 if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) {
                     alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione IMEDIATAMENTE com ofício liberatório para estancar diárias.`});
@@ -848,7 +850,7 @@ SENHA TEMP: ${senhaTemp}`);
                 const casoAtual = window.casosDb.find(c => c.id === idCaso);
                 if(casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
                     payload.dataStatus = Date.now();
-                    let hist = casoAtual.andamentos || [];
+                    let hist = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
                     hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
@@ -877,7 +879,10 @@ SENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
         document.getElementById('novo-obs').value = c.obs || ''; 
         
-        const validStatus = STATUS_PHASES.find(f => f.id === c.status);
+        let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
+        if (st === 'Localizado') st = 'Veículo Localizado';
+
+        const validStatus = STATUS_PHASES.find(f => f.id === st);
         document.getElementById('novo-status').value = validStatus ? validStatus.id : 'Aguardando recolhimento das custas iniciais';
         
         document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
@@ -899,7 +904,7 @@ SENHA TEMP: ${senhaTemp}`);
         const obs = document.getElementById('encerrar-obs').value.trim();
         
         const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
-        let andAtuais = casoAtual.andamentos || [];
+        let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
         
         let msgEncerramento = `🔒 CASO ENCERRADO: ${motivo}.`;
         if (obs) msgEncerramento += ` Obs: ${obs}`;
@@ -927,7 +932,7 @@ SENHA TEMP: ${senhaTemp}`);
     window.reabrirCaso = async function(idCaso) {
         if(confirm("Deseja reativar este processo? Ele voltará para a fila de 'Aguardando Liminar' e aparecerá no Kanban novamente.")) {
             const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
-            let andAtuais = casoAtual.andamentos || [];
+            let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
             
             andAtuais.unshift({ 
                 id: Date.now(), 
@@ -971,7 +976,7 @@ SENHA TEMP: ${senhaTemp}`);
         if(window.usuarioLogado.role === 'admin') { responsavelDaAcao = document.getElementById('nova-acao-responsavel').value; }
 
         const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
-        let andAtuais = casoAtual.andamentos || [];
+        let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
         
         andAtuais.unshift({ id: Date.now(), descricao: acaoText, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: responsavelDaAcao });
         await updateDoc(doc(db, "casos", idCaso), { andamentos: andAtuais, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
@@ -991,9 +996,12 @@ SENHA TEMP: ${senhaTemp}`);
         if(window.usuarioLogado.role !== 'admin') return;
         ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
         const idCaso = ev.dataTransfer.getData("caseId"); const caso = window.casosDb.find(c => c.id === idCaso);
-        if(!caso || caso.status === novoStatus) return;
+        
+        let st = caso.status;
+        if (st === 'Localizado') st = 'Veículo Localizado';
+        if(!caso || st === novoStatus) return;
 
-        let andamentos = caso.andamentos || []; const now = new Date();
+        let andamentos = Array.isArray(caso.andamentos) ? caso.andamentos : []; const now = new Date();
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
         await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
     };
@@ -1006,9 +1014,10 @@ SENHA TEMP: ${senhaTemp}`);
             document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
         });
 
-        // Filtrar apenas casos NÃO ENCERRADOS para o Kanban
         window.casosDb.filter(c => c.encerrado !== true).forEach(c => {
-            const statusStr = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
+            let statusStr = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
+            if (statusStr === 'Localizado') statusStr = 'Veículo Localizado';
+
             const col = document.getElementById('col-' + statusStr.replace(/\s+/g, ''));
             
             if(col) {
@@ -1061,7 +1070,6 @@ SENHA TEMP: ${senhaTemp}`);
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-        // Filtrar para remover os encerrados
         let base = window.casosDb.filter(c => c.encerrado !== true);
         
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
@@ -1071,7 +1079,8 @@ SENHA TEMP: ${senhaTemp}`);
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🧹</div><h3>Nenhum processo ativo encontrado!</h3></div>`;
 
         base.forEach(c => {
-            const st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
+            let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
+            if (st === 'Localizado') st = 'Veículo Localizado';
             const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
 
             let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
@@ -1118,6 +1127,7 @@ SENHA TEMP: ${senhaTemp}`);
 
             const clienteFormatado = c.cliente || 'Sem Cliente';
             const contratoFormatado = c.contrato || 'Sem Contrato';
+            const infoCriador = c.criadoPor ? ` | 👤 Cadastrado por: ${c.criadoPor}` : '';
 
             let div = document.createElement('div'); div.className = 'card';
             div.innerHTML = `
@@ -1125,7 +1135,7 @@ SENHA TEMP: ${senhaTemp}`);
                     <div>
                         <span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span>
                         <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${clienteFormatado}</h3>
-                        <p style="margin:0; font-family:monospace; color:var(--laranja); font-weight:600;">Contrato: ${contratoFormatado}</p>
+                        <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${contratoFormatado}${infoCriador}</p>
                     </div>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
                         <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados</button>
@@ -1293,11 +1303,12 @@ Base total:;${window.casosDb.length} processos
 CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
 `;
         window.casosDb.forEach(c => {
+            let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${c.status||''};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
 `;
         });
         const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
@@ -1318,7 +1329,8 @@ CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;
         let motivosCount = { 'Apreensão': 0, 'Entrega Amigável': 0, 'Acordo Realizado': 0, 'Quitado': 0, 'Pagou parcelas em atraso (Purgação da Mora)': 0 };
 
         window.casosDb.forEach(c => {
-            let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === c.status);
+            let st = c.status; if(st === 'Localizado') st = 'Veículo Localizado';
+            let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === st);
             
             if(c.encerrado !== true) {
                 if(idxFaseAtual >= faseMandadoId) expedidos++;
