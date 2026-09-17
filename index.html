@@ -93,15 +93,14 @@
         .user-role { font-size: 0.7rem; color: #94a3b8; background: rgba(0,0,0,0.3); padding: 4px 10px; border-radius: 12px; display: inline-block; border: 1px solid rgba(255,255,255,0.05); }
         
         nav { flex: 1; padding: 15px 10px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
-        .nav-item { padding: 10px 15px; color: #94a3b8; cursor: pointer; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; border-radius: 8px; }
+        .nav-item { padding: 10px 15px; color: #94a3b8; cursor: pointer; transition: all 0.2s; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-radius: 8px; }
         .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
         .nav-item.active { background: var(--laranja); color: #fff; box-shadow: 0 4px 6px rgba(234, 88, 12, 0.2); }
         
         main { flex: 1; display: flex; flex-direction: column; background: var(--fundo); position: relative; overflow: hidden; }
         
         .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 30px; background: #fff; border-bottom: 1px solid var(--borda); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        .notif-bell { position: relative; cursor: pointer; font-size: 1.3rem; padding: 5px; }
-        .notif-badge { position: absolute; top: -2px; right: -2px; background: var(--erro); color: white; font-size: 0.6rem; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; justify-content: center; align-items: center; display: none; border: 2px solid #fff; }
+        .notif-badge-copiloto { background: var(--erro); color: white; font-size: 0.65rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; display: none; }
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; padding: 25px 30px; overflow-y: auto; flex: 1; }
         .tab-content.active { display: block; }
@@ -180,6 +179,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
+        /* Cores das Colunas Kanban - Apenas as ativas */
         .cor-aguardando { background-color: var(--kb-aguardando); } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
         .cor-deferida { background-color: var(--kb-deferida); } .borda-deferida { border-bottom-color: var(--kb-deferida); }
         .cor-aguardando-mandado { background-color: var(--kb-aguardando-mandado); } .borda-aguardando-mandado { border-bottom-color: var(--kb-aguardando-mandado); }
@@ -191,6 +191,7 @@
         
         .drop-hover { background-color: rgba(234, 88, 12, 0.05); border: 2px dashed var(--laranja); }
         
+        /* Badge de caso encerrado */
         .badge-encerrado { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 5px; }
     </style>
 </head>
@@ -238,12 +239,34 @@
             <div class="user-role" id="role-badge">Admin</div>
         </div>
         <nav>
-            <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos Ativos</div>
-            <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
-            <div class="nav-item" onclick="window.switchTab('tab-encerrados')" id="nav-encerrados">🔒 Casos Encerrados</div>
-            <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">📊 Dashboard Gerencial</div>
-            <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">💰 Financeiro</div>
-            <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">👥 Gestão de Equipe</div>
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-copiloto')" id="nav-copiloto" style="display: none; background-color: rgba(14, 165, 233, 0.1); border: 1px solid rgba(14, 165, 233, 0.3); color: #38bdf8;">
+                <div>🤖 Copiloto IA</div>
+                <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
+            </div>
+            
+            <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">
+                <div>📁 Casos Ativos</div>
+            </div>
+            
+            <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban">
+                <div>📌 Visão Kanban</div>
+            </div>
+            
+            <div class="nav-item" onclick="window.switchTab('tab-encerrados')" id="nav-encerrados">
+                <div>🔒 Casos Encerrados</div>
+            </div>
+            
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">
+                <div>📊 Dashboard</div>
+            </div>
+            
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">
+                <div>💰 Financeiro</div>
+            </div>
+            
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">
+                <div>👥 Equipe</div>
+            </div>
         </nav>
         <div style="padding: 20px;">
             <button class="btn" style="width: 100%; background: rgba(255,255,255,0.05); color: #cbd5e1; border: 1px solid rgba(255,255,255,0.1);" onclick="window.doLogout()">🚪 Sair do Sistema</button>
@@ -255,12 +278,20 @@
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <div class="notif-bell admin-only" onclick="window.abrirModalInercia()" title="Alertas de Cartório" style="display:none;">
-                    🔔 <span class="notif-badge" id="notif-badge">0</span>
-                </div>
                 <button class="btn btn-primary" onclick="window.openModal('modal-novo-caso')">➕ Novo Processo</button>
             </div>
         </header>
+
+        <!-- ABA COPILOTO IA -->
+        <div id="tab-copiloto" class="tab-content">
+            <div class="top-bar">
+                <h2>🤖 Copiloto SGI - Recomendações do Dia</h2>
+                <div style="font-size: 0.85rem; color: var(--texto-claro);">A inteligência artificial identificou os seguintes pontos de atenção nos seus processos ativos.</div>
+            </div>
+            <div id="copiloto-container">
+                <!-- Cards de alertas do copiloto injetados via JS -->
+            </div>
+        </div>
 
         <!-- ABA 1: CASOS ATIVOS (LISTA) -->
         <div id="tab-casos" class="tab-content active">
@@ -478,22 +509,6 @@
     </div>
 </div>
 
-<div id="modal-notificacoes" class="modal">
-    <div class="modal-content" style="max-width: 750px;">
-        <div class="modal-header">
-            <h3 style="color: var(--erro);">🚨 Alerta de Gargalo no Cartório</h3>
-            <button class="close-btn" onclick="window.closeModal('modal-notificacoes')">&times;</button>
-        </div>
-        <p style="font-size: 0.9rem; color: var(--texto-claro); margin-bottom: 20px;">Os processos abaixo estão com a Liminar Deferida há mais de 5 dias sem expedição. <strong>Prioridade de cobrança!</strong></p>
-        <div class="table-container">
-            <table class="audit-table">
-                <thead><tr><th>Processo / Cliente</th><th>Comarca</th><th>Dias Travado</th></tr></thead>
-                <tbody id="notif-tbody"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
@@ -623,7 +638,7 @@
         tbody.innerHTML = html;
     };
 
-    // INTERFACE CORE
+    // INTERFACE CORE E COPILOTO
     function mostrarPainel() {
         document.getElementById('auth-screen').style.display = 'none'; 
         document.getElementById('app-screen').style.display = 'flex';
@@ -651,7 +666,7 @@
 
     window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item, .nav-tab').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         
         const content = document.getElementById(tabId);
         content.classList.add('active');
@@ -664,13 +679,107 @@
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
     window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
-    window.abrirModalInercia = function() { window.openModal('modal-notificacoes'); };
 
     window.renderizarGeral = function() {
         window.renderizarCasos();
         window.renderizarEncerrados();
         window.renderizarKanban();
-        if(window.usuarioLogado.role === 'admin') { window.checarInercia(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
+        if(window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
+    };
+
+    // --- REGRAS DO COPILOTO IA ---
+    window.renderizarCopiloto = function() {
+        if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
+        const container = document.getElementById('copiloto-container');
+        container.innerHTML = '';
+        let alertas = [];
+
+        window.casosDb.forEach(c => {
+            if(c.encerrado) return; // IA ignora casos encerrados
+
+            let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
+            let diasUltimoAndamento = c.andamentos && c.andamentos.length > 0 
+                ? Math.floor((Date.now() - c.andamentos[0].id) / 86400000) 
+                : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
+
+            // Regra 1: Aguardando Liminar > 10 dias
+            if (c.status === 'Aguardando Liminar' && diasStatus >= 10) {
+                alertas.push({ caso: c, tipo: 'alerta', titulo: 'Liminar Atrasada', msg: `Aguardando liminar há ${diasStatus} dias. Peticione reiteração ou contate a Vara.`});
+            }
+            // Regra 3: Em Busca > 15 dias
+            if (c.status === 'Em Busca' && diasStatus >= 15) {
+                alertas.push({ caso: c, tipo: 'alerta', titulo: 'Mandado sem Retorno', msg: `Oficial de Justiça com o mandado há ${diasStatus} dias sem atualização. Contate a Central de Mandados.`});
+            }
+            // Regra 4: Bloqueado > 30 dias
+            if (c.status === 'Bloqueado' && diasStatus >= 30) {
+                alertas.push({ caso: c, tipo: 'aviso', titulo: 'Bloqueio Ineficaz', msg: `Veículo bloqueado há ${diasStatus} dias sem apreensão. Avalie oficiar PM/PRF ou Execução.`});
+            }
+            // Regra 10: Abandono de Causa
+            if (diasUltimoAndamento >= 45) {
+                alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de intimação para dar andamento sob pena de extinção (Art. 485, III, CPC).`});
+            }
+
+            // Análise de Texto dos Andamentos
+            if (c.andamentos && c.andamentos.length > 0) {
+                let textAndamentos = c.andamentos.map(a => a.descricao.toLowerCase()).join(' ');
+                let ultimoAndamentoText = c.andamentos[0].descricao.toLowerCase();
+                
+                // Regra 6: Pátio / Diárias
+                if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) {
+                    alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione IMEDIATAMENTE com ofício liberatório para estancar diárias.`});
+                }
+                
+                // Regra 2: Diligência Negativa
+                let countNegativas = (textAndamentos.match(/negativa|não encontrad|mudou|endereço incorreto/g) || []).length;
+                if (ultimoAndamentoText.match(/(negativa|não encontrad|mudou|endereço incorreto)/)) {
+                    alertas.push({ caso: c, tipo: 'aviso', titulo: 'Diligência Negativa Recente', msg: `Diligência falhou recentemente. Peça Sisbajud/Infojud/Renajud para novos endereços e bloqueio de circulação.`});
+                }
+                
+                // Regra 7: Esgotamento de Endereços
+                if (countNegativas >= 3 && !textAndamentos.includes('edital')) {
+                    alertas.push({ caso: c, tipo: 'alerta', titulo: 'Esgotamento de Endereços', msg: `Detectadas múltiplas diligências negativas. Avalie requerer Citação por Edital.`});
+                }
+            }
+        });
+
+        // Atualizar Badge de notificações
+        const notifBadge = document.getElementById('notif-badge-copiloto');
+        if(notifBadge) {
+            notifBadge.innerText = alertas.length;
+            notifBadge.style.display = alertas.length > 0 ? 'flex' : 'none';
+        }
+
+        if(alertas.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🤖</div><h3>Tudo sob controle!</h3><p>A IA não encontrou nenhum gargalo nos seus processos ativos no momento.</p></div>`;
+            return;
+        }
+
+        let html = '<div class="grid-2">';
+        alertas.forEach(a => {
+            let corBorda = '#3b82f6'; let bgIcon = '#eff6ff'; let icon = '💡';
+            if(a.tipo === 'aviso') { corBorda = '#f59e0b'; bgIcon = '#fef3c7'; icon = '⚠️'; }
+            if(a.tipo === 'alerta') { corBorda = '#ea580c'; bgIcon = '#ffedd5'; icon = '⏰'; }
+            if(a.tipo === 'erro') { corBorda = '#ef4444'; bgIcon = '#fee2e2'; icon = '🚨'; }
+            if(a.tipo === 'sucesso') { corBorda = '#10b981'; bgIcon = '#d1fae5'; icon = '✅'; }
+            
+            html += `
+            <div class="card" style="border-left: 4px solid ${corBorda}; padding: 15px; margin-bottom: 0;">
+                <div style="display: flex; gap: 15px;">
+                    <div style="font-size: 1.5rem; background: ${bgIcon}; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink: 0;">${icon}</div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; color: var(--azul); font-size: 1rem;">${a.titulo}</h4>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><strong>${a.caso.cliente}</strong> (Contrato: ${a.caso.contrato})</div>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--texto); line-height: 1.4;">${a.msg}</p>
+                        <div style="margin-top: 10px; display: flex; gap: 8px;">
+                            <button class="btn btn-outline btn-small" onclick="window.abrirModalAndamento('${a.caso.id}')">Lançar Ação</button>
+                            <button class="btn btn-outline btn-small" onclick="window.abrirModalEditarCaso('${a.caso.id}')">Ver Ficha</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
     };
 
     window.salvarCasoFull = async function() {
@@ -882,27 +991,6 @@
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
             if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length;
         });
-    };
-
-    window.checarInercia = function() {
-        const hoje = Date.now(); let travados = [];
-        window.casosDb.filter(c => c.encerrado !== true).forEach(c => {
-            if((c.status || 'Aguardando Liminar') === 'Liminar Deferida') {
-                let dias = Math.floor((hoje - (c.dataStatus || c.timestamp)) / 86400000);
-                if(dias >= 5) travados.push({...c, diasTravado: dias});
-            }
-        });
-        const bell = document.getElementById('notif-badge'); const tbody = document.getElementById('notif-tbody');
-        if(travados.length > 0) {
-            bell.style.display = 'flex'; bell.innerText = travados.length;
-            tbody.innerHTML = travados.map(t => {
-                let local = t.comarcaReq ? t.comarcaReq : (t.comarcaOrigem || '-');
-                let procHtml = t.processo ? `<br><span style="font-size:0.7rem;color:var(--info);">${t.processo}</span>` : '';
-                return `<tr><td><strong>${t.cliente}</strong><br><span style="font-size:0.75rem;color:#64748b;">${t.contrato}</span>${procHtml}</td><td>${local}</td><td style="color:var(--erro); font-weight:bold;">${t.diasTravado} dias</td></tr>`;
-            }).join('');
-        } else {
-            bell.style.display = 'none'; tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--sucesso);">Tudo em dia! Sem gargalos no cartório. ✅</td></tr>';
-        }
     };
 
     window.atualizarFiltros = function() {
@@ -1156,16 +1244,9 @@
         let agil = 0, atencao = 0, criticos = 0; 
         let comarcasMap = {};
         
-        let motivosCount = {
-            'Apreensão': 0,
-            'Entrega Amigável': 0,
-            'Acordo Realizado': 0,
-            'Quitado': 0,
-            'Pagou parcelas em atraso (Purgação da Mora)': 0
-        };
+        let motivosCount = { 'Apreensão': 0, 'Entrega Amigável': 0, 'Acordo Realizado': 0, 'Quitado': 0, 'Pagou parcelas em atraso (Purgação da Mora)': 0 };
 
         window.casosDb.forEach(c => {
-            // Contagem de expedidos: Ativos que passaram da fase de mandado + Todos os encerrados
             let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === c.status);
             
             if(c.encerrado !== true) {
@@ -1192,16 +1273,13 @@
         document.getElementById('dash-mandados').innerText = expedidos;
         document.getElementById('dash-apreendidos').innerText = totalEncerramentosExito;
         
-        // Taxa de Sucesso baseada APENAS em Apreensão sobre o total de expedidos
         let taxaApreensao = expedidos > 0 ? ((motivosCount['Apreensão'] / expedidos) * 100).toFixed(1) : 0;
         document.getElementById('dash-taxa').innerText = `${taxaApreensao}%`;
 
         let listaComarcas = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total }));
         let topVol = [...listaComarcas].sort((a,b) => b.casos - a.casos).slice(0, 5);
 
-        const ctxStatus = document.getElementById('chartStatus'); 
-        const ctxEncerramentos = document.getElementById('chartEncerramentos');
-        const ctxComarcas = document.getElementById('chartComarcas');
+        const ctxStatus = document.getElementById('chartStatus'); const ctxEncerramentos = document.getElementById('chartEncerramentos'); const ctxComarcas = document.getElementById('chartComarcas');
         
         if(chartStatusInstance) chartStatusInstance.destroy(); 
         if(chartEncerramentosInstance) chartEncerramentosInstance.destroy(); 
@@ -1218,14 +1296,7 @@
         if(ctxEncerramentos && totalEncerramentosExito > 0) {
             chartEncerramentosInstance = new Chart(ctxEncerramentos, {
                 type: 'pie',
-                data: { 
-                    labels: ['Apreensão', 'Amigável', 'Acordo', 'Quitado', 'Mora'], 
-                    datasets: [{ 
-                        data: [motivosCount['Apreensão'], motivosCount['Entrega Amigável'], motivosCount['Acordo Realizado'], motivosCount['Quitado'], motivosCount['Pagou parcelas em atraso (Purgação da Mora)']], 
-                        backgroundColor: ['#10b981', '#14b8a6', '#0ea5e9', '#059669', '#0284c7'],
-                        borderWidth: 1
-                    }] 
-                },
+                data: { labels: ['Apreensão', 'Amigável', 'Acordo', 'Quitado', 'Mora'], datasets: [{ data: [motivosCount['Apreensão'], motivosCount['Entrega Amigável'], motivosCount['Acordo Realizado'], motivosCount['Quitado'], motivosCount['Pagou parcelas em atraso (Purgação da Mora)']], backgroundColor: ['#10b981', '#14b8a6', '#0ea5e9', '#059669', '#0284c7'], borderWidth: 1 }] },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 11} } } } }
             });
         }
