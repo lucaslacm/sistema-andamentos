@@ -205,7 +205,7 @@
             </div>
         </header>
 
-        <div id="loading">Sincronizando com a Nuvem...</div>
+        <div id="loading">Conectando e Baixando Dados da Nuvem...</div>
 
         <div id="tab-kanban" class="tab-content kanban-active active">
             <div class="top-bar" style="margin-bottom: 15px;">
@@ -346,7 +346,7 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, where } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // INSIRA AS SUAS CHAVES AQUI
+    // AS CHAVES ESTÃO INJETADAS AQUI EXATAMENTE COMO VOCÊ MANDOU
     const firebaseConfig = {
         apiKey: "AIzaSyAWjjd2SdSRQ1Pwm68m3LBj4uaC4k4enlM",
         authDomain: "sistema-andamentos.firebaseapp.com",
@@ -380,15 +380,24 @@
     let sessao = localStorage.getItem('usuarioSessaoSGI');
     if(sessao) { window.usuarioLogado = JSON.parse(sessao); mostrarPainel(); }
 
-    // CORREÇÃO AQUI: Mudado de "casos_omni" para "casos" para ler o seu banco de dados correto.
     onSnapshot(collection(db, "casos"), (snapshot) => {
         window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-        if(window.usuarioLogado) { window.renderizarGeral(); document.getElementById('loading').style.display = 'none'; }
+        if(window.usuarioLogado) { 
+            document.getElementById('loading').style.display = 'none'; // GARANTE QUE A TELA DE CARREGAMENTO SUMA
+            try { window.renderizarGeral(); } catch(e) { console.error("Erro renderizarGeral:", e); }
+        }
+    }, (error) => {
+        console.error("Firebase Sync Error (Casos):", error);
+        document.getElementById('loading').innerHTML = `<span style="color:var(--erro);">Falha ao baixar dados. O Firebase recusou a leitura (Erro de Permissão).</span>`;
     });
     
     onSnapshot(collection(db, "usuarios"), (s) => { 
         window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); 
-        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') window.desenharTabelaEquipe();
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') {
+            try { window.desenharTabelaEquipe(); } catch(e) { console.error("Erro desenhar Equipe:", e); }
+        }
+    }, (error) => {
+        console.error("Firebase Sync Error (Usuarios):", error);
     });
 
     window.toggleAuth = function() {
@@ -411,7 +420,7 @@
             await addDoc(collection(db, "usuarios"), { nome, username: user, password: pass, role });
             alert('Conta criada na nuvem com sucesso! Faça login.'); window.toggleAuth();
         } catch (e) {
-            alert('Erro de Permissão (Firebase Rules). Vá na aba Regras do seu banco de dados e coloque "allow read, write: if true;"');
+            alert('Erro de Permissão (Firebase Rules).');
             console.error(e);
         }
     };
@@ -438,7 +447,7 @@
             }
         } catch (e) {
             console.error("ERRO FIREBASE:", e);
-            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>1. Verifique se colou as <b>chaves corretas</b> no código.<br>2. Verifique se a aba <b>Regras</b> do seu banco está como <i>allow read, write: if true;</i><br><br>Detalhe técnico: ${e.message}`;
+            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Detalhe técnico: ${e.message}`;
             err.style.display = 'block';
         }
         btn.innerText = "Acessar Painel";
@@ -446,12 +455,12 @@
 
     function mostrarPainel() {
         document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
-        document.getElementById('user-display').innerText = window.usuarioLogado.nome;
-        document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
+        document.getElementById('user-display').innerText = window.usuarioLogado.nome || 'Usuário';
+        document.getElementById('user-avatar').innerText = (window.usuarioLogado.nome || 'U').charAt(0).toUpperCase();
         document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe Externa';
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = window.usuarioLogado.role === 'admin' ? 'flex' : 'none');
         document.getElementById('loading').style.display = 'block';
-        gerarColunasKanban(); window.atualizarFiltros();
+        try { gerarColunasKanban(); window.atualizarFiltros(); } catch(e){ console.error(e); }
     }
 
     window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessaoSGI'); location.reload(); };
@@ -481,7 +490,10 @@
         document.getElementById('novo-caso-id').value = c.id; document.getElementById('novo-contrato').value = c.contrato || ''; 
         document.getElementById('novo-cliente').value = c.cliente || ''; document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; 
         document.getElementById('novo-comarca-req').value = c.comarcaReq || ''; document.getElementById('novo-obs').value = c.obs || ''; 
-        document.getElementById('novo-status').value = c.status || 'Aguardando recolhimento das custas iniciais';
+        
+        const validStatus = STATUS_PHASES.find(f => f.id === c.status);
+        document.getElementById('novo-status').value = validStatus ? validStatus.id : 'Aguardando recolhimento das custas iniciais';
+        
         window.openModal('modal-novo-caso');
     };
 
@@ -500,15 +512,15 @@
         
         if(idCaso) {
             const cAtual = window.casosDb.find(x => x.id === idCaso);
-            let andamentos = cAtual.andamentos || []; let dataStatus = cAtual.dataStatus;
+            let andamentos = Array.isArray(cAtual.andamentos) ? cAtual.andamentos : []; 
+            let dataStatus = cAtual.dataStatus;
+            
             if(cAtual.status !== payload.status) {
                 dataStatus = Date.now();
                 andamentos.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
             }
-            // MUDADO PARA "casos"
             await updateDoc(doc(db, "casos", idCaso), { ...payload, dataStatus, andamentos });
         } else {
-            // MUDADO PARA "casos"
             await addDoc(collection(db, "casos"), {
                 ...payload, andamentos: [], dataStatus: Date.now(), timestamp: Date.now(), mandadoExpedido: false, mesRegistro: new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' })
             });
@@ -525,7 +537,8 @@
     window.salvarAndamento = async function() {
         const idCaso = document.getElementById('andamento-caso-id').value; const acaoText = document.getElementById('nova-acao').value.trim();
         if (!acaoText) return alert('Descreva!'); 
-        const cAtual = window.casosDb.find(x => x.id === idCaso); let andamentos = cAtual.andamentos || [];
+        const cAtual = window.casosDb.find(x => x.id === idCaso); 
+        let andamentos = Array.isArray(cAtual.andamentos) ? cAtual.andamentos : [];
         andamentos.unshift({ id: Date.now(), descricao: acaoText, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
         await updateDoc(doc(db, "casos", idCaso), { andamentos }); window.closeModal('modal-novo-andamento');
     };
@@ -533,7 +546,8 @@
     window.salvarMandado = async function() {
         const idCaso = document.getElementById('mandado-caso-id').value; const valor = parseFloat(document.getElementById('mandado-valor').value);
         if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
-        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andamentosAtuais = casoAtual.andamentos || [];
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); 
+        let andamentosAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
         andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
         await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
         window.closeModal('modal-mandado');
@@ -541,7 +555,9 @@
 
     window.desfazerMandado = async function(idCaso) {
         if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório financeiro.")) {
-            const casoAtual = window.casosDb.find(c => c.id === idCaso); const novosAndamentos = casoAtual.andamentos.filter(a => a.responsavel !== "SISTEMA");
+            const casoAtual = window.casosDb.find(c => c.id === idCaso); 
+            let arr = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+            const novosAndamentos = arr.filter(a => a.responsavel !== "SISTEMA");
             await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
         }
     };
@@ -553,7 +569,7 @@
         ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
         const idCaso = ev.dataTransfer.getData("caseId"); const cAtual = window.casosDb.find(c => c.id === idCaso);
         if(!cAtual || cAtual.status === novoStatus) return;
-        let andamentos = cAtual.andamentos || [];
+        let andamentos = Array.isArray(cAtual.andamentos) ? cAtual.andamentos : [];
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
         await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
     };
@@ -569,26 +585,38 @@
     }
 
     window.renderizarGeral = function() {
-        renderizarKanban(); renderizarCasos();
+        try { renderizarKanban(); } catch(e) { console.error("Erro no Kanban", e); }
+        try { renderizarCasos(); } catch(e) { console.error("Erro nos Casos", e); }
+        
         if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { 
-            analisarRegrasCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); 
+            try { analisarRegrasCopiloto(); } catch(e){} 
+            try { window.renderizarFinanceiro(); } catch(e){}
+            try { window.renderizarRelatorios(); } catch(e){} 
         }
     };
 
     function renderizarKanban() {
         STATUS_PHASES.forEach(f => { const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) col.innerHTML = ''; });
         window.casosDb.forEach(c => {
-            const status = c.status || 'Aguardando recolhimento das custas iniciais';
-            const col = document.getElementById('col-' + status.replace(/\s+/g, ''));
+            const statusStr = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
+            const col = document.getElementById('col-' + statusStr.replace(/\s+/g, ''));
+            
             if(col) {
-                const conf = STATUS_PHASES.find(x => x.id === status) || STATUS_PHASES[0];
+                const conf = STATUS_PHASES.find(x => x.id === statusStr) || STATUS_PHASES[0];
                 const dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
                 let diasHtml = dias > 0 ? `<span style="color:${dias > 5 ? 'var(--erro)' : 'var(--texto-claro)'};">⏱️ ${dias}d</span>` : '<span>✨ Novo</span>';
+                
+                const clienteFormatado = c.cliente || 'Sem Cliente';
+                const contratoFormatado = c.contrato || 'Sem Contrato';
+                const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
+                const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
+                const comarcaFinal = comReq || comOri || 'N/A';
+
                 col.innerHTML += `
                     <div class="k-card" draggable="true" ondragstart="window.dragKanban(event, '${c.id}')" onclick="window.abrirModalEditarCaso('${c.id}')">
-                        <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${status}</div>
-                        <h4>${c.cliente}</h4><p>${c.contrato}</p>
-                        <div class="k-meta"><span>${c.comarcaReq || c.comarcaOrigem || 'N/A'}</span>${diasHtml}</div>
+                        <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${statusStr}</div>
+                        <h4>${clienteFormatado}</h4><p>${contratoFormatado}</p>
+                        <div class="k-meta"><span>${comarcaFinal}</span>${diasHtml}</div>
                     </div>`;
             }
         });
@@ -602,20 +630,28 @@
         const container = document.getElementById('cases-container'); container.innerHTML = '';
         const isAdmin = window.usuarioLogado.role === 'admin';
         window.casosDb.forEach(c => {
-            const st = c.status || 'Aguardando recolhimento das custas iniciais'; const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
-            let andHTML = (c.andamentos||[]).slice(0,3).map(a => `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data}:</strong> ${a.descricao}</div>`).join('');
+            const st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
+            const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
+            
+            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
+            let andHTML = arr.slice(0,3).map(a => `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data || ''}:</strong> ${a.descricao || ''}</div>`).join('');
+            
             let btnFaturar = ''; let btnExcluir = '';
             if(isAdmin) {
                 btnExcluir = `<button class="btn btn-small btn-danger" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>`;
                 btnFaturar = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Faturar</button>` : `<span class="tag-status" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:0.75rem;">Faturado</span>`;
             }
+            
+            const clienteFormatado = c.cliente || 'Sem Cliente';
+            const contratoFormatado = c.contrato || 'Sem Contrato';
+
             let div = document.createElement('div'); div.className = 'card';
             div.innerHTML = `
                 <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
                     <div>
                         <span class="tag-status ${conf.cor}">${st}</span>
-                        <h3 style="margin:10px 0 5px; color:var(--azul);">${c.cliente}</h3>
-                        <p style="margin:0; font-family:monospace; color:var(--laranja);">${c.contrato}</p>
+                        <h3 style="margin:10px 0 5px; color:var(--azul);">${clienteFormatado}</h3>
+                        <p style="margin:0; font-family:monospace; color:var(--laranja);">${contratoFormatado}</p>
                     </div>
                     <div style="display:flex; gap:10px; align-items:center;">
                         ${btnFaturar}
@@ -666,7 +702,9 @@
         let total = 0;
         casosFin.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); total += v;
-            let comarca = c.comarcaReq ? c.comarcaReq : (c.comarcaOrigem || '');
+            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
+            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
+            let comarca = comReq || comOri || '';
             csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato};${c.cliente};${comarca};${v.toFixed(2).replace('.', ',')}
 `;
         });
@@ -683,7 +721,10 @@
         window.casosDb.forEach(c => {
             if(c.mandadoExpedido) expedidos++;
             let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
-            let comarcaNome = (c.comarcaReq && c.comarcaReq.trim() !== '') ? c.comarcaReq.trim() : ((c.comarcaOrigem && c.comarcaOrigem.trim() !== '') ? c.comarcaOrigem.trim() : 'Sem Comarca');
+            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq.trim() : '';
+            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem.trim() : '';
+            let comarcaNome = comReq || comOri || 'Sem Comarca';
+            
             if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
             comarcasMap[comarcaNome].total++;
             if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
@@ -715,7 +756,9 @@ CONTRATO;CLIENTE;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
 `;
         window.casosDb.forEach(c => {
             let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
-            let comarca = c.comarcaReq ? `${c.comarcaReq} (Req)` : (c.comarcaOrigem ? `${c.comarcaOrigem} (Orig)` : 'Não inf.');
+            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
+            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
+            let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
             csvFinal += `${c.contrato};${c.cliente};${comarca};${c.status};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
 `;
         });
