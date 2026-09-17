@@ -152,7 +152,7 @@
         .kanban-cards { padding: 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
         
         .k-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--borda); transition: 0.2s; position: relative; }
-        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transform: scale(0.97) rotate(1deg); z-index: 100; }
+        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transform: scale(0.97) rotate(1deg); border-color: var(--laranja); z-index: 100; }
         .k-card h4 { margin: 0 0 5px 0; color: var(--azul); font-size: 0.9rem; line-height: 1.2; }
         .k-card .k-meta { margin-top: 8px; font-size: 0.7rem; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 8px; }
 
@@ -600,12 +600,7 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
-        alert(`✅ Restauração Concluída!
-
-Seu Login: ${usernameGerado}
-Sua Senha: ${senha}
-
-Guarde essas informações.`);
+        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações.`);
         document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
         window.voltarLogin();
     };
@@ -684,10 +679,7 @@ Guarde essas informações.`);
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
-        alert(`✅ Conta gerada com sucesso!
-
-LOGIN: ${usernameGerado}
-SENHA TEMP: ${senhaTemp}`);
+        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -720,7 +712,6 @@ SENHA TEMP: ${senhaTemp}`);
         document.querySelector('.toggle-wrapper.admin-only').style.display = isAdmin ? 'flex' : 'none';
         
         document.getElementById('kb-subtitle').innerText = isAdmin ? "Arraste os cartões para atualizar as fases." : "Modo leitura (Apenas Gestão move os cartões).";
-        document.getElementById('loading').style.display = 'block';
 
         const kbContainer = document.getElementById('kanban-board-container');
         kbContainer.innerHTML = STATUS_PHASES.map(fase => `
@@ -733,6 +724,9 @@ SENHA TEMP: ${senhaTemp}`);
         window.switchTab('tab-casos'); window.atualizarFiltros(); 
         try { window.renderizarGeral(); } catch(e){ console.error(e); }
         if(isAdmin) window.desenharTabelaEquipe();
+        
+        const loadEl = document.getElementById('loading');
+        if(loadEl) loadEl.style.display = 'none';
     }
 
     window.switchTab = function(tabId) {
@@ -1163,7 +1157,7 @@ SENHA TEMP: ${senhaTemp}`);
             }
             
             const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && a.descricao.includes('Mandado Faturado')));
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
             
             let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => {
                 let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}', ${a.id})" title="Excluir">✖</span>` : '';
@@ -1250,7 +1244,7 @@ SENHA TEMP: ${senhaTemp}`);
             }
             
             const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && a.descricao.includes('Mandado Faturado')));
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
             
             let andHTML = andamentosVisiveis.slice(0,5).map((a, i) => {
                 let isRecent = i === 0 ? 'recent' : '';
@@ -1352,20 +1346,17 @@ SENHA TEMP: ${senhaTemp}`);
         if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
         if(casosFin.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO
-`;
+        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
         let total = 0;
         casosFin.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); total += v;
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq || comOri || '';
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}
-`;
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
         });
-        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
-`;
-        const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
+        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
     };
 
@@ -1373,22 +1364,16 @@ SENHA TEMP: ${senhaTemp}`);
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI
-Gerado em:;${dataHoje}
-Base total:;${window.casosDb.length} processos
-
-CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
-`;
+        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.\n`;
         window.casosDb.forEach(c => {
             let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
-`;
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}\n`;
         });
-        const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
