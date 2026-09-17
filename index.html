@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle - Omni (Completo)</title>
+    <title>Painel de Controle - SGI</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -84,7 +84,6 @@
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; padding: 30px 40px; overflow-y: auto; flex: 1; }
         .tab-content.active { display: block; }
-        /* CORREÇÃO DO BUG AQUI: adicionado .active para não sobrepor */
         .tab-content.kanban-active.active { display: flex; flex-direction: column; overflow: hidden; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -142,17 +141,23 @@
 
         .drop-hover { background-color: rgba(243, 112, 33, 0.05); border: 2px dashed var(--laranja); }
         #loading { display: none; text-align: center; padding: 20px; color: var(--azul); font-weight: bold; width: 100%; margin: auto; }
+        
+        #error-msg { color: var(--erro); background: #fee2e2; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; display: none; text-align: left; }
     </style>
 </head>
 <body>
 
 <div id="auth-screen" class="auth-container">
     <div id="login-box" class="auth-box">
-        <div style="font-size: 3rem; color: var(--laranja); font-weight: 900; letter-spacing: -2px; margin-bottom: 5px; line-height: 1;">omni</div>
-        <p style="color: var(--texto-claro); font-size: 0.9rem; margin-bottom: 25px;">Agente Omni (Nuvem)</p>
+        <div style="font-size: 2.5rem; color: var(--laranja); font-weight: 900; letter-spacing: -2px; margin-bottom: 5px; line-height: 1;">SGI Web</div>
+        <p style="color: var(--texto-claro); font-size: 0.9rem; margin-bottom: 25px;">Acesso Integrado</p>
+        
         <div class="form-group"><label>Usuário</label><input type="text" id="login-username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-password"></div>
-        <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
+        <button class="btn btn-primary" id="btn-login-submit" style="width: 100%; font-size: 1.1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
+        
+        <div id="error-msg"></div>
+        
         <div class="auth-toggle">Não tem uma conta? <a onclick="window.toggleAuth()">Criar conta</a></div>
     </div>
     
@@ -172,7 +177,7 @@
 <div id="app-screen" style="display: none;">
     <aside class="sidebar">
         <div class="sidebar-header">
-            <span style="font-size: 2rem; color: var(--laranja); font-weight: 900; letter-spacing: -1px;">omni</span>
+            <span style="font-size: 1.8rem; color: var(--laranja); font-weight: 900; letter-spacing: -1px;">SGI App</span>
         </div>
         <div class="user-profile">
             <div class="avatar" id="user-avatar">U</div>
@@ -341,8 +346,9 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, where } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+    // INSIRA AS SUAS CHAVES AQUI
     const firebaseConfig = {
-        apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM",
+        apiKey: "AIzaSyAWjjd2SdSRQ1Pwm68m3LBj4uaC4k4enlM",
         authDomain: "sistema-andamentos.firebaseapp.com",
         projectId: "sistema-andamentos",
         storageBucket: "sistema-andamentos.firebasestorage.app",
@@ -371,11 +377,12 @@
         {id: 'Acordo Realizado', cor: 'cor-acordo', borda: 'borda-acordo'}
     ];
 
-    let sessao = localStorage.getItem('usuarioSessaoOmni');
+    let sessao = localStorage.getItem('usuarioSessaoSGI');
     if(sessao) { window.usuarioLogado = JSON.parse(sessao); mostrarPainel(); }
 
-    onSnapshot(query(collection(db, "casos_omni"), orderBy("timestamp", "desc")), (snapshot) => {
-        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // CORREÇÃO AQUI: Mudado de "casos_omni" para "casos" para ler o seu banco de dados correto.
+    onSnapshot(collection(db, "casos"), (snapshot) => {
+        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
         if(window.usuarioLogado) { window.renderizarGeral(); document.getElementById('loading').style.display = 'none'; }
     });
     
@@ -396,21 +403,45 @@
         const pass = document.getElementById('reg-password').value;
         const role = document.getElementById('reg-role').value;
         if (!nome || !user || !pass) return alert('Preencha todos os campos!');
-        const q = query(collection(db, "usuarios"), where("username", "==", user));
-        const qSnap = await getDocs(q);
-        if(!qSnap.empty) return alert('Este nome de usuário já está em uso na nuvem.');
-        await addDoc(collection(db, "usuarios"), { nome, username: user, password: pass, role });
-        alert('Conta criada na nuvem com sucesso! Faça login.'); window.toggleAuth();
+        
+        try {
+            const q = query(collection(db, "usuarios"), where("username", "==", user));
+            const qSnap = await getDocs(q);
+            if(!qSnap.empty) return alert('Este nome de usuário já está em uso na nuvem.');
+            await addDoc(collection(db, "usuarios"), { nome, username: user, password: pass, role });
+            alert('Conta criada na nuvem com sucesso! Faça login.'); window.toggleAuth();
+        } catch (e) {
+            alert('Erro de Permissão (Firebase Rules). Vá na aba Regras do seu banco de dados e coloque "allow read, write: if true;"');
+            console.error(e);
+        }
     };
 
     window.doLogin = async function() {
-        const user = document.getElementById('login-username').value.trim(); const pass = document.getElementById('login-password').value;
-        const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
-        const qSnap = await getDocs(q);
-        if (!qSnap.empty) {
-            window.usuarioLogado = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
-            localStorage.setItem('usuarioSessaoOmni', JSON.stringify(window.usuarioLogado)); mostrarPainel();
-        } else alert('Usuário ou senha incorretos!');
+        const btn = document.getElementById('btn-login-submit');
+        const err = document.getElementById('error-msg');
+        const user = document.getElementById('login-username').value.trim(); 
+        const pass = document.getElementById('login-password').value;
+        
+        btn.innerText = "Conectando..."; err.style.display = 'none';
+        
+        try {
+            const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
+            const qSnap = await getDocs(q);
+            
+            if (!qSnap.empty) {
+                window.usuarioLogado = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+                localStorage.setItem('usuarioSessaoSGI', JSON.stringify(window.usuarioLogado)); 
+                mostrarPainel();
+            } else {
+                err.innerHTML = "<b>Credenciais inválidas!</b><br>Verifique se o usuário ou a senha estão corretos.";
+                err.style.display = 'block';
+            }
+        } catch (e) {
+            console.error("ERRO FIREBASE:", e);
+            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>1. Verifique se colou as <b>chaves corretas</b> no código.<br>2. Verifique se a aba <b>Regras</b> do seu banco está como <i>allow read, write: if true;</i><br><br>Detalhe técnico: ${e.message}`;
+            err.style.display = 'block';
+        }
+        btn.innerText = "Acessar Painel";
     };
 
     function mostrarPainel() {
@@ -423,7 +454,7 @@
         gerarColunasKanban(); window.atualizarFiltros();
     }
 
-    window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessaoOmni'); location.reload(); };
+    window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessaoSGI'); location.reload(); };
 
     window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -474,9 +505,11 @@
                 dataStatus = Date.now();
                 andamentos.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
             }
-            await updateDoc(doc(db, "casos_omni", idCaso), { ...payload, dataStatus, andamentos });
+            // MUDADO PARA "casos"
+            await updateDoc(doc(db, "casos", idCaso), { ...payload, dataStatus, andamentos });
         } else {
-            await addDoc(collection(db, "casos_omni"), {
+            // MUDADO PARA "casos"
+            await addDoc(collection(db, "casos"), {
                 ...payload, andamentos: [], dataStatus: Date.now(), timestamp: Date.now(), mandadoExpedido: false, mesRegistro: new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' })
             });
         }
@@ -484,7 +517,7 @@
     };
 
     window.excluirCaso = async function(idCaso) {
-        if(confirm("Deseja apagar este caso da nuvem?")) await deleteDoc(doc(db, "casos_omni", idCaso));
+        if(confirm("Deseja apagar este caso da nuvem?")) await deleteDoc(doc(db, "casos", idCaso));
     };
 
     window.abrirModalAndamento = function(idCaso) { document.getElementById('andamento-caso-id').value = idCaso; document.getElementById('nova-acao').value = ''; window.openModal('modal-novo-andamento'); };
@@ -494,7 +527,7 @@
         if (!acaoText) return alert('Descreva!'); 
         const cAtual = window.casosDb.find(x => x.id === idCaso); let andamentos = cAtual.andamentos || [];
         andamentos.unshift({ id: Date.now(), descricao: acaoText, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos_omni", idCaso), { andamentos }); window.closeModal('modal-novo-andamento');
+        await updateDoc(doc(db, "casos", idCaso), { andamentos }); window.closeModal('modal-novo-andamento');
     };
 
     window.salvarMandado = async function() {
@@ -502,14 +535,14 @@
         if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
         const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andamentosAtuais = casoAtual.andamentos || [];
         andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
-        await updateDoc(doc(db, "casos_omni", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
+        await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
         window.closeModal('modal-mandado');
     };
 
     window.desfazerMandado = async function(idCaso) {
         if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório financeiro.")) {
             const casoAtual = window.casosDb.find(c => c.id === idCaso); const novosAndamentos = casoAtual.andamentos.filter(a => a.responsavel !== "SISTEMA");
-            await updateDoc(doc(db, "casos_omni", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+            await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
         }
     };
 
@@ -522,7 +555,7 @@
         if(!cAtual || cAtual.status === novoStatus) return;
         let andamentos = cAtual.andamentos || [];
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos_omni", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
+        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
     };
 
     function gerarColunasKanban() {
