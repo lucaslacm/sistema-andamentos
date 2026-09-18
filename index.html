@@ -80,7 +80,6 @@
         .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, var(--azul) 0%, var(--azul-escuro) 100%); }
         .auth-box { background: var(--fundo-card); padding: 40px; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--laranja); }
         .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.5rem; font-weight: 700; }
-        #error-msg { color: var(--erro); background: #fee2e2; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; display: none; text-align: left; }
         
         /* Layout Principal */
         #app-screen { display: none; height: 100vh; display: flex; width: 100vw; }
@@ -117,7 +116,7 @@
         .top-bar h2 { margin: 0; font-size: 1.4rem; color: var(--azul); font-weight: 700; letter-spacing: -0.5px; }
         
         /* Cards (Lista) */
-        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; transition: all 0.2s; }
+        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; transition: all 0.2s;}
         .tag-status { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; margin: 10px 0; border: 1px dashed var(--borda); font-size: 0.85rem; }
@@ -170,7 +169,7 @@
         
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 2px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 1px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
         td { padding: 12px 15px; border-bottom: 1px solid var(--borda); color: var(--texto); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto; padding: 20px; }
@@ -183,7 +182,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
+        /* Cores das Colunas Kanban */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -200,8 +199,6 @@
         
         /* Badge de caso encerrado */
         .badge-encerrado { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 5px; }
-        
-        #loading { display: none; background: #fff3cd; color: #856404; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #ffeeba; }
         
         /* EFEITO DE URGENCIA PARA VEICULOS LOCALIZADOS */
         @keyframes pulseAlert {
@@ -226,8 +223,7 @@
         <p style="color: var(--texto-claro); font-size: 0.85rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;">SGI - Acesso Restrito</p>
         <div class="form-group"><label>Credencial de Acesso</label><input type="text" id="login-username" placeholder="Login ou Email"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
-        <button class="btn btn-primary" id="btn-login-submit" style="width: 100%; font-size: 1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
-        <div id="error-msg"></div>
+        <button class="btn btn-primary" style="width: 100%; font-size: 1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
     </div>
 
     <div id="force-password-box" class="auth-box" style="display: none;">
@@ -297,11 +293,9 @@
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="btn btn-primary" onclick="window.openModal('modal-novo-caso')">➕ Novo Processo</button>
+                <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
         </header>
-
-        <div id="loading">Conectando e Baixando Dados da Nuvem...</div>
 
         <!-- ABA COPILOTO IA -->
         <div id="tab-copiloto" class="tab-content">
@@ -437,7 +431,7 @@
 <!-- === MODAIS === -->
 <div id="modal-novo-caso" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
+        <div class="modal-header"><h3 id="titulo-modal-caso">📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
         <input type="hidden" id="novo-caso-id">
         
         <div class="grid-2">
@@ -451,7 +445,7 @@
         </div>
         
         <div class="form-group">
-            <label>Status / Fase Atual do Processo</label>
+            <label>Status / Fase Atual</label>
             <select id="novo-status">
                 <option value="Aguardando recolhimento das custas iniciais">Aguardando recolhimento das custas iniciais</option>
                 <option value="Aguardando distribuição da ação">Aguardando distribuição da ação</option>
@@ -549,15 +543,8 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // AS CHAVES EXATAS FORNECIDAS MANTIDAS INTACTAS
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAWjjd2SdSRQ1Pwm68m3LBj4uaC4k4enlM", 
-        authDomain: "sistema-andamentos.firebaseapp.com", 
-        projectId: "sistema-andamentos", 
-        storageBucket: "sistema-andamentos.firebasestorage.app", 
-        messagingSenderId: "421431391255", 
-        appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" 
-    };
+    // CHAVES ORIGINAIS DO SOURCE 5 INTACTAS
+    const firebaseConfig = { apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", authDomain: "sistema-andamentos.firebaseapp.com", projectId: "sistema-andamentos", storageBucket: "sistema-andamentos.firebasestorage.app", messagingSenderId: "421431391255", appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" };
     
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
@@ -600,49 +587,40 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
-        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações.`);
+        alert(`✅ Restauração Concluída!
+
+Seu Login: ${usernameGerado}
+Sua Senha: ${senha}
+
+Guarde essas informações.`);
         document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
         window.voltarLogin();
     };
 
     window.doLogin = async function() {
-        const btn = document.getElementById('btn-login-submit');
-        const err = document.getElementById('error-msg');
-        const userRaw = document.getElementById('login-username').value.trim(); 
-        const pass = document.getElementById('login-password').value;
-        
+        const userRaw = document.getElementById('login-username').value.trim(); const pass = document.getElementById('login-password').value;
         if (userRaw.toUpperCase() === 'RESGATE') { window.abrirCriarAdminMestre(); return; }
         if(!userRaw || !pass) return alert("Preencha as credenciais.");
         if (userRaw.toLowerCase() !== 'lucaslacerdamatos@hotmail.com' && !userRaw.toUpperCase().startsWith('1593')) return alert('Acesso Negado 🛑');
         
-        btn.innerText = "Conectando..."; err.style.display = 'none';
+        let qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw), where("password", "==", pass)));
+        if(qSnap.empty) qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toLowerCase()), where("password", "==", pass)));
+        if(qSnap.empty) qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toUpperCase()), where("password", "==", pass)));
         
-        try {
-            let qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw), where("password", "==", pass)));
-            if(qSnap.empty) qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toLowerCase()), where("password", "==", pass)));
-            if(qSnap.empty) qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", userRaw.toUpperCase()), where("password", "==", pass)));
-            
-            if (!qSnap.empty) {
-                const uData = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
-                if (uData.precisaTrocarSenha) { 
-                    window.usuarioPendenteTrocaSenha = uData; 
-                    document.getElementById('login-box').style.display='none'; 
-                    document.getElementById('force-password-box').style.display='block'; 
-                } else { 
-                    window.usuarioLogado = uData; 
-                    localStorage.setItem('usuarioSessao', JSON.stringify(uData)); 
-                    mostrarPainel(); 
-                }
-            } else {
-                err.innerHTML = "<b>Credenciais incorretas!</b>";
-                err.style.display = 'block';
+        if (!qSnap.empty) {
+            const uData = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+            if (uData.precisaTrocarSenha) { 
+                window.usuarioPendenteTrocaSenha = uData; 
+                document.getElementById('login-box').style.display='none'; 
+                document.getElementById('force-password-box').style.display='block'; 
+            } else { 
+                window.usuarioLogado = uData; 
+                localStorage.setItem('usuarioSessao', JSON.stringify(uData)); 
+                mostrarPainel(); 
             }
-        } catch(e) {
-            console.error("ERRO FIREBASE:", e);
-            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Verifique se a aba <b>Regras</b> do seu banco está como <i>allow read, write: if true;</i>`;
-            err.style.display = 'block';
+        } else {
+            alert('❌ Credenciais incorretas!');
         }
-        btn.innerText = "Acessar Painel";
     };
 
     window.salvarNovaSenhaObrigatoria = async function() {
@@ -677,9 +655,12 @@
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
-        if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); return; }
+        if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
-        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
+        alert(`✅ Conta gerada com sucesso!
+
+LOGIN: ${usernameGerado}
+SENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -721,12 +702,8 @@
             </div>
         `).join('');
 
-        window.switchTab('tab-casos'); window.atualizarFiltros(); 
-        try { window.renderizarGeral(); } catch(e){ console.error(e); }
+        window.switchTab('tab-casos'); window.atualizarFiltros(); window.renderizarGeral();
         if(isAdmin) window.desenharTabelaEquipe();
-        
-        const loadEl = document.getElementById('loading');
-        if(loadEl) loadEl.style.display = 'none';
     }
 
     window.switchTab = function(tabId) {
@@ -743,13 +720,20 @@
     };
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
-    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
+    
+    // Zera os ID's ao fechar a modal de cadastro para impedir sobrescrita acidental
+    window.closeModal = function(id) { 
+        document.getElementById(id).style.display = 'none'; 
+        if(id === 'modal-novo-caso') {
+            document.getElementById('novo-caso-id').value = '';
+        }
+    };
 
     window.renderizarGeral = function() {
         window.renderizarCasos();
         window.renderizarEncerrados();
         window.renderizarKanban();
-        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
+        if(window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
     };
 
     // --- REGRAS DO COPILOTO IA ---
@@ -760,47 +744,54 @@
         let alertas = [];
 
         window.casosDb.forEach(c => {
-            if(c.encerrado) return;
+            if(c.encerrado) return; // IA ignora casos encerrados
 
             let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
-            
-            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            let diasUltimoAndamento = (arr.length > 0) 
-                ? Math.floor((Date.now() - arr[0].id) / 86400000) 
+            let diasUltimoAndamento = c.andamentos && c.andamentos.length > 0 
+                ? Math.floor((Date.now() - c.andamentos[0].id) / 86400000) 
                 : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
 
+            // Regra 1: Aguardando Liminar > 10 dias
             if (c.status === 'Aguardando Liminar' && diasStatus >= 10) {
                 alertas.push({ caso: c, tipo: 'alerta', titulo: 'Liminar Atrasada', msg: `Aguardando liminar há ${diasStatus} dias. Peticione reiteração ou contate a Vara.`});
             }
+            // Regra 3: Em Busca > 15 dias
             if (c.status === 'Em Busca' && diasStatus >= 15) {
                 alertas.push({ caso: c, tipo: 'alerta', titulo: 'Mandado sem Retorno', msg: `Oficial de Justiça com o mandado há ${diasStatus} dias sem atualização. Contate a Central de Mandados.`});
             }
+            // Regra 4: Bloqueado > 30 dias
             if (c.status === 'Bloqueado' && diasStatus >= 30) {
                 alertas.push({ caso: c, tipo: 'aviso', titulo: 'Bloqueio Ineficaz', msg: `Veículo bloqueado há ${diasStatus} dias sem apreensão. Avalie oficiar PM/PRF ou Execução.`});
             }
+            // Regra 10: Abandono de Causa
             if (diasUltimoAndamento >= 45) {
                 alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de intimação para dar andamento sob pena de extinção (Art. 485, III, CPC).`});
             }
 
-            if (arr.length > 0) {
-                let textAndamentos = arr.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
-                let ultimoAndamentoText = arr[0].descricao ? arr[0].descricao.toLowerCase() : '';
+            // Análise de Texto dos Andamentos
+            if (c.andamentos && c.andamentos.length > 0) {
+                let textAndamentos = c.andamentos.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
+                let ultimoAndamentoText = c.andamentos[0].descricao ? c.andamentos[0].descricao.toLowerCase() : '';
                 
+                // Regra 6: Pátio / Diárias
                 if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) {
                     alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione IMEDIATAMENTE com ofício liberatório para estancar diárias.`});
                 }
                 
+                // Regra 2: Diligência Negativa
                 let countNegativas = (textAndamentos.match(/negativa|não encontrad|mudou|endereço incorreto/g) || []).length;
                 if (ultimoAndamentoText.match(/(negativa|não encontrad|mudou|endereço incorreto)/)) {
                     alertas.push({ caso: c, tipo: 'aviso', titulo: 'Diligência Negativa Recente', msg: `Diligência falhou recentemente. Peça Sisbajud/Infojud/Renajud para novos endereços e bloqueio de circulação.`});
                 }
                 
+                // Regra 7: Esgotamento de Endereços
                 if (countNegativas >= 3 && !textAndamentos.includes('edital')) {
                     alertas.push({ caso: c, tipo: 'alerta', titulo: 'Esgotamento de Endereços', msg: `Detectadas múltiplas diligências negativas. Avalie requerer Citação por Edital.`});
                 }
             }
         });
 
+        // Atualizar Badge de notificações
         const notifBadge = document.getElementById('notif-badge-copiloto');
         if(notifBadge) {
             notifBadge.innerText = alertas.length;
@@ -841,10 +832,15 @@
     };
 
     window.abrirModalNovoCaso = function() {
-        document.getElementById('novo-caso-id').value = ''; document.getElementById('novo-contrato').value = '';
-        document.getElementById('novo-cliente').value = ''; document.getElementById('novo-processo').value = '';
-        document.getElementById('novo-vara').value = ''; document.getElementById('novo-comarca-origem').value = '';
-        document.getElementById('novo-comarca-req').value = ''; document.getElementById('novo-obs').value = '';
+        document.getElementById('titulo-modal-caso').innerText = '📄 Novo Processo';
+        document.getElementById('novo-caso-id').value = '';
+        document.getElementById('novo-contrato').value = '';
+        document.getElementById('novo-cliente').value = '';
+        document.getElementById('novo-processo').value = '';
+        document.getElementById('novo-vara').value = '';
+        document.getElementById('novo-comarca-origem').value = '';
+        document.getElementById('novo-comarca-req').value = '';
+        document.getElementById('novo-obs').value = '';
         document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais';
         document.getElementById('novo-is-localizado').checked = false;
         
@@ -856,7 +852,7 @@
         const btn = document.getElementById('btn-salvar-caso');
         btn.innerText = "Salvando..."; btn.disabled = true;
 
-        const idCaso = document.getElementById('novo-caso-id').value;
+        let idCaso = document.getElementById('novo-caso-id').value.trim();
         const isLoc = document.getElementById('novo-is-localizado').checked;
         const payload = {
             contrato: document.getElementById('novo-contrato').value.trim(),
@@ -875,16 +871,17 @@
         }
         
         try {
-            if(idCaso) {
+            if(idCaso && idCaso !== '') {
+                // EDITAR EXISTENTE
                 const casoAtual = window.casosDb.find(c => c.id === idCaso);
-                if(casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
+                if(casoAtual && casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
                     payload.dataStatus = Date.now();
                     let hist = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
                     hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
-                // Adicionar tracking se ele foi marcado como localizado agora
-                if(isLoc && casoAtual.isLocalizado !== true) {
+                
+                if(casoAtual && isLoc && casoAtual.isLocalizado !== true) {
                     let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
                     hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
@@ -892,6 +889,7 @@
                 
                 await updateDoc(doc(db, "casos", idCaso), payload);
             } else {
+                // CRIAR NOVO
                 payload.mesRegistro = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
                 payload.criadoPor = window.usuarioLogado.nome; payload.mandadoExpedido = false; payload.valorComissao = 0; payload.ultimaAnaliseData = ""; payload.andamentos = []; payload.timestamp = Date.now(); payload.dataStatus = Date.now();
                 payload.encerrado = false;
@@ -903,10 +901,17 @@
                 await addDoc(collection(db, "casos"), payload);
             }
             
-            document.getElementById('novo-contrato').value = ''; document.getElementById('novo-cliente').value = '';
-            document.getElementById('novo-processo').value = ''; document.getElementById('novo-vara').value = '';
-            document.getElementById('novo-comarca-origem').value = ''; document.getElementById('novo-comarca-req').value = '';
+            // LIMPEZA OBRIGATÓRIA PARA EVITAR BUG DE SOBRESCRITA
+            document.getElementById('novo-caso-id').value = '';
+            document.getElementById('novo-contrato').value = ''; 
+            document.getElementById('novo-cliente').value = '';
+            document.getElementById('novo-processo').value = ''; 
+            document.getElementById('novo-vara').value = '';
+            document.getElementById('novo-comarca-origem').value = ''; 
+            document.getElementById('novo-comarca-req').value = '';
             document.getElementById('novo-obs').value = '';
+            document.getElementById('novo-is-localizado').checked = false;
+            
             window.closeModal('modal-novo-caso');
         } catch(e) { alert("Erro ao salvar. Verifique a conexão."); console.error(e); }
         btn.innerText = "Salvar Ficha"; btn.disabled = false;
@@ -914,6 +919,7 @@
 
     window.abrirModalEditarCaso = function(idCaso) {
         const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
+        document.getElementById('titulo-modal-caso').innerText = '✏️ Editar Processo';
         document.getElementById('novo-caso-id').value = c.id;
         document.getElementById('novo-contrato').value = c.contrato || ''; document.getElementById('novo-cliente').value = c.cliente || '';
         document.getElementById('novo-processo').value = c.processo || ''; document.getElementById('novo-vara').value = c.vara || '';
@@ -1154,6 +1160,8 @@
                 badgeFin = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Aprovar PG</button>` : `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;">Comissão Paga</span>`;
                 bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`;
                 btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
+            } else {
+                btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
             }
             
             const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
@@ -1346,17 +1354,20 @@
         if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
         if(casosFin.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
+        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO
+`;
         let total = 0;
         casosFin.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); total += v;
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq || comOri || '';
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}
+`;
         });
-        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
-        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
+`;
+        const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
     };
 
@@ -1364,16 +1375,22 @@
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.\n`;
+        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI
+Gerado em:;${dataHoje}
+Base total:;${window.casosDb.length} processos
+
+CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
+`;
         window.casosDb.forEach(c => {
             let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}\n`;
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
+`;
         });
-        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
