@@ -40,6 +40,7 @@
             --kb-tentando: #eab308;
             --kb-em-busca: #f97316;
             --kb-localizado: #84cc16;
+            --kb-apreendido: #059669; /* Verde escuro */
         }
         
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -80,6 +81,7 @@
         .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, var(--azul) 0%, var(--azul-escuro) 100%); }
         .auth-box { background: var(--fundo-card); padding: 40px; border-radius: 12px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 400px; text-align: center; border-top: 4px solid var(--laranja); }
         .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.5rem; font-weight: 700; }
+        #error-msg { color: var(--erro); background: #fee2e2; padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; display: none; text-align: left; }
         
         /* Layout Principal */
         #app-screen { display: none; height: 100vh; display: flex; width: 100vw; }
@@ -116,7 +118,7 @@
         .top-bar h2 { margin: 0; font-size: 1.4rem; color: var(--azul); font-weight: 700; letter-spacing: -0.5px; }
         
         /* Cards (Lista) */
-        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; transition: all 0.2s;}
+        .card { background: var(--fundo-card); border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03); padding: 20px; margin-bottom: 15px; border: 1px solid var(--borda); position: relative; transition: all 0.2s; }
         .tag-status { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; margin: 10px 0; border: 1px dashed var(--borda); font-size: 0.85rem; }
@@ -151,7 +153,7 @@
         .kanban-cards { padding: 10px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px; }
         
         .k-card { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid var(--borda); transition: 0.2s; position: relative; }
-        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transform: scale(0.97) rotate(1deg); border-color: var(--laranja); z-index: 100; }
+        .k-card.draggable:active { cursor: grabbing !important; box-shadow: 0 8px 16px rgba(0,0,0,0.1); transform: scale(0.97) rotate(1deg); z-index: 100; }
         .k-card h4 { margin: 0 0 5px 0; color: var(--azul); font-size: 0.9rem; line-height: 1.2; }
         .k-card .k-meta { margin-top: 8px; font-size: 0.7rem; color: #64748b; display: flex; justify-content: space-between; border-top: 1px solid #f1f5f9; padding-top: 8px; }
 
@@ -169,7 +171,7 @@
         
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
-        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 1px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
+        th { background: #f8fafc; color: var(--texto-claro); font-weight: 600; padding: 12px 15px; border-bottom: 2px solid var(--borda); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px; }
         td { padding: 12px 15px; border-bottom: 1px solid var(--borda); color: var(--texto); }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; overflow-y: auto; padding: 20px; }
@@ -182,7 +184,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban */
+        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -194,11 +196,14 @@
         .cor-tentando { background-color: var(--kb-tentando); color: white; } .borda-tentando { border-bottom-color: var(--kb-tentando); }
         .cor-em-busca { background-color: var(--kb-em-busca); color: white; } .borda-em-busca { border-bottom-color: var(--kb-em-busca); }
         .cor-localizado { background-color: var(--kb-localizado); color: white; } .borda-localizado { border-bottom-color: var(--kb-localizado); }
+        .cor-apreendido { background-color: var(--kb-apreendido); color: white; } .borda-apreendido { border-bottom-color: var(--kb-apreendido); }
         
         .drop-hover { background-color: rgba(234, 88, 12, 0.05); border: 2px dashed var(--laranja); }
         
         /* Badge de caso encerrado */
         .badge-encerrado { position: absolute; top: 15px; right: 15px; background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 5px; }
+        
+        #loading { display: none; background: #fff3cd; color: #856404; text-align: center; padding: 10px; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid #ffeeba; }
         
         /* EFEITO DE URGENCIA PARA VEICULOS LOCALIZADOS */
         @keyframes pulseAlert {
@@ -223,7 +228,8 @@
         <p style="color: var(--texto-claro); font-size: 0.85rem; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px;">SGI - Acesso Restrito</p>
         <div class="form-group"><label>Credencial de Acesso</label><input type="text" id="login-username" placeholder="Login ou Email"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-password" placeholder="••••••••"></div>
-        <button class="btn btn-primary" style="width: 100%; font-size: 1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
+        <button class="btn btn-primary" id="btn-login-submit" style="width: 100%; font-size: 1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
+        <div id="error-msg"></div>
     </div>
 
     <div id="force-password-box" class="auth-box" style="display: none;">
@@ -266,9 +272,13 @@
             <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban">
                 <div>📌 Visão Kanban</div>
             </div>
+
+            <div class="nav-item" onclick="window.switchTab('tab-apreendidos')" id="nav-apreendidos">
+                <div>🚔 Apreendidos</div>
+            </div>
             
             <div class="nav-item" onclick="window.switchTab('tab-encerrados')" id="nav-encerrados">
-                <div>🔒 Casos Encerrados</div>
+                <div>🔒 Arquivo Encerrados</div>
             </div>
             
             <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">
@@ -296,6 +306,8 @@
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
         </header>
+
+        <div id="loading">Conectando e Baixando Dados da Nuvem...</div>
 
         <!-- ABA COPILOTO IA -->
         <div id="tab-copiloto" class="tab-content">
@@ -336,6 +348,20 @@
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
             </div>
+        </div>
+
+        <!-- ABA APREENDIDOS -->
+        <div id="tab-apreendidos" class="tab-content">
+            <div class="top-bar">
+                <h2>Veículos Apreendidos</h2>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <input type="text" id="search-apreendidos" placeholder="🔍 Buscar cliente..." onkeyup="window.renderizarApreendidos()" style="max-width: 250px;">
+                    <select id="filtro-mes-apreendidos" onchange="window.renderizarApreendidos()" style="width: auto;">
+                        <option value="todos">Todos os meses</option>
+                    </select>
+                </div>
+            </div>
+            <div id="apreendidos-container"></div>
         </div>
 
         <!-- ABA NOVA: ENCERRADOS -->
@@ -445,7 +471,7 @@
         </div>
         
         <div class="form-group">
-            <label>Status / Fase Atual</label>
+            <label>Status / Fase Atual do Processo</label>
             <select id="novo-status">
                 <option value="Aguardando recolhimento das custas iniciais">Aguardando recolhimento das custas iniciais</option>
                 <option value="Aguardando distribuição da ação">Aguardando distribuição da ação</option>
@@ -458,6 +484,7 @@
                 <option value="Tentando Localização">Tentando Localização</option>
                 <option value="Em Busca">Em Busca</option>
                 <option value="Veículo Localizado">Veículo Localizado</option>
+                <option value="Apreendido">Apreendido</option>
             </select>
         </div>
 
@@ -543,7 +570,7 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // CHAVES ORIGINAIS DO SOURCE 5 INTACTAS
+    // CHAVES ORIGINAIS INTACTAS
     const firebaseConfig = { apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", authDomain: "sistema-andamentos.firebaseapp.com", projectId: "sistema-andamentos", storageBucket: "sistema-andamentos.firebasestorage.app", messagingSenderId: "421431391255", appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" };
     
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
@@ -562,7 +589,8 @@
         {id: 'Mandado Expedido', cor: 'cor-mandado', borda: 'borda-mandado'},
         {id: 'Tentando Localização', cor: 'cor-tentando', borda: 'borda-tentando'},
         {id: 'Em Busca', cor: 'cor-em-busca', borda: 'borda-em-busca'},
-        {id: 'Veículo Localizado', cor: 'cor-localizado', borda: 'borda-localizado'}
+        {id: 'Veículo Localizado', cor: 'cor-localizado', borda: 'borda-localizado'},
+        {id: 'Apreendido', cor: 'cor-apreendido', borda: 'borda-apreendido'}
     ];
 
     window.copiarTexto = function(texto) {
@@ -587,12 +615,7 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
-        alert(`✅ Restauração Concluída!
-
-Seu Login: ${usernameGerado}
-Sua Senha: ${senha}
-
-Guarde essas informações.`);
+        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações.`);
         document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
         window.voltarLogin();
     };
@@ -657,10 +680,7 @@ Guarde essas informações.`);
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
-        alert(`✅ Conta gerada com sucesso!
-
-LOGIN: ${usernameGerado}
-SENHA TEMP: ${senhaTemp}`);
+        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -704,6 +724,9 @@ SENHA TEMP: ${senhaTemp}`);
 
         window.switchTab('tab-casos'); window.atualizarFiltros(); window.renderizarGeral();
         if(isAdmin) window.desenharTabelaEquipe();
+        
+        const loadEl = document.getElementById('loading');
+        if(loadEl) loadEl.style.display = 'none';
     }
 
     window.switchTab = function(tabId) {
@@ -731,9 +754,10 @@ SENHA TEMP: ${senhaTemp}`);
 
     window.renderizarGeral = function() {
         window.renderizarCasos();
+        window.renderizarApreendidos();
         window.renderizarEncerrados();
         window.renderizarKanban();
-        if(window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
     };
 
     // --- REGRAS DO COPILOTO IA ---
@@ -871,31 +895,42 @@ SENHA TEMP: ${senhaTemp}`);
         }
         
         try {
+            const now = new Date();
             if(idCaso && idCaso !== '') {
                 // EDITAR EXISTENTE
                 const casoAtual = window.casosDb.find(c => c.id === idCaso);
                 if(casoAtual && casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
                     payload.dataStatus = Date.now();
                     let hist = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-                    hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
+                }
+                
+                if(payload.status === 'Apreendido' && (!casoAtual || casoAtual.status !== 'Apreendido')) {
+                    payload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                    payload.dataApreensao = now.toLocaleDateString('pt-BR');
                 }
                 
                 if(casoAtual && isLoc && casoAtual.isLocalizado !== true) {
                     let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
-                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
                 
                 await updateDoc(doc(db, "casos", idCaso), payload);
             } else {
                 // CRIAR NOVO
-                payload.mesRegistro = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                payload.mesRegistro = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
                 payload.criadoPor = window.usuarioLogado.nome; payload.mandadoExpedido = false; payload.valorComissao = 0; payload.ultimaAnaliseData = ""; payload.andamentos = []; payload.timestamp = Date.now(); payload.dataStatus = Date.now();
                 payload.encerrado = false;
                 
+                if(payload.status === 'Apreendido') {
+                    payload.mesApreensao = payload.mesRegistro;
+                    payload.dataApreensao = now.toLocaleDateString('pt-BR');
+                }
+                
                 if(isLoc) {
-                    payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                 }
                 
                 await addDoc(collection(db, "casos"), payload);
@@ -965,15 +1000,22 @@ SENHA TEMP: ${senhaTemp}`);
             responsavel: window.usuarioLogado.nome 
         });
         
-        await updateDoc(doc(db, "casos", idCaso), { 
+        let updatePayload = { 
             encerrado: true,
             motivoEncerramento: motivo,
             status: 'Encerrado',
             andamentos: andAtuais,
             dataEncerramento: now.toLocaleDateString('pt-BR'),
+            mesEncerramento: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
             ultimaAnaliseData: now.toLocaleDateString('pt-BR')
-        });
+        };
         
+        if (motivo === 'Apreensão') {
+            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
+        }
+
+        await updateDoc(doc(db, "casos", idCaso), updatePayload);
         window.closeModal('modal-encerrar');
     };
 
@@ -1051,7 +1093,14 @@ SENHA TEMP: ${senhaTemp}`);
 
         let andamentos = Array.isArray(caso.andamentos) ? caso.andamentos : []; const now = new Date();
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
+        
+        let updatePayload = { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') };
+        if (novoStatus === 'Apreendido' && caso.status !== 'Apreendido') {
+            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
+        }
+
+        await updateDoc(doc(db, "casos", idCaso), updatePayload);
     };
 
     window.renderizarKanban = function() {
@@ -1114,14 +1163,28 @@ SENHA TEMP: ${senhaTemp}`);
     };
 
     window.atualizarFiltros = function() {
-        const selCasos = document.getElementById('filtro-mes'); const selFin = document.getElementById('filtro-mes-fin');
+        const selCasos = document.getElementById('filtro-mes'); 
+        const selFin = document.getElementById('filtro-mes-fin');
+        const selApreendidos = document.getElementById('filtro-mes-apreendidos');
+
         const mCasos = [...new Set(window.casosDb.map(c => c.mesRegistro))].sort().reverse();
         const mFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))].sort().reverse();
-        const aCasos = selCasos.value; const aFin = selFin.value;
+        
+        let baseApreendidos = window.casosDb.filter(c => c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão'));
+        const mApreendidos = [...new Set(baseApreendidos.map(c => c.mesApreensao || c.mesRegistro))].filter(Boolean).sort().reverse();
+
+        const aCasos = selCasos.value; const aFin = selFin.value; const aApreendidos = selApreendidos ? selApreendidos.value : 'todos';
 
         selCasos.innerHTML = '<option value="todos">Todos os meses</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; });
         selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
-        if(mCasos.includes(aCasos)) selCasos.value = aCasos; if(mFin.includes(aFin)) selFin.value = aFin;
+        if(selApreendidos) {
+            selApreendidos.innerHTML = '<option value="todos">Todos os meses</option>'; 
+            mApreendidos.forEach(m => { if(m) selApreendidos.innerHTML += `<option value="${m}">${m}</option>`; });
+        }
+
+        if(mCasos.includes(aCasos)) selCasos.value = aCasos; 
+        if(mFin.includes(aFin)) selFin.value = aFin;
+        if(selApreendidos && mApreendidos.includes(aApreendidos)) selApreendidos.value = aApreendidos;
     };
 
     // RENDERIZAR CASOS ATIVOS
@@ -1232,7 +1295,64 @@ SENHA TEMP: ${senhaTemp}`);
         });
     };
 
-    // RENDERIZAR CASOS ENCERRADOS (NOVA ABA)
+    // RENDERIZAR APREENDIDOS (NOVA ABA)
+    window.renderizarApreendidos = function() {
+        const container = document.getElementById('apreendidos-container'); 
+        if(!container) return;
+        container.innerHTML = '';
+        const termoBusca = document.getElementById('search-apreendidos').value.toLowerCase();
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        const mesFiltro = document.getElementById('filtro-mes-apreendidos').value;
+
+        // Pega casos que tem status Apreendido OU encerrado com motivo Apreensão
+        let base = window.casosDb.filter(c => c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão'));
+        
+        if (mesFiltro !== 'todos') {
+            base = base.filter(c => (c.mesApreensao || c.mesEncerramento || c.mesRegistro) === mesFiltro);
+        }
+
+        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+
+        if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🚔</div><h3>Nenhuma apreensão localizada neste mês.</h3></div>`;
+
+        base.forEach(c => {
+            let btnsAdmin = '';
+            if(isAdmin) {
+                btnsAdmin = `<button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar Ficha</button>`;
+                if (!c.encerrado) {
+                    btnsAdmin += `<button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')">🔒 Arquivar/Encerrar</button>`;
+                } else {
+                    btnsAdmin += `<button class="btn btn-small btn-outline" style="color:var(--sucesso); border-color:var(--sucesso);" onclick="window.reabrirCaso('${c.id}')">🔓 Reabrir</button>`;
+                }
+            } else {
+                btnsAdmin = `<button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar</button>`;
+            }
+            
+            let dataTag = c.dataApreensao ? `Data da Apreensão: ${c.dataApreensao}` : `Mês Ref: ${c.mesApreensao || c.mesEncerramento || c.mesRegistro}`;
+            let encStatus = c.encerrado ? `<span class="badge" style="background:#e2e8f0;color:#475569;margin-left:10px;padding:4px 8px;border-radius:12px;font-size:0.7rem;font-weight:bold;">🔒 Caso Arquivado</span>` : '';
+
+            let div = document.createElement('div'); div.className = 'card';
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <span class="tag-status" style="background-color: var(--kb-apreendido); margin-bottom:8px; display:inline-block;">🚔 VEÍCULO APREENDIDO</span>
+                        ${encStatus}
+                        <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${c.cliente || ''}</h3>
+                        <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${c.contrato || ''}</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        ${btnsAdmin}
+                    </div>
+                </div>
+                <div style="margin-top:15px; padding-top: 15px; border-top: 1px solid var(--borda); font-size: 0.85rem; color: var(--texto-claro); font-weight: 600;">
+                    📅 ${dataTag}
+                </div>
+            `;
+            container.appendChild(div);
+        });
+    };
+
+    // RENDERIZAR CASOS ENCERRADOS
     window.renderizarEncerrados = function() {
         const container = document.getElementById('encerrados-container'); container.innerHTML = '';
         const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
@@ -1354,20 +1474,17 @@ SENHA TEMP: ${senhaTemp}`);
         if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
         if(casosFin.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO
-`;
+        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
         let total = 0;
         casosFin.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); total += v;
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq || comOri || '';
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}
-`;
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
         });
-        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
-`;
-        const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
+        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
     };
 
@@ -1375,22 +1492,16 @@ SENHA TEMP: ${senhaTemp}`);
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI
-Gerado em:;${dataHoje}
-Base total:;${window.casosDb.length} processos
-
-CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
-`;
+        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.\n`;
         window.casosDb.forEach(c => {
             let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
-`;
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}\n`;
         });
-        const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
