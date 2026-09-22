@@ -609,7 +609,7 @@
         const nome = document.getElementById('master-nome').value.trim();
         const senha = document.getElementById('master-senha').value;
         if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
-        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
@@ -674,7 +674,7 @@
         const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
         const role = document.getElementById('novo-membro-role').value;
         if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
-        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
