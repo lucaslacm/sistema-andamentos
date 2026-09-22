@@ -184,7 +184,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban */
+        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -346,16 +346,23 @@
         <div id="tab-casos" class="tab-content active">
             <div class="top-bar">
                 <h2>Processos em Andamento</h2>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%;">
                     <div class="toggle-wrapper admin-only" style="display: none;">
-                        <span>Ocultar já vistos</span>
+                        <span>Ocultar vistos</span>
                         <label class="switch">
                             <input type="checkbox" id="filtro-pendentes-hoje" onchange="window.renderizarCasos()">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 250px;">
-                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto;"><option value="todos">Todos os meses</option></select>
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato/processo..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
+                    
+                    <!-- NOVOS FILTROS -->
+                    <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todas">Origem (Todas)</option></select>
+                    <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todas">Requerimento (Todas)</option></select>
+                    <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todos">Status (Todos)</option></select>
+                    <!-- /NOVOS FILTROS -->
+
+                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todos">Mês Cad. (Todos)</option></select>
                 </div>
             </div>
             
@@ -370,7 +377,7 @@
         <div id="tab-kanban" class="tab-content">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2>Quadro de Fluxo</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases. (Somente casos aprovados)</div>
             </div>
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
@@ -446,12 +453,14 @@
             </div>
         </div>
 
-        <!-- ABA 3: FINANCEIRO -->
+        <!-- ABA 3: FINANCEIRO (MODIFICADA) -->
         <div id="tab-financeiro" class="tab-content">
             <div class="top-bar">
                 <h2>Faturamento e Comissões</h2>
-                <div style="display: flex; gap: 10px;">
-                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()"><option value="todos">Todos os meses</option></select>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px;"><option value="todos">Todos os meses</option></select>
+                    <!-- BOTAO PARA LANCAR NOVO FATURAMENTO DIRETAMENTE -->
+                    <button class="btn btn-primary" onclick="window.abrirModalFaturamento()">➕ Novo Faturamento</button>
                     <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
             </div>
@@ -459,7 +468,7 @@
                 <div><h3 style="margin: 0; font-size: 1.1rem; color: var(--texto-claro);">Comissões Aprovadas (Mês)</h3></div>
                 <span id="total-financeiro" style="color: var(--sucesso); font-size: 2.2rem; font-weight: 700;">R$ 0,00</span>
             </div>
-            <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
+            <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente / Lançamento</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
         </div>
         
         <!-- ABA 4: EQUIPE -->
@@ -586,14 +595,39 @@
     </div>
 </div>
 
-<div id="modal-mandado" class="modal">
-    <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <div class="modal-header" style="border: none; padding-bottom: 0;"><h3></h3><button class="close-btn" onclick="window.closeModal('modal-mandado')">&times;</button></div>
-        <h3 style="color: var(--azul); margin-top: 0;">Faturar Mandado</h3>
-        <p style="font-size: 0.85rem; color: #64748b;">Aprovar o pagamento de comissão referente à expedição.</p>
-        <input type="hidden" id="mandado-caso-id">
-        <div class="form-group" style="text-align: left;"><label>Valor da Comissão (R$)</label><input type="number" id="mandado-valor" value="30.00" step="0.01"></div>
-        <button class="btn btn-success" style="width: 100%; padding: 12px;" onclick="window.salvarMandado()">Confirmar Lançamento</button>
+<!-- MODAL FATURAMENTO ATUALIZADO -->
+<div id="modal-faturamento" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header"><h3>💰 Lançar Faturamento</h3><button class="close-btn" onclick="window.closeModal('modal-faturamento')">&times;</button></div>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0;">Aprove comissões para mandados, apreensões e entregas amigáveis.</p>
+        
+        <input type="hidden" id="faturamento-caso-id">
+        
+        <!-- Aparece apenas quando aberto diretamente da aba Financeiro -->
+        <div class="form-group" id="div-faturamento-caso" style="display: none;">
+            <label>Selecione o Processo / Cliente</label>
+            <select id="faturamento-select-caso">
+                <option value="">-- Selecione --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo de Lançamento</label>
+            <select id="faturamento-tipo" onchange="window.atualizarValorFaturamento()">
+                <option value="Mandado Expedido">Mandado Expedido</option>
+                <option value="Apreensão - Moto">Apreensão - Moto</option>
+                <option value="Apreensão - Carro">Apreensão - Carro</option>
+                <option value="Apreensão - Caminhão">Apreensão - Caminhão</option>
+                <option value="Entrega Amigável">Entrega Amigável</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Valor da Comissão (R$)</label>
+            <input type="number" id="faturamento-valor" value="30.00" step="0.01" style="font-weight:bold; color:var(--sucesso); font-size: 1.2rem;">
+        </div>
+        
+        <button class="btn btn-success" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="window.salvarFaturamento()">Confirmar Lançamento</button>
     </div>
 </div>
 
@@ -654,7 +688,7 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
-        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações.`);
+        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha:${senha}\n\nGuarde essas informações.`);
         document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
         window.voltarLogin();
     };
@@ -733,7 +767,7 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
-        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
+        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP:${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -775,7 +809,8 @@
             </div>
         `).join('');
 
-        window.switchTab('tab-casos'); window.atualizarFiltros(); window.renderizarGeral();
+        window.switchTab('tab-casos'); window.atualizarFiltros(); 
+        try { window.renderizarGeral(); } catch(e){ console.error(e); }
         if(isAdmin) window.desenharTabelaEquipe();
         
         const loadEl = document.getElementById('loading');
@@ -822,7 +857,7 @@
         let alertas = [];
 
         window.casosDb.forEach(c => {
-            if(c.encerrado) return; // IA ignora casos encerrados
+            if(c.encerrado) return;
 
             let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             
@@ -888,7 +923,7 @@
                     <div style="font-size: 1.5rem; background: ${bgIcon}; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink: 0;">${icon}</div>
                     <div>
                         <h4 style="margin: 0 0 5px 0; color: var(--azul); font-size: 1rem;">${a.titulo}</h4>
-                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><strong>${a.caso.cliente}</strong> (Contrato: ${a.caso.contrato})</div>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><strong>${a.caso.cliente}</strong> (Contrato:${a.caso.contrato})</div>
                         <p style="margin: 0; font-size: 0.85rem; color: var(--texto); line-height: 1.4;">${a.msg}</p>
                         <div style="margin-top: 10px; display: flex; gap: 8px;">
                             <button class="btn btn-outline btn-small" onclick="window.abrirModalAndamento('${a.caso.id}')">Lançar Ação</button>
@@ -957,12 +992,6 @@
                     hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
-                
-                if(payload.status === 'Apreendido' && (!casoAtual || casoAtual.status !== 'Apreendido')) {
-                    payload.mesApreensao = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
-                    payload.dataApreensao = new Date().toLocaleDateString('pt-BR');
-                }
-                
                 if(isLoc && casoAtual.isLocalizado !== true) {
                     let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
                     hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
@@ -984,11 +1013,6 @@
                 payload.dataStatus = Date.now();
                 payload.encerrado = false;
                 payload.emTriagem = isEquipe;
-                
-                if(payload.status === 'Apreendido') {
-                    payload.mesApreensao = payload.mesRegistro;
-                    payload.dataApreensao = now.toLocaleDateString('pt-BR');
-                }
                 
                 if(isLoc) {
                     payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
@@ -1082,7 +1106,8 @@
             ultimaAnaliseData: now.toLocaleDateString('pt-BR')
         };
         
-        if (motivo === 'Apreensão') {
+        // Se for apreensão e não tinha data antes, seta a data
+        if (motivo === 'Apreensão' && !casoAtual.dataApreensao) {
             updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
             updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
         }
@@ -1208,7 +1233,7 @@
                 
                 let origKb = c.comarcaOrigem ? `Orig: ${c.comarcaOrigem}` : '';
                 let reqKb = c.comarcaReq ? `Req: ${c.comarcaReq}` : '';
-                let kbComarcas = (origKb && reqKb) ? `${origKb} | ${reqKb}` : (origKb || reqKb || 'N/A');
+                let kbComarcas = (origKb && reqKb) ? `${origKb} \vert{}${reqKb}` : (origKb || reqKb || 'N/A');
 
                 const clienteFormatado = c.cliente || 'Sem Cliente';
                 const contratoFormatado = c.contrato || 'Sem Contrato';
@@ -1218,11 +1243,9 @@
 
                 col.innerHTML += `
                     <div class="${cardClass}" ${dragAttr} style="${cursorStyle}">
-                        <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${statusStr}</div>
-                        ${isLocBadge}
+                        <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${statusStr}</div>${isLocBadge}
                         <h4 onclick="window.abrirModalEditarCaso('${c.id}')" style="cursor:pointer;">${clienteFormatado}</h4>
-                        <p>${contratoFormatado}</p>
-                        ${c.processo ? `<p style="color:var(--info); font-size:0.7rem; margin-top:2px;">${c.processo} <span style="cursor:pointer" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span></p>` : ''}
+                        <p>${contratoFormatado}</p>${c.processo ? `<p style="color:var(--info); font-size:0.7rem; margin-top:2px;">${c.processo} <span style="cursor:pointer" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span></p>` : ''}
                         <div class="k-meta"><span>📍 ${kbComarcas}</span>${diasHtml}</div>
                     </div>`;
             }
@@ -1239,14 +1262,48 @@
         const selApreendidos = document.getElementById('filtro-mes-apreendidos');
 
         const mCasos = [...new Set(window.casosDb.map(c => c.mesRegistro))].sort().reverse();
-        const mFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))].sort().reverse();
+        
+        let faturamentosGlobais = [];
+        window.casosDb.forEach(c => {
+            if (c.faturamentos && c.faturamentos.length > 0) {
+                c.faturamentos.forEach(f => faturamentosGlobais.push(f.mes));
+            } else if (c.mandadoExpedido) {
+                faturamentosGlobais.push(c.mesExpedicao);
+            }
+        });
+        const mFin = [...new Set(faturamentosGlobais)].sort().reverse();
+
         let baseApreendidos = window.casosDb.filter(c => c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão'));
         const mApreendidos = [...new Set(baseApreendidos.map(c => c.mesApreensao || c.mesRegistro))].filter(Boolean).sort().reverse();
 
         const aCasos = selCasos.value; const aFin = selFin.value; const aApreendidos = selApreendidos ? selApreendidos.value : 'todos';
 
+        // Update Filters in Casos
+        const selOrigem = document.getElementById('filtro-comarca-origem');
+        const selReq = document.getElementById('filtro-comarca-req');
+        const selStatus = document.getElementById('filtro-status');
+
+        if (selOrigem && selReq && selStatus) {
+            const aOrigem = selOrigem.value; const aReq = selReq.value; const aStatus = selStatus.value;
+            let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(Boolean))].sort();
+            let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(Boolean))].sort();
+            
+            selOrigem.innerHTML = '<option value="todas">Origem (Todas)</option>';
+            mOrigem.forEach(o => { selOrigem.innerHTML += `<option value="${o}">${o}</option>`; });
+            
+            selReq.innerHTML = '<option value="todas">Requerimento (Todas)</option>';
+            mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
+
+            selStatus.innerHTML = '<option value="todos">Status (Todos)</option>';
+            STATUS_PHASES.forEach(s => { selStatus.innerHTML += `<option value="${s.id}">${s.id}</option>`; });
+
+            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
+            if(mReq.includes(aReq)) selReq.value = aReq;
+            if(STATUS_PHASES.some(s => s.id === aStatus)) selStatus.value = aStatus;
+        }
+
         if(selCasos) {
-            selCasos.innerHTML = '<option value="todos">Todos os meses</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; });
+            selCasos.innerHTML = '<option value="todos">Mês Cad. (Todos)</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; });
             if(mCasos.includes(aCasos)) selCasos.value = aCasos;
         }
         if(selFin) {
@@ -1267,18 +1324,28 @@
 
         let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
         
+        let somaFaturado = 0;
+        if (c.faturamentos && c.faturamentos.length > 0) {
+            somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f.valor || 0), 0);
+        } else if (c.mandadoExpedido) {
+            somaFaturado = parseFloat(c.valorComissao || 0);
+        }
+
         if(isAdmin) {
             btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>
                          <button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')" title="Finalizar e Arquivar">🔒 Encerrar</button>`;
-            badgeFin = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Aprovar PG</button>` : `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0; font-size:0.7rem; padding: 4px 8px; border-radius:12px;">Comissão Paga</span>`;
+            
+            badgeFin = somaFaturado > 0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0; font-size:0.7rem; padding: 4px 8px; border-radius:12px;">Faturado R$ ${somaFaturado.toFixed(2).replace('.',',')}</span>` : ``;
+            
             bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`;
-            btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
+            btnLancar = `<button class="btn btn-small btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>
+                         <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
         } else {
             btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
         }
         
         const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-        const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
+        const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
         
         let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => {
             let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}', ${a.id})" title="Excluir">✖</span>` : '';
@@ -1399,6 +1466,16 @@
         let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true);
         
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
+        
+        // Novos Filtros Ativos
+        const valOrigem = document.getElementById('filtro-comarca-origem') ? document.getElementById('filtro-comarca-origem').value : 'todas';
+        const valReq = document.getElementById('filtro-comarca-req') ? document.getElementById('filtro-comarca-req').value : 'todas';
+        const valStatus = document.getElementById('filtro-status') ? document.getElementById('filtro-status').value : 'todos';
+
+        if(valOrigem !== 'todas') base = base.filter(c => c.comarcaOrigem === valOrigem);
+        if(valReq !== 'todas') base = base.filter(c => c.comarcaReq === valReq);
+        if(valStatus !== 'todos') base = base.filter(c => c.status === valStatus || (c.status === 'Localizado' && valStatus === 'Veículo Localizado'));
+
         if(document.getElementById('filtro-mes') && document.getElementById('filtro-mes').value !== 'todos') {
             base = base.filter(c => c.mesRegistro === document.getElementById('filtro-mes').value);
         }
@@ -1507,7 +1584,7 @@
             }
             
             const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
             
             let andHTML = andamentosVisiveis.slice(0,5).map((a, i) => {
                 let isRecent = i === 0 ? 'recent' : '';
@@ -1561,82 +1638,194 @@
         });
     };
 
-    // FINANCEIRO
-    window.abrirModalMandado = function(idCaso) { document.getElementById('mandado-caso-id').value = idCaso; window.openModal('modal-mandado'); };
-    window.salvarMandado = async function() {
-        const idCaso = document.getElementById('mandado-caso-id').value;
-        const valor = parseFloat(document.getElementById('mandado-valor').value);
-        if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
-
-        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
-        let andamentosAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-        andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
-
-        await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
-        window.closeModal('modal-mandado');
+    // FINANCEIRO (Novo Sistema Múltiplo)
+    window.atualizarValorFaturamento = function() {
+        const tipo = document.getElementById('faturamento-tipo').value;
+        const inputValor = document.getElementById('faturamento-valor');
+        if (tipo === 'Mandado Expedido') inputValor.value = '30.00';
+        else if (tipo === 'Apreensão - Moto') inputValor.value = '150.00';
+        else if (tipo === 'Apreensão - Carro') inputValor.value = '250.00';
+        else inputValor.value = ''; // Caminhão e Amigável (a combinar, em branco)
     };
-    
-    window.desfazerMandado = async function(idCaso) {
-        if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório.")) {
+
+    window.abrirModalFaturamento = function(idCaso = null) {
+        document.getElementById('faturamento-tipo').value = 'Mandado Expedido';
+        window.atualizarValorFaturamento();
+        
+        if (idCaso) {
+            document.getElementById('faturamento-caso-id').value = idCaso;
+            document.getElementById('div-faturamento-caso').style.display = 'none';
+        } else {
+            document.getElementById('faturamento-caso-id').value = '';
+            document.getElementById('div-faturamento-caso').style.display = 'block';
+            const select = document.getElementById('faturamento-select-caso');
+            select.innerHTML = '<option value="">-- Selecione um Cliente/Processo --</option>';
+            
+            // Popula com todos os casos, ordenados alfabeticamente
+            let casosOrd = [...window.casosDb].sort((a,b) => a.cliente.localeCompare(b.cliente));
+            casosOrd.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.cliente} (CT: ${c.contrato}) ${c.encerrado ? '- Encerrado' : ''}</option>`;
+            });
+        }
+        window.openModal('modal-faturamento');
+    };
+
+    window.salvarFaturamento = async function() {
+        let idCaso = document.getElementById('faturamento-caso-id').value;
+        if (!idCaso) {
+            idCaso = document.getElementById('faturamento-select-caso').value;
+        }
+        if (!idCaso) return alert("Selecione um processo na lista!");
+
+        const tipo = document.getElementById('faturamento-tipo').value;
+        const valor = parseFloat(document.getElementById('faturamento-valor').value);
+        if (isNaN(valor) || valor <= 0) return alert("Por favor, informe um valor válido de comissão.");
+
+        const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        if (!casoAtual) return alert("Erro ao localizar processo.");
+
+        const now = new Date();
+        
+        let faturamentos = Array.isArray(casoAtual.faturamentos) ? casoAtual.faturamentos : [];
+        let andamentos = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+
+        const novoFat = {
+            id: Date.now().toString(),
+            tipo: tipo,
+            valor: valor,
+            data: now.toLocaleDateString('pt-BR'),
+            mes: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
+            responsavel: window.usuarioLogado.nome
+        };
+
+        faturamentos.push(novoFat);
+        
+        andamentos.unshift({ 
+            id: Date.now(), 
+            descricao: `💰 Faturamento Lançado: ${tipo} (R$ ${valor.toFixed(2).replace('.',',')}).`, 
+            data: now.toLocaleDateString('pt-BR'), 
+            hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 
+            responsavel: window.usuarioLogado.nome 
+        });
+
+        await updateDoc(doc(db, "casos", idCaso), { 
+            faturamentos: faturamentos, 
+            andamentos: andamentos,
+            mandadoExpedido: true // mantido por compatibilidade
+        });
+
+        window.closeModal('modal-faturamento');
+    };
+
+    window.desfazerFaturamento = async function(idCaso, idFat) {
+        if(confirm("Cancelar este faturamento? Ele será removido do relatório financeiro.")) {
             const casoAtual = window.casosDb.find(c => c.id === idCaso);
-            let arr = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-            const novosAndamentos = arr.filter(a => a.responsavel !== "SISTEMA");
-            await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+            if(!casoAtual) return;
+
+            if (idFat === 'legacy') {
+                let novosAndamentos = casoAtual.andamentos.filter(a => !(a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada') || a.descricao.includes('Faturamento Lançado')));
+                await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+            } else {
+                let novosFat = casoAtual.faturamentos.filter(f => f.id !== idFat);
+                let novosAndamentos = casoAtual.andamentos.filter(a => !(a.descricao.includes('Faturamento Lançado'))); 
+                await updateDoc(doc(db, "casos", idCaso), { faturamentos: novosFat, andamentos: novosAndamentos });
+            }
         }
     };
 
     window.renderizarFinanceiro = function() {
         const tbody = document.getElementById('financeiro-tbody'); tbody.innerHTML = '';
-        let base = window.casosDb.filter(c => c.mandadoExpedido === true);
-        if (document.getElementById('filtro-mes-fin') && document.getElementById('filtro-mes-fin').value !== 'todos') {
-            base = base.filter(c => c.mesExpedicao === document.getElementById('filtro-mes-fin').value);
+        
+        let faturamentosGerais = [];
+        window.casosDb.forEach(c => {
+            if (c.faturamentos && c.faturamentos.length > 0) {
+                c.faturamentos.forEach(fat => {
+                    faturamentosGerais.push({ caso: c, ...fat });
+                });
+            } else if (c.mandadoExpedido === true) {
+                faturamentosGerais.push({
+                    caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao
+                });
+            }
+        });
+
+        const mesFiltro = document.getElementById('filtro-mes-fin') ? document.getElementById('filtro-mes-fin').value : 'todos';
+        if (mesFiltro !== 'todos') {
+            faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
         }
 
         let t = 0;
-        if(base.length === 0) {
+        if(faturamentosGerais.length === 0) {
             document.getElementById('total-financeiro').innerText = `R$ 0,00`;
-            return tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Fila financeira vazia.</td></tr>';
+            return tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Nenhum lançamento no período.</td></tr>';
         }
-        base.forEach(c => {
-            const v = parseFloat(c.valorComissao || 0); t += v;
-            let btn = `<button class="btn btn-outline btn-small" style="color:var(--erro); border-color:var(--erro);" onclick="window.desfazerMandado('${c.id}')">Estornar</button>`;
-            tbody.innerHTML += `<tr><td>${c.dataExpedicao}</td><td style="font-family:monospace;">${c.contrato || ''}</td><td><strong>${c.cliente || ''}</strong></td><td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td><td>${btn}</td></tr>`;
+
+        faturamentosGerais.sort((a,b) => b.id === 'legacy' ? -1 : b.id - a.id);
+
+        faturamentosGerais.forEach(f => {
+            let c = f.caso;
+            const v = parseFloat(f.valor || 0); t += v;
+            let btn = `<button class="btn btn-outline btn-small" style="color:var(--erro); border-color:var(--erro);" onclick="window.desfazerFaturamento('${c.id}', '${f.id}')">Estornar</button>`;
+            tbody.innerHTML += `<tr>
+                <td>${f.data}</td>
+                <td style="font-family:monospace;">${c.contrato || ''}</td>
+                <td><strong>${c.cliente || ''}</strong><br><span style="font-size:0.75rem; color:#64748b;">${f.tipo}</span></td>
+                <td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td>
+                <td>${btn}</td>
+            </tr>`;
         });
         document.getElementById('total-financeiro').innerText = `R$ ${t.toFixed(2).replace('.',',')}`;
     };
 
     window.exportarExcelFinanceiro = function() {
-        let casosFin = window.casosDb.filter(c => c.mandadoExpedido === true);
+        let faturamentosGerais = [];
+        window.casosDb.forEach(c => {
+            if (c.faturamentos && c.faturamentos.length > 0) {
+                c.faturamentos.forEach(fat => { faturamentosGerais.push({ caso: c, ...fat }); });
+            } else if (c.mandadoExpedido === true) {
+                faturamentosGerais.push({ caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao });
+            }
+        });
+
         const mesFiltro = document.getElementById('filtro-mes-fin').value;
-        if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
-        if(casosFin.length === 0) return alert("Sem comissões no período.");
+        if (mesFiltro !== 'todos') faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
+        if(faturamentosGerais.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
+        let csv = `DATA;TIPO_LANCAMENTO;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
         let total = 0;
-        casosFin.forEach(c => {
-            const v = parseFloat(c.valorComissao || 0); total += v;
+        faturamentosGerais.forEach(f => {
+            let c = f.caso;
+            const v = parseFloat(f.valor || 0); total += v;
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq || comOri || '';
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
+            csv += `${f.data};${f.tipo};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
         });
         csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
         const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Financeiro_${mesFiltro}.csv`; link.click();
     };
 
     // RELATÓRIOS E DASHBOARD
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.\n`;
+        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;TOTAL FATURADO;DIAS SEM MOV.\n`;
         window.casosDb.forEach(c => {
             let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}\n`;
+            
+            let somaFaturado = 0;
+            if (c.faturamentos) {
+                somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f.valor || 0), 0);
+            } else if (c.mandadoExpedido) {
+                somaFaturado = parseFloat(c.valorComissao || 0);
+            }
+            
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};R$ ${somaFaturado.toFixed(2).replace('.',',')};${dias}\n`;
         });
         const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
