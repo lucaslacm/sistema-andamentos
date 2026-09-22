@@ -184,7 +184,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
+        /* Cores das Colunas Kanban */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -213,6 +213,8 @@
         }
         .urgente-highlight { border: 2px solid var(--erro) !important; background-color: #fef2f2 !important; }
         .urgente-badge { background-color: var(--erro); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; animation: pulseAlert 2s infinite; display: inline-block; margin-bottom: 8px; letter-spacing: 0.5px; }
+        
+        .section-title { font-size: 1.1rem; font-weight: 600; padding-bottom: 5px; margin-bottom: 15px; margin-top: 30px; border-bottom: 2px solid; }
     </style>
 </head>
 <body>
@@ -265,13 +267,12 @@
                 <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
             </div>
             
+            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">
+                <div>📥 Triagem / Lançamentos</div>
+            </div>
+            
             <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">
                 <div>📁 Casos Ativos</div>
-            </div>
-
-            <!-- NOVA ABA: LANÇAMENTOS (TRIAGEM) -->
-            <div class="nav-item" onclick="window.switchTab('tab-triagem')" id="nav-triagem">
-                <div>📥 Lançamentos (Triagem)</div>
             </div>
             
             <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban">
@@ -326,10 +327,10 @@
         </div>
 
         <!-- ABA NOVA: TRIAGEM -->
-        <div id="tab-triagem" class="tab-content">
+        <div id="tab-lancamentos" class="tab-content">
             <div class="top-bar">
                 <h2>Lançamentos Pendentes</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Processos adicionados pela equipe aguardando aprovação do Administrador.</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;">Processos adicionados pela equipa a aguardar aprovação do Administrador.</div>
             </div>
             <div id="triagem-container"></div>
         </div>
@@ -351,10 +352,10 @@
                 </div>
             </div>
             
-            <h3 style="color: var(--sucesso); border-bottom: 2px solid var(--sucesso); padding-bottom: 5px; margin-top: 10px; font-size: 1.1rem;">🟢 Veículos Localizados / Apreendidos</h3>
+            <h3 class="section-title" style="color: var(--sucesso); border-color: var(--sucesso);">🟢 Veículos Localizados / Apreendidos</h3>
             <div id="cases-localizados-container"></div>
 
-            <h3 style="color: var(--alerta); border-bottom: 2px solid var(--alerta); padding-bottom: 5px; margin-top: 30px; font-size: 1.1rem;">🟠 Em Busca / Tramitação</h3>
+            <h3 class="section-title" style="color: var(--alerta); border-color: var(--alerta);">🟠 Em Busca / Tramitação</h3>
             <div id="cases-busca-container"></div>
         </div>
 
@@ -362,7 +363,7 @@
         <div id="tab-kanban" class="tab-content">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2>Quadro de Fluxo</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases. (Somente casos aprovados)</div>
             </div>
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
@@ -463,7 +464,7 @@
                     <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome" placeholder="Ex: João Silva"></div>
                     <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha" placeholder="Ex: 1234"></div>
                     <div class="form-group" style="grid-column:span 2;"><label>Perfil de Acesso</label>
-                        <select id="novo-membro-role"><option value="cadastro">Equipe (Apenas visualiza e envia para triagem)</option><option value="admin">Administrador (Acesso Total)</option></select>
+                        <select id="novo-membro-role"><option value="cadastro">Equipe (Analista - Lançamentos para Triagem)</option><option value="admin">Administrador (Acesso Total)</option></select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
@@ -476,7 +477,7 @@
 <!-- === MODAIS === -->
 <div id="modal-novo-caso" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
+        <div class="modal-header"><h3 id="titulo-modal-caso">📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
         <input type="hidden" id="novo-caso-id">
         
         <div class="grid-2">
@@ -484,12 +485,13 @@
             <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div>
         </div>
         
-        <div class="grid-2">
+        <!-- Ocultos para Equipe -->
+        <div class="grid-2" id="div-processo-vara">
             <div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div>
             <div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" id="div-status-fase">
             <label>Status / Fase Atual do Processo</label>
             <select id="novo-status">
                 <option value="Aguardando recolhimento das custas iniciais">Aguardando recolhimento das custas iniciais</option>
@@ -507,11 +509,12 @@
             </select>
         </div>
 
-        <div class="grid-2">
+        <div class="grid-2" id="div-comarcas">
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
-        
+        <!-- / Ocultos para Equipe -->
+
         <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;">
             <label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
@@ -589,15 +592,8 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // AS CHAVES EXATAS FORNECIDAS MANTIDAS INTACTAS
-    const firebaseConfig = { 
-        apiKey: "AIzaSyAWjjd2SdSRQ1Pwm68m3LBj4uaC4k4enlM", 
-        authDomain: "sistema-andamentos.firebaseapp.com", 
-        projectId: "sistema-andamentos", 
-        storageBucket: "sistema-andamentos.firebasestorage.app", 
-        messagingSenderId: "421431391255", 
-        appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" 
-    };
+    // CHAVES ORIGINAIS INTACTAS
+    const firebaseConfig = { apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", authDomain: "sistema-andamentos.firebaseapp.com", projectId: "sistema-andamentos", storageBucket: "sistema-andamentos.firebasestorage.app", messagingSenderId: "421431391255", appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" };
     
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
@@ -784,15 +780,17 @@
     };
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
+    
+    // Zera os ID's ao fechar a modal de cadastro para impedir sobrescrita acidental
     window.closeModal = function(id) { 
-        document.getElementById(id).style.display = 'none';
+        document.getElementById(id).style.display = 'none'; 
         if(id === 'modal-novo-caso') {
             document.getElementById('novo-caso-id').value = '';
         }
     };
 
     window.renderizarGeral = function() {
-        window.renderizarTriagem();
+        window.renderizarLancamentos();
         window.renderizarCasos();
         window.renderizarApreendidos();
         window.renderizarEncerrados();
@@ -889,14 +887,26 @@
     };
 
     window.abrirModalNovoCaso = function() {
-        document.getElementById('novo-caso-id').value = ''; document.getElementById('novo-contrato').value = '';
-        document.getElementById('novo-cliente').value = ''; document.getElementById('novo-processo').value = '';
-        document.getElementById('novo-vara').value = ''; document.getElementById('novo-comarca-origem').value = '';
-        document.getElementById('novo-comarca-req').value = ''; document.getElementById('novo-obs').value = '';
+        document.getElementById('titulo-modal-caso').innerText = '📄 Novo Processo';
+        document.getElementById('novo-caso-id').value = '';
+        document.getElementById('novo-contrato').value = '';
+        document.getElementById('novo-cliente').value = '';
+        document.getElementById('novo-processo').value = '';
+        document.getElementById('novo-vara').value = '';
+        document.getElementById('novo-comarca-origem').value = '';
+        document.getElementById('novo-comarca-req').value = '';
+        document.getElementById('novo-obs').value = '';
         document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais';
         document.getElementById('novo-is-localizado').checked = false;
         
         document.getElementById('novo-status').disabled = false;
+        
+        // CONTROLO DE VISIBILIDADE POR PERFIL
+        const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
+        document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
+        document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('div-comarcas').style.display = isAdmin ? 'grid' : 'none';
+
         window.openModal('modal-novo-caso');
     };
 
@@ -933,7 +943,7 @@
                 }
                 if(isLoc && casoAtual.isLocalizado !== true) {
                     let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
-                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo utilizador.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
                 
@@ -967,13 +977,21 @@
             document.getElementById('novo-processo').value = ''; document.getElementById('novo-vara').value = '';
             document.getElementById('novo-comarca-origem').value = ''; document.getElementById('novo-comarca-req').value = '';
             document.getElementById('novo-obs').value = '';
+            document.getElementById('novo-is-localizado').checked = false;
+            
             window.closeModal('modal-novo-caso');
-        } catch(e) { alert("Erro ao salvar. Verifique a conexão."); console.error(e); }
+        } catch(e) { alert("Erro ao salvar. Verifique a ligação."); console.error(e); }
         btn.innerText = "Salvar Ficha"; btn.disabled = false;
+    };
+
+    window.aprovarTriagem = async function(idCaso) {
+        if(window.usuarioLogado.role !== 'admin') return;
+        await updateDoc(doc(db, "casos", idCaso), { emTriagem: false });
     };
 
     window.abrirModalEditarCaso = function(idCaso) {
         const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
+        document.getElementById('titulo-modal-caso').innerText = '✏️ Editar Processo';
         document.getElementById('novo-caso-id').value = c.id;
         document.getElementById('novo-contrato').value = c.contrato || ''; document.getElementById('novo-cliente').value = c.cliente || '';
         document.getElementById('novo-processo').value = c.processo || ''; document.getElementById('novo-vara').value = c.vara || '';
@@ -988,6 +1006,13 @@
         document.getElementById('novo-status').value = validStatus ? validStatus.id : 'Aguardando recolhimento das custas iniciais';
         
         document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
+
+        // CONTROLO DE VISIBILIDADE POR PERFIL
+        const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
+        document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
+        document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('div-comarcas').style.display = isAdmin ? 'grid' : 'none';
+
         window.openModal('modal-novo-caso');
     };
 
@@ -1268,7 +1293,7 @@
     }
 
     // LISTA 1: TRIAGEM (Lançamentos Pendentes)
-    window.renderizarTriagem = function() {
+    window.renderizarLancamentos = function() {
         const cont = document.getElementById('triagem-container');
         if(!cont) return;
         cont.innerHTML = '';
@@ -1355,8 +1380,7 @@
         if (countBusca === 0) contBusca.innerHTML = `<div style="padding:20px; color:#94a3b8; font-size:0.9rem;">Nenhum processo em andamento regular.</div>`;
     };
 
-    // RENDERIZAR CASOS ENCERRADOS E APREENDIDOS 
-    // Como os Encerrados e Apreendidos continuam idênticos, as funções originais foram mantidas.
+    // RENDERIZAR APREENDIDOS 
     window.renderizarApreendidos = function() {
         const container = document.getElementById('apreendidos-container'); 
         if(!container) return;
@@ -1484,6 +1508,30 @@
             `;
             container.appendChild(div);
         });
+    };
+
+    // FINANCEIRO
+    window.abrirModalMandado = function(idCaso) { document.getElementById('mandado-caso-id').value = idCaso; window.openModal('modal-mandado'); };
+    window.salvarMandado = async function() {
+        const idCaso = document.getElementById('mandado-caso-id').value;
+        const valor = parseFloat(document.getElementById('mandado-valor').value);
+        if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
+
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andamentosAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+        andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
+
+        await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
+        window.closeModal('modal-mandado');
+    };
+    
+    window.desfazerMandado = async function(idCaso) {
+        if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório.")) {
+            const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            let arr = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+            const novosAndamentos = arr.filter(a => a.responsavel !== "SISTEMA");
+            await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+        }
     };
 
     window.renderizarFinanceiro = function() {
