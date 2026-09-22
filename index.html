@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Controle - Omni (Completo)</title>
+    <title>Painel de Controle - Omni (Lançamentos)</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -68,8 +68,6 @@
         .auth-container { display: flex; height: 100vh; justify-content: center; align-items: center; background: linear-gradient(135deg, var(--azul) 0%, var(--azul-escuro) 100%); }
         .auth-box { background: var(--branco); padding: 40px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 420px; text-align: center; margin: 15px; border-top: 5px solid var(--laranja); }
         .auth-box h2 { color: var(--azul); margin-top: 0; margin-bottom: 25px; font-size: 1.8rem; font-weight: 700; }
-        .auth-toggle { margin-top: 20px; font-size: 0.9rem; color: #666; }
-        .auth-toggle a { color: var(--laranja); text-decoration: none; font-weight: 600; cursor: pointer; }
         
         /* Layout Principal */
         #app-screen { display: none; height: 100vh; display: flex; width: 100vw; }
@@ -105,7 +103,7 @@
         
         /* Cards Modernos (Lista) */
         .card { background: var(--branco); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 20px; border: 1px solid rgba(226, 232, 240, 0.8); }
-        .tag-status { padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .tag-status { padding: 5px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; color: #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-block; }
         
         /* KANBAN BOARD */
         .kanban-wrapper { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; flex: 1; align-items: flex-start; }
@@ -129,7 +127,6 @@
         .dash-card.warning::after { background: linear-gradient(90deg, #f59e0b, #d97706); }
         .dash-card h4 { margin: 0 0 10px 0; color: var(--texto-claro); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; }
         .dash-card .number { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--azul); line-height: 1; }
-        .chart-container { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--borda); margin-bottom: 20px; }
 
         .table-container { overflow-x: auto; border-radius: 10px; border: 1px solid var(--borda); background: #fff; }
         table { width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left; }
@@ -141,7 +138,7 @@
         .modal-content { background: var(--branco); padding: 30px; border-radius: 12px; width: 100%; max-width: 600px; margin: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); border-top: 5px solid var(--laranja); }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--borda); padding-bottom: 10px; }
         .modal-header h3 { margin: 0; color: var(--azul); font-size: 1.2rem; }
-        .close-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #64748b; }
+        .close-btn { background: #f1f5f9; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; }
         
         /* Cores das Colunas/Tags */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
@@ -159,6 +156,8 @@
 
         .drop-hover { background-color: rgba(243, 112, 33, 0.05); border: 2px dashed var(--laranja); }
         #loading { display: none; text-align: center; padding: 20px; color: var(--azul); font-weight: bold; width: 100%; margin: auto; }
+        
+        .section-title { font-size: 1.1rem; font-weight: 600; padding-bottom: 5px; margin-bottom: 15px; margin-top: 30px; border-bottom: 2px solid; }
     </style>
 </head>
 <body>
@@ -167,23 +166,21 @@
 <div id="auth-screen" class="auth-container">
     <div id="login-box" class="auth-box">
         <div style="font-size: 3rem; color: var(--laranja); font-weight: 900; letter-spacing: -2px; margin-bottom: 5px; line-height: 1;">omni</div>
-        <p style="color: var(--texto-claro); font-size: 0.9rem; margin-bottom: 25px;">Agente Omni (Nuvem)</p>
-        <div class="form-group"><label>Usuário</label><input type="text" id="login-username"></div>
+        <p style="color: var(--texto-claro); font-size: 0.9rem; margin-bottom: 25px;">Agente Omni Sete Lagoas</p>
+        <div class="form-group"><label>Usuário / Login (Ex: 1593LUCAS)</label><input type="text" id="login-username"></div>
         <div class="form-group"><label>Senha</label><input type="password" id="login-password"></div>
         <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px; padding: 12px;" onclick="window.doLogin()">Acessar Painel</button>
-        <div class="auth-toggle">Não tem uma conta? <a onclick="window.toggleAuth()">Criar conta</a></div>
+        <!-- BOTÃO MESTRE ESCONDIDO (Basta digitar RESGATE no login) -->
     </div>
-    
-    <div id="register-box" class="auth-box" style="display: none;">
-        <h2>Criar Conta</h2>
-        <div class="form-group"><label>Nome</label><input type="text" id="reg-name"></div>
-        <div class="form-group"><label>Usuário</label><input type="text" id="reg-username"></div>
-        <div class="form-group"><label>Senha</label><input type="password" id="reg-password"></div>
-        <div class="form-group"><label>Perfil</label>
-            <select id="reg-role"><option value="admin">Administrador (Total Acesso)</option><option value="cadastro">Equipe Externa</option></select>
-        </div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="window.doRegister()">Cadastrar</button>
-        <div class="auth-toggle">Já tem uma conta? <a onclick="window.toggleAuth()">Fazer Login</a></div>
+
+    <!-- TELA DE CRIAÇÃO DO ADMIN MESTRE (OCULTA) -->
+    <div id="master-admin-box" class="auth-box" style="display: none;">
+        <h2 style="color: var(--laranja);">Admin Mestre</h2>
+        <p style="color: #666; font-size: 0.85rem; margin-bottom: 20px;">Crie a sua conta principal para ter acesso total.</p>
+        <div class="form-group"><label>Seu Nome (Ex: Lucas)</label><input type="text" id="master-nome"></div>
+        <div class="form-group"><label>Senha Definitiva</label><input type="password" id="master-senha"></div>
+        <button class="btn btn-primary" style="width: 100%; font-size: 1.1rem; margin-top: 10px;" onclick="window.criarAdminMestre()">Criar Minha Conta</button>
+        <div style="margin-top: 20px;"><a onclick="window.voltarLogin()" style="color: var(--azul); font-size: 0.9rem; cursor: pointer; text-decoration: underline;">Voltar ao Login</a></div>
     </div>
 </div>
 
@@ -200,8 +197,9 @@
             <div class="user-role" id="role-badge">Admin</div>
         </div>
         <nav>
-            <div class="nav-item active" onclick="window.switchTab('tab-kanban')" id="nav-kanban">📌 Visão Kanban</div>
-            <div class="nav-item" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos e Andamentos</div>
+            <div class="nav-item admin-only" onclick="window.switchTab('tab-kanban')" id="nav-kanban" style="display: none;">📌 Visão Kanban</div>
+            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">📥 Triagem / Lançamentos</div>
+            <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos">📁 Casos Ativos</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display: none;">📊 Dashboard Gerencial</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display: none;">💰 Financeiro</div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display: none;">👥 Gestão de Equipe</div>
@@ -212,58 +210,67 @@
     <main>
         <!-- TOPO -->
         <header class="main-header">
-            <div style="font-size: 1.2rem; font-weight: 600; color: var(--azul);">SGI - Banco de Dados Online <span style="font-size: 0.8rem; color: #a0c4ff; font-weight: normal;">v11 (Correção da Taxa)</span></div>
+            <div style="font-size: 1.2rem; font-weight: 600; color: var(--azul);">SGI - Banco de Dados Online <span style="font-size: 0.8rem; color: #a0c4ff; font-weight: normal;">v13 (Fluxo Completo)</span></div>
             <div style="display: flex; gap: 20px; align-items: center;">
-                <div class="notif-bell admin-only" onclick="window.abrirModalCopiloto()" title="Copiloto IA - Alertas" style="display:none;">
-                    🤖 Copiloto <span class="notif-badge" id="notif-badge">0</span>
-                </div>
-                <button class="btn btn-small btn-primary" style="border:none;" onclick="window.abrirModalNovoCaso()">➕ Novo Caso</button>
+                <button class="btn btn-small btn-primary" style="border:none;" onclick="window.abrirModalNovoCaso()">➕ Novo Cliente / Solicitação</button>
             </div>
         </header>
 
         <div id="loading">Sincronizando com a Nuvem...</div>
 
         <!-- ABA 0: KANBAN -->
-        <div id="tab-kanban" class="tab-content kanban-active active">
+        <div id="tab-kanban" class="tab-content kanban-active">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2 style="font-size: 1.4rem;">Quadro de Fluxo (Kanban)</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases.</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;">Arraste os cartões para atualizar as fases. (Somente casos aprovados)</div>
             </div>
             <div class="kanban-wrapper" id="kanban-board-container"></div>
         </div>
-
-        <!-- ABA 1: CASOS (LISTA) -->
-        <div id="tab-casos" class="tab-content">
-            <div class="top-bar"><h2>Todos os Casos</h2></div>
-            <div id="cases-container"></div>
+        
+        <!-- ABA 1: TRIAGEM / LANÇAMENTOS -->
+        <div id="tab-lancamentos" class="tab-content">
+            <div class="top-bar">
+                <h2>Lançamentos Pendentes</h2>
+                <p style="color: var(--texto-claro); font-size: 0.9rem;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</p>
+            </div>
+            <div id="lancamentos-container"></div>
         </div>
 
-        <!-- ABA 2: DASHBOARD (ADMIN) -->
+        <!-- ABA 2: CASOS ATIVOS (SEPARADOS) -->
+        <div id="tab-casos" class="tab-content active">
+            <div class="top-bar">
+                <h2>Casos Ativos</h2>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente, contrato..." onkeyup="window.renderizarCasos()" style="padding: 8px; border-radius:6px; border: 1px solid var(--borda);">
+                </div>
+            </div>
+            
+            <h3 class="section-title" style="color: var(--sucesso); border-color: var(--sucesso);">🟢 Veículos Localizados / Apreendidos</h3>
+            <div id="cases-localizados-container"></div>
+
+            <h3 class="section-title" style="color: var(--alerta); border-color: var(--alerta);">🟠 Em Busca / Tramitação</h3>
+            <div id="cases-busca-container"></div>
+        </div>
+
+        <!-- ABA 3: DASHBOARD (ADMIN) -->
         <div id="tab-relatorios" class="tab-content">
             <div class="top-bar">
                 <h2>Dashboard Gerencial</h2>
-                <button class="btn btn-outline" onclick="window.exportarRelatorioMestre()">📥 Exportar Relatório Excel</button>
             </div>
             <div class="dash-grid">
-                <div class="dash-card primary"><h4>Total de Casos</h4><p class="number" id="dash-total">0</p></div>
-                <div class="dash-card success"><h4>Processos Trabalhados</h4><p class="number" id="dash-mandados">0</p></div>
-                <div class="dash-card warning"><h4>Total de Encerrados</h4><p class="number" id="dash-apreendidos">0</p></div>
-                <div class="dash-card" style="border-top-color: var(--erro);"><h4>Taxa de Apreensão</h4><p class="number" id="dash-taxa" style="color: var(--erro);">0%</p></div>
-            </div>
-            <div class="grid-2">
-                <div class="chart-container"><h3 style="margin-top:0; font-size:1rem; color:var(--azul);">Saúde da Base</h3><div style="height:250px;"><canvas id="chartStatus"></canvas></div></div>
-                <div class="chart-container"><h3 style="margin-top:0; font-size:1rem; color:var(--azul);">Motivos de Encerramento</h3><div style="height:250px;"><canvas id="chartEncerramentos"></canvas></div></div>
-                <div class="chart-container" style="grid-column: span 2;"><h3 style="margin-top:0; font-size:1rem; color:var(--azul);">Top Comarcas</h3><div style="height:250px;"><canvas id="chartComarcas"></canvas></div></div>
+                <div class="dash-card primary"><h4>Total de Casos na Base</h4><p class="number" id="dash-total">0</p></div>
+                <div class="dash-card success"><h4>Mandados Expedidos</h4><p class="number" id="dash-mandados">0</p></div>
+                <div class="dash-card warning"><h4>Veículos Apreendidos</h4><p class="number" id="dash-apreendidos">0</p></div>
+                <div class="dash-card" style="border-top-color: var(--erro);"><h4>Taxa de Apreensão Global</h4><p class="number" id="dash-taxa" style="color: var(--erro);">0%</p></div>
             </div>
         </div>
 
-        <!-- ABA 3: FINANCEIRO (ADMIN) -->
+        <!-- ABA 4: FINANCEIRO (ADMIN) -->
         <div id="tab-financeiro" class="tab-content">
             <div class="top-bar">
                 <h2>Faturamento e Comissões</h2>
                 <div style="display: flex; gap: 10px;">
                     <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px; border-radius: 6px;"><option value="todos">Todos os meses</option></select>
-                    <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
             </div>
             <div class="card" style="border-left: 5px solid var(--sucesso); display: flex; justify-content: space-between; align-items: center; padding: 20px;">
@@ -273,16 +280,16 @@
             <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
         </div>
 
-        <!-- ABA 4: EQUIPE (ADMIN) -->
+        <!-- ABA 5: EQUIPE (ADMIN) -->
         <div id="tab-equipe" class="tab-content">
             <div class="top-bar"><h2>Gestão de Equipe</h2></div>
             <div class="card">
                 <h3 style="margin-top:0; font-size: 1rem;">➕ Novo Acesso</h3>
                 <div class="grid-2">
-                    <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome"></div>
+                    <div class="form-group"><label>Nome Completo (Primeiro nome será o login)</label><input type="text" id="novo-membro-nome"></div>
                     <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha"></div>
                     <div class="form-group" style="grid-column:span 2;"><label>Perfil</label>
-                        <select id="novo-membro-role"><option value="cadastro">Equipe Externa</option><option value="admin">Administrador</option></select>
+                        <select id="novo-membro-role"><option value="cadastro">Equipe Externa (Lança casos pendentes)</option><option value="admin">Administrador Mestre</option></select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
@@ -323,7 +330,7 @@
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req"></div>
         </div>
         <div class="form-group"><label>Observações</label><textarea id="novo-obs"></textarea></div>
-        <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarCaso()">Salvar Ficha</button>
+        <button class="btn btn-primary" style="width: 100%; padding: 12px;" onclick="window.salvarCaso()">Salvar Ficha</button>
     </div>
 </div>
 
@@ -347,28 +354,13 @@
     </div>
 </div>
 
-<div id="modal-notificacoes" class="modal">
-    <div class="modal-content" style="max-width: 800px;">
-        <div class="modal-header">
-            <h3 style="color: var(--azul); display: flex; align-items: center; gap: 10px;">🤖 Alertas Estratégicos - Copiloto IA</h3>
-            <button class="close-btn" onclick="window.closeModal('modal-notificacoes')">&times;</button>
-        </div>
-        <p style="font-size: 0.9rem; color: var(--texto-claro);">A Inteligência Artificial varreu seus processos na Nuvem e encontrou as seguintes oportunidades de atuação:</p>
-        <div class="table-container">
-            <table class="audit-table">
-                <thead><tr><th>Caso / Contrato</th><th>Dias no Status</th><th>Análise / Recomendação da IA</th></tr></thead>
-                <tbody id="notif-tbody"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
-
 <!-- FIREBASE INTEGRATION -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, query, orderBy, doc, updateDoc, deleteDoc, where } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+    // Configuracao base
     const firebaseConfig = {
         apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM",
         authDomain: "sistema-andamentos.firebaseapp.com",
@@ -384,9 +376,6 @@
     window.casosDb = [];
     window.usuariosDb = [];
     window.usuarioLogado = null;
-    let chartStatusInstance = null;
-    let chartComarcasInstance = null;
-    let chartEncerramentosInstance = null;
 
     const STATUS_PHASES = [
         {id: 'Aguardando recolhimento das custas iniciais', cor: 'cor-custas', borda: 'borda-custas'},
@@ -403,10 +392,99 @@
         {id: 'Acordo Realizado', cor: 'cor-acordo', borda: 'borda-acordo'}
     ];
 
-    let sessao = localStorage.getItem('usuarioSessaoOmni');
+    // ==========================================
+    // SISTEMA DE LOGIN (EXATAMENTE COMO PEDIDO)
+    // ==========================================
+    window.abrirCriarAdminMestre = function() {
+        document.getElementById('login-box').style.display = 'none';
+        document.getElementById('master-admin-box').style.display = 'block';
+    };
+
+    window.voltarLogin = function() {
+        document.getElementById('master-admin-box').style.display = 'none';
+        document.getElementById('login-box').style.display = 'block';
+    };
+
+    window.criarAdminMestre = async function() {
+        const nome = document.getElementById('master-nome').value.trim();
+        const senha = document.getElementById('master-senha').value;
+        if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
+
+        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const usernameGerado = "1593" + primeiroNome;
+
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
+        
+        if(!qSnap.empty) {
+            alert(`O login ${usernameGerado} já existe. Tente logar com ele!`);
+            window.voltarLogin();
+            return;
+        }
+
+        await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
+        alert(`✅ Conta Mestre criada com sucesso!
+
+Seu Login: ${usernameGerado}
+Sua Senha: ${senha}
+
+Guarde essas informações!`);
+        
+        document.getElementById('login-username').value = usernameGerado;
+        document.getElementById('login-password').value = senha;
+        window.voltarLogin();
+    };
+
+    window.doLogin = async function() {
+        const userRaw = document.getElementById('login-username').value.trim();
+        const pass = document.getElementById('login-password').value;
+        
+        // TRUQUE SECRETO
+        if (userRaw.toUpperCase() === 'RESGATE') {
+            window.abrirCriarAdminMestre();
+            document.getElementById('login-username').value = '';
+            document.getElementById('login-password').value = '';
+            return;
+        }
+        
+        if(!userRaw || !pass) { alert("Preencha login e senha."); return; }
+
+        const userUpper = userRaw.toUpperCase();
+        const q = query(collection(db, "usuarios"), where("username", "==", userUpper), where("password", "==", pass));
+        const qSnap = await getDocs(q);
+        
+        if (!qSnap.empty) {
+            window.usuarioLogado = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
+            localStorage.setItem('usuarioSessaoOmniV13', JSON.stringify(window.usuarioLogado));
+            mostrarPainel();
+        } else {
+            alert('Usuário ou senha incorretos! Verifique se digitou "1593" antes do nome.');
+        }
+    };
+
+    function mostrarPainel() {
+        document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
+        document.getElementById('user-display').innerText = window.usuarioLogado.nome;
+        document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
+        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe Externa';
+        
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = window.usuarioLogado.role === 'admin' ? 'flex' : 'none');
+        document.getElementById('loading').style.display = 'block';
+        
+        gerarColunasKanban(); 
+        window.switchTab('tab-casos');
+    }
+
+    window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessaoOmniV13'); location.reload(); };
+
+    // ==========================================
+    // SINCRONIZAÇÃO BANCO DE DADOS (CASOS E USUÁRIOS)
+    // ATENÇÃO: UTILIZANDO A COLEÇÃO "casos" CORRETA DO PRINT DO FIREBASE
+    // ==========================================
+    let sessao = localStorage.getItem('usuarioSessaoOmniV13');
     if(sessao) { window.usuarioLogado = JSON.parse(sessao); mostrarPainel(); }
 
-    onSnapshot(query(collection(db, "casos_omni"), orderBy("timestamp", "desc")), (snapshot) => {
+    onSnapshot(query(collection(db, "casos"), orderBy("timestamp", "desc")), (snapshot) => {
         window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         if(window.usuarioLogado) { window.renderizarGeral(); document.getElementById('loading').style.display = 'none'; }
     });
@@ -416,57 +494,22 @@
         if(window.usuarioLogado && window.usuarioLogado.role === 'admin') window.desenharTabelaEquipe();
     });
 
-    window.toggleAuth = function() {
-        const l = document.getElementById('login-box'); const r = document.getElementById('register-box');
-        if(l.style.display === 'none') { l.style.display = 'block'; r.style.display = 'none'; }
-        else { l.style.display = 'none'; r.style.display = 'block'; }
-    };
-
-    window.doRegister = async function() {
-        const nome = document.getElementById('reg-name').value.trim();
-        const user = document.getElementById('reg-username').value.trim();
-        const pass = document.getElementById('reg-password').value;
-        const role = document.getElementById('reg-role').value;
-        if (!nome || !user || !pass) return alert('Preencha todos os campos!');
-        const q = query(collection(db, "usuarios"), where("username", "==", user));
-        const qSnap = await getDocs(q);
-        if(!qSnap.empty) return alert('Este nome de usuário já está em uso na nuvem.');
-        await addDoc(collection(db, "usuarios"), { nome, username: user, password: pass, role });
-        alert('Conta criada na nuvem com sucesso! Faça login.'); window.toggleAuth();
-    };
-
-    window.doLogin = async function() {
-        const user = document.getElementById('login-username').value.trim(); const pass = document.getElementById('login-password').value;
-        const q = query(collection(db, "usuarios"), where("username", "==", user), where("password", "==", pass));
-        const qSnap = await getDocs(q);
-        if (!qSnap.empty) {
-            window.usuarioLogado = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
-            localStorage.setItem('usuarioSessaoOmni', JSON.stringify(window.usuarioLogado)); mostrarPainel();
-        } else alert('Usuário ou senha incorretos!');
-    };
-
-    function mostrarPainel() {
-        document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
-        document.getElementById('user-display').innerText = window.usuarioLogado.nome;
-        document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
-        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Administrador' : 'Equipe Externa';
-        document.querySelectorAll('.admin-only').forEach(el => el.style.display = window.usuarioLogado.role === 'admin' ? 'flex' : 'none');
-        document.getElementById('loading').style.display = 'block';
-        gerarColunasKanban(); window.atualizarFiltros();
-    }
-
-    window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessaoOmni'); location.reload(); };
-
+    // ==========================================
+    // NAVEGAÇÃO E MODAIS
+    // ==========================================
     window.switchTab = function(tabId) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active'); document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
+        document.getElementById(tabId).classList.add('active'); 
+        if(document.getElementById('nav-' + tabId.split('-')[1])) {
+            document.getElementById('nav-' + tabId.split('-')[1]).classList.add('active');
+        }
         if(tabId === 'tab-relatorios') setTimeout(window.renderizarRelatorios, 100);
     };
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
     window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; };
-    window.abrirModalCopiloto = function() { window.openModal('modal-notificacoes'); };
+    
     window.abrirModalMandado = function(idCaso) { document.getElementById('mandado-caso-id').value = idCaso; document.getElementById('mandado-valor').value = "30.00"; window.openModal('modal-mandado'); };
 
     window.abrirModalNovoCaso = function() {
@@ -486,6 +529,9 @@
         window.openModal('modal-novo-caso');
     };
 
+    // ==========================================
+    // CRIAÇÃO E EDIÇÃO DE CASOS (COM SISTEMA DE APROVAÇÃO/TRIAGEM)
+    // ==========================================
     window.salvarCaso = async function() {
         const idCaso = document.getElementById('novo-caso-id').value;
         const payload = {
@@ -506,61 +552,197 @@
                 dataStatus = Date.now();
                 andamentos.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
             }
-            await updateDoc(doc(db, "casos_omni", idCaso), { ...payload, dataStatus, andamentos });
+            await updateDoc(doc(db, "casos", idCaso), { ...payload, dataStatus, andamentos });
         } else {
-            await addDoc(collection(db, "casos_omni"), {
-                ...payload, andamentos: [], dataStatus: Date.now(), timestamp: Date.now(), mandadoExpedido: false, mesRegistro: new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' })
+            // Se for Admin, o caso ja vai pra base principal (aprovado: true). Se for Equipe, vai pra triagem (aprovado: false).
+            let isAprovado = (window.usuarioLogado.role === 'admin');
+            
+            await addDoc(collection(db, "casos"), {
+                ...payload, 
+                andamentos: [], 
+                dataStatus: Date.now(), 
+                timestamp: Date.now(), 
+                mandadoExpedido: false, 
+                mesRegistro: new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
+                criadoPor: window.usuarioLogado.nome,
+                aprovado: isAprovado
             });
+            
+            if(!isAprovado) {
+                alert("Solicitação enviada para o Administrador aprovar!");
+            }
         }
         window.closeModal('modal-novo-caso');
     };
 
     window.excluirCaso = async function(idCaso) {
-        if(confirm("Deseja apagar este caso da nuvem?")) await deleteDoc(doc(db, "casos_omni", idCaso));
+        if(confirm("Deseja apagar este caso da nuvem?")) await deleteDoc(doc(db, "casos", idCaso));
     };
 
+    window.aprovarCasoTriagem = async function(idCaso) {
+        if(window.usuarioLogado.role !== 'admin') return;
+        await updateDoc(doc(db, "casos", idCaso), { aprovado: true });
+    };
+
+    // ==========================================
+    // ANDAMENTOS
+    // ==========================================
     window.abrirModalAndamento = function(idCaso) { document.getElementById('andamento-caso-id').value = idCaso; document.getElementById('nova-acao').value = ''; window.openModal('modal-novo-andamento'); };
     
     window.salvarAndamento = async function() {
         const idCaso = document.getElementById('andamento-caso-id').value; const acaoText = document.getElementById('nova-acao').value.trim();
-        if (!acaoText) return alert('Descreva!'); 
+        if (!acaoText) return alert('Descreva a ação!'); 
         const cAtual = window.casosDb.find(x => x.id === idCaso); let andamentos = cAtual.andamentos || [];
         andamentos.unshift({ id: Date.now(), descricao: acaoText, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos_omni", idCaso), { andamentos }); window.closeModal('modal-novo-andamento');
+        await updateDoc(doc(db, "casos", idCaso), { andamentos }); window.closeModal('modal-novo-andamento');
     };
 
-    // FINANCEIRO
-    window.salvarMandado = async function() {
-        const idCaso = document.getElementById('mandado-caso-id').value; const valor = parseFloat(document.getElementById('mandado-valor').value);
-        if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
-        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andamentosAtuais = casoAtual.andamentos || [];
-        andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
-        await updateDoc(doc(db, "casos_omni", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
-        window.closeModal('modal-mandado');
-    };
-
-    window.desfazerMandado = async function(idCaso) {
-        if(confirm("Cancelar o pagamento desta comissão? O caso sairá do relatório financeiro.")) {
-            const casoAtual = window.casosDb.find(c => c.id === idCaso); const novosAndamentos = casoAtual.andamentos.filter(a => a.responsavel !== "SISTEMA");
-            await updateDoc(doc(db, "casos_omni", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+    window.excluirAndamento = async function(idCaso, idAndamento) {
+        if(confirm("Apagar andamento?")) {
+            const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            const novosAndamentos = casoAtual.andamentos.filter(a => a.id !== idAndamento);
+            await updateDoc(doc(db, "casos", idCaso), { andamentos: novosAndamentos });
         }
     };
 
-    // DRAG & DROP
+    // ==========================================
+    // RENDERIZAÇÃO GERAL E SEPARAÇÃO DE LISTAS
+    // ==========================================
+    window.renderizarGeral = function() {
+        renderizarLancamentos();
+        renderizarCasos();
+        
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { 
+            renderizarKanban();
+            window.renderizarFinanceiro(); 
+            window.renderizarRelatorios(); 
+        }
+    };
+
+    function gerarHTMLCartao(c, isAdmin) {
+        const st = c.status || 'Aguardando recolhimento das custas iniciais'; 
+        const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
+        let andHTML = (c.andamentos||[]).slice(0,3).map(a => {
+            let btnDelAnd = isAdmin && a.responsavel !== 'SISTEMA' ? `<span style="cursor:pointer; color:var(--erro); margin-left:8px;" onclick="window.excluirAndamento('${c.id}', ${a.id})">✖</span>` : '';
+            return `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data}:</strong> ${a.descricao} <span style="color:#94a3b8; font-size:0.7rem;">(${a.responsavel})</span>${btnDelAnd}</div>`
+        }).join('');
+        
+        let btnFaturar = ''; let btnExcluir = ''; let btnLancar = '';
+        if(isAdmin) {
+            btnExcluir = `<button class="btn btn-small btn-danger" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>`;
+            btnFaturar = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Faturar Mandado</button>` : `<span class="tag-status" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:0.75rem;">Mandado Faturado</span>`;
+            btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">+ Lançar Ação</button>`;
+        }
+
+        return `
+            <div class="card" style="padding: 20px;">
+                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+                    <div>
+                        <span class="tag-status ${conf.cor}">${st}</span>
+                        <h3 style="margin:10px 0 5px; color:var(--azul); font-size:1.1rem;">${c.cliente}</h3>
+                        <p style="margin:0; font-family:monospace; color:var(--laranja);">${c.contrato}</p>
+                        <p style="margin:5px 0 0 0; font-size:0.8rem; color:#64748b;">📍 ${c.comarcaReq || c.comarcaOrigem || 'Comarca não informada'}</p>
+                    </div>
+                    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        ${btnFaturar}
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar Info</button>
+                        ${btnLancar}
+                        ${btnExcluir}
+                    </div>
+                </div>
+                <div style="background:#f8fafc; padding:10px; border-radius:8px;">${andHTML || '<span style="color:#94a3b8;font-size:0.85rem;">Sem andamentos.</span>'}</div>
+            </div>
+        `;
+    }
+
+    // LISTA 1: TRIAGEM (Lançamentos Pendentes)
+    function renderizarLancamentos() {
+        const cont = document.getElementById('lancamentos-container'); cont.innerHTML = '';
+        
+        let base = window.casosDb.filter(c => c.aprovado === false);
+        
+        // Se for equipe, só vê os que ele mesmo enviou
+        if(window.usuarioLogado.role !== 'admin') {
+            base = base.filter(c => c.criadoPor === window.usuarioLogado.nome);
+        }
+
+        if (base.length === 0) {
+            cont.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8;">Nenhum caso pendente de aprovação.</div>`;
+            return;
+        }
+
+        base.forEach(c => {
+            let htmlBase = gerarHTMLCartao(c, window.usuarioLogado.role === 'admin');
+            
+            // Adiciona o botão de aprovar no topo do cartão para o admin
+            let tagAprovacao = window.usuarioLogado.role === 'admin' 
+                ? `<div style="background:#fef3c7; padding:10px; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border:1px solid #f59e0b;">
+                     <span style="color:#b45309; font-size:0.85rem; font-weight:600;">Enviado por: ${c.criadoPor}</span>
+                     <button class="btn btn-small" style="background:#10b981; color:white;" onclick="window.aprovarCasoTriagem('${c.id}')">✅ Aprovar para Base Ativa</button>
+                   </div>`
+                : `<div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:10px; color:#64748b; font-size:0.85rem; font-weight:600; text-align:center;">⏳ Aguardando aprovação do Administrador</div>`;
+            
+            let divWrap = document.createElement('div');
+            divWrap.innerHTML = tagAprovacao + htmlBase;
+            cont.appendChild(divWrap);
+        });
+    }
+
+    // LISTA 2: CASOS ATIVOS (SEPARADOS LOCALIZADO vs EM BUSCA)
+    window.renderizarCasos = function() {
+        const contLoc = document.getElementById('cases-localizados-container');
+        const contBusca = document.getElementById('cases-busca-container');
+        contLoc.innerHTML = ''; contBusca.innerHTML = '';
+        
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        const termoBusca = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+        
+        // Pega só os APROVADOS e que NÃO ESTÃO ENCERRADOS de vez (se você usar a lógica de excluir)
+        let base = window.casosDb.filter(c => c.aprovado !== false);
+        
+        if (termoBusca) {
+            base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca));
+        }
+
+        let contagemLoc = 0; let contagemBusca = 0;
+
+        base.forEach(c => {
+            const st = c.status || '';
+            const html = gerarHTMLCartao(c, isAdmin);
+            let wrap = document.createElement('div'); wrap.innerHTML = html;
+
+            if (['Veículo Localizado', 'Apreendido', 'Acordo Realizado'].includes(st)) {
+                contLoc.appendChild(wrap);
+                contagemLoc++;
+            } else {
+                contBusca.appendChild(wrap);
+                contagemBusca++;
+            }
+        });
+
+        if(contagemLoc === 0) contLoc.innerHTML = `<p style="color:#94a3b8; font-size:0.9rem;">Nenhum veículo localizado no momento.</p>`;
+        if(contagemBusca === 0) contBusca.innerHTML = `<p style="color:#94a3b8; font-size:0.9rem;">Nenhum veículo em busca no momento.</p>`;
+    }
+
+    // ==========================================
+    // KANBAN ADMIN
+    // ==========================================
     window.allowDrop = function(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
     window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
     window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
+    
     window.dropKanban = async function(ev, novoStatus) {
         ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
         const idCaso = ev.dataTransfer.getData("caseId"); const cAtual = window.casosDb.find(c => c.id === idCaso);
         if(!cAtual || cAtual.status === novoStatus) return;
         let andamentos = cAtual.andamentos || [];
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos_omni", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
+        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos });
     };
 
     function gerarColunasKanban() {
         const kbContainer = document.getElementById('kanban-board-container');
+        if(!kbContainer) return;
         kbContainer.innerHTML = STATUS_PHASES.map(fase => `
             <div class="kanban-col" ondrop="window.dropKanban(event, '${fase.id}')" ondragover="window.allowDrop(event)" ondragleave="window.dragLeave(event)">
                 <div class="kanban-header ${fase.borda}">${fase.id} <span class="k-count" id="count-${fase.id.replace(/\s+/g, '')}">0</span></div>
@@ -569,16 +751,11 @@
         `).join('');
     }
 
-    window.renderizarGeral = function() {
-        renderizarKanban(); renderizarCasos();
-        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { 
-            analisarRegrasCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); 
-        }
-    };
-
     function renderizarKanban() {
         STATUS_PHASES.forEach(f => { const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) col.innerHTML = ''; });
-        window.casosDb.forEach(c => {
+        
+        // Pega só os casos aprovados para colocar no Kanban
+        window.casosDb.filter(c => c.aprovado !== false).forEach(c => {
             const status = c.status || 'Aguardando recolhimento das custas iniciais';
             const col = document.getElementById('col-' + status.replace(/\s+/g, ''));
             if(col) {
@@ -593,203 +770,101 @@
                     </div>`;
             }
         });
+        
         STATUS_PHASES.forEach(f => {
             const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
             if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length;
         });
     }
 
-    function renderizarCasos() {
-        const container = document.getElementById('cases-container'); container.innerHTML = '';
-        const isAdmin = window.usuarioLogado.role === 'admin';
-        window.casosDb.forEach(c => {
-            const st = c.status || 'Aguardando recolhimento das custas iniciais'; const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
-            let andHTML = (c.andamentos||[]).slice(0,3).map(a => `<div style="font-size:0.85rem; padding:5px 0; border-bottom:1px solid #eee;"><strong>${a.data}:</strong> ${a.descricao}</div>`).join('');
-            
-            let btnFaturar = ''; let btnExcluir = '';
-            if(isAdmin) {
-                btnExcluir = `<button class="btn btn-small btn-danger" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>`;
-                btnFaturar = !c.mandadoExpedido ? `<button class="btn btn-small btn-success" onclick="window.abrirModalMandado('${c.id}')">💲 Faturar</button>` : `<span class="tag-status" style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; font-size:0.75rem;">Faturado</span>`;
-            }
+    // ==========================================
+    // FINANCEIRO (MANTIDO)
+    // ==========================================
+    window.salvarMandado = async function() {
+        const idCaso = document.getElementById('mandado-caso-id').value; const valor = parseFloat(document.getElementById('mandado-valor').value);
+        if(isNaN(valor) || valor <= 0) return alert("Valor inválido.");
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andamentosAtuais = casoAtual.andamentos || [];
+        andamentosAtuais.unshift({ id: Date.now(), descricao: `✅ Mandado Faturado. Comissão autorizada: R$ ${valor.toFixed(2).replace('.',',')}.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: "SISTEMA" });
+        await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: true, valorComissao: valor, dataExpedicao: now.toLocaleDateString('pt-BR'), mesExpedicao: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), andamentos: andamentosAtuais });
+        window.closeModal('modal-mandado');
+    };
 
-            let div = document.createElement('div'); div.className = 'card';
-            div.innerHTML = `
-                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-                    <div>
-                        <span class="tag-status ${conf.cor}">${st}</span>
-                        <h3 style="margin:10px 0 5px; color:var(--azul);">${c.cliente}</h3>
-                        <p style="margin:0; font-family:monospace; color:var(--laranja);">${c.contrato}</p>
-                    </div>
-                    <div style="display:flex; gap:10px; align-items:center;">
-                        ${btnFaturar}
-                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>
-                        <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">+ Lançar Ação</button>
-                        ${btnExcluir}
-                    </div>
-                </div>
-                <div style="background:#f8fafc; padding:10px; border-radius:8px;">${andHTML || '<span style="color:#94a3b8;font-size:0.85rem;">Sem andamentos.</span>'}</div>
-            `;
-            container.appendChild(div);
-        });
-    }
-
-    window.atualizarFiltros = function() {
+    window.renderizarFinanceiro = function() {
         const selFin = document.getElementById('filtro-mes-fin');
         const mFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))].sort().reverse();
         const aFin = selFin.value;
         selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
         if(mFin.includes(aFin)) selFin.value = aFin;
-    };
 
-    window.renderizarFinanceiro = function() {
         const tbody = document.getElementById('financeiro-tbody'); tbody.innerHTML = '';
         let base = window.casosDb.filter(c => c.mandadoExpedido === true);
         if (document.getElementById('filtro-mes-fin').value !== 'todos') base = base.filter(c => c.mesExpedicao === document.getElementById('filtro-mes-fin').value);
 
         let t = 0;
         if(base.length === 0) {
-            document.getElementById('total-financeiro').innerText = `R$ 0,00`; return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">Fila financeira vazia.</td></tr>';
+            document.getElementById('total-financeiro').innerText = `R$ 0,00`; return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">Nenhum mandado faturado.</td></tr>';
         }
         base.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); t += v;
-            let btn = `<button class="btn btn-outline btn-small" style="color:var(--erro); border-color:var(--erro);" onclick="window.desfazerMandado('${c.id}')">Estornar</button>`;
-            tbody.innerHTML += `<tr><td>${c.dataExpedicao}</td><td style="font-family:monospace;">${c.contrato}</td><td><strong>${c.cliente}</strong></td><td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td><td>${btn}</td></tr>`;
+            tbody.innerHTML += `<tr><td>${c.dataExpedicao}</td><td style="font-family:monospace;">${c.contrato}</td><td><strong>${c.cliente}</strong></td><td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td><td>-</td></tr>`;
         });
         document.getElementById('total-financeiro').innerText = `R$ ${t.toFixed(2).replace('.',',')}`;
     };
 
-    window.exportarExcelFinanceiro = function() {
-        let casosFin = window.casosDb.filter(c => c.mandadoExpedido === true);
-        const mesFiltro = document.getElementById('filtro-mes-fin').value;
-        if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
-        if(casosFin.length === 0) return alert("Sem comissões no período.");
-        
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;COMARCA;VALOR_COMISSAO\n`;
-        let total = 0;
-        casosFin.forEach(c => {
-            const v = parseFloat(c.valorComissao || 0); total += v;
-            let comarca = c.comarcaReq ? c.comarcaReq : (c.comarcaOrigem || '');
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato};${c.cliente};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
-        });
-        csv += `;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
-        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
-    };
-
+    // ==========================================
+    // RELATÓRIOS E TAXA (CORREÇÃO APLICADA)
+    // ==========================================
     window.renderizarRelatorios = function() {
         if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
         
-        let ativos = window.casosDb.filter(c => c.encerrado !== true);
-        let totalAtivos = ativos.length;
+        let baseAprovada = window.casosDb.filter(c => c.aprovado !== false);
         
-        let expedidos = 0; 
-        let agil = 0, atencao = 0, criticos = 0; 
-        let comarcasMap = {};
-        
-        let motivosCount = { 'Apreensão': 0, 'Entrega Amigável': 0, 'Acordo Realizado': 0, 'Quitado': 0, 'Pagou parcelas em atraso (Purgação da Mora)': 0 };
-        let apreensoesParaTaxa = 0;
+        let totalAtivos = baseAprovada.length;
+        let mandadosExpedidos = 0;
+        let totalApreendidos = 0;
 
-        window.casosDb.forEach(c => {
+        baseAprovada.forEach(c => {
             let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === c.status);
             let faseMandadoId = STATUS_PHASES.findIndex(f => f.id === 'Mandado Expedido');
             
-            // Corrige a contagem de expedidos (trabalhados) para a taxa
-            if (c.mandadoExpedido || idxFaseAtual >= faseMandadoId || c.encerrado) {
-                expedidos++;
-            }
-
-            if(c.encerrado !== true) {
-                let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
-                if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
-            } else {
-                let motivo = c.motivoEncerramento || '';
-                if(motivosCount[motivo] !== undefined) {
-                    motivosCount[motivo]++;
-                } else if(motivo.includes('Apreens')) {
-                    motivosCount['Apreensão']++; 
-                }
-
-                // Isola a contagem exata de apreensões para a taxa
-                if(motivo.includes('Apreens')) {
-                    apreensoesParaTaxa++;
-                }
+            // Conta quantos já passaram ou estão na fase de Mandado
+            if (c.mandadoExpedido || idxFaseAtual >= faseMandadoId) {
+                mandadosExpedidos++;
             }
             
-            let comarcaNome = (c.comarcaReq && c.comarcaReq.trim() !== '') ? c.comarcaReq.trim() : ((c.comarcaOrigem && c.comarcaOrigem.trim() !== '') ? c.comarcaOrigem.trim() : 'Sem Comarca');
-            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
-            comarcasMap[comarcaNome].total++;
+            // Conta APENAS quem está com o status explicitamente como 'Apreendido'
+            if (c.status === 'Apreendido') {
+                totalApreendidos++;
+            }
         });
-
-        let totalEncerramentosExito = Object.values(motivosCount).reduce((a,b)=>a+b, 0);
 
         document.getElementById('dash-total').innerText = totalAtivos; 
-        document.getElementById('dash-mandados').innerText = expedidos;
-        document.getElementById('dash-apreendidos').innerText = totalEncerramentosExito;
+        document.getElementById('dash-mandados').innerText = mandadosExpedidos;
+        document.getElementById('dash-apreendidos').innerText = totalApreendidos;
         
-        // Nova fórmula da Taxa de Apreensão
-        let taxaApreensao = expedidos > 0 ? ((apreensoesParaTaxa / expedidos) * 100).toFixed(1) : 0;
+        // CÁLCULO REAL DA TAXA DE APREENSÃO: (Apreendidos / Total de Casos Base) * 100
+        let taxaApreensao = totalAtivos > 0 ? ((totalApreendidos / totalAtivos) * 100).toFixed(1) : 0;
         document.getElementById('dash-taxa').innerText = `${taxaApreensao}%`;
-
-        let listaComarcas = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total }));
-        let topVol = [...listaComarcas].sort((a,b) => b.casos - a.casos).slice(0, 5);
-
-        const ctxStatus = document.getElementById('chartStatus'); const ctxEncerramentos = document.getElementById('chartEncerramentos'); const ctxComarcas = document.getElementById('chartComarcas');
-        
-        if(chartStatusInstance) chartStatusInstance.destroy(); 
-        if(chartEncerramentosInstance) chartEncerramentosInstance.destroy(); 
-        if(chartComarcasInstance) chartComarcasInstance.destroy();
-
-        if(ctxStatus && totalAtivos > 0) {
-            chartStatusInstance = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: { labels: ['No Prazo', 'Atenção (>7d)', 'Crítico (>15d)'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right' } } }
-            });
-        }
-        
-        if(ctxEncerramentos && totalEncerramentosExito > 0) {
-            chartEncerramentosInstance = new Chart(ctxEncerramentos, {
-                type: 'pie',
-                data: { labels: ['Apreensão', 'Amigável', 'Acordo', 'Quitado', 'Mora'], datasets: [{ data: [motivosCount['Apreensão'], motivosCount['Entrega Amigável'], motivosCount['Acordo Realizado'], motivosCount['Quitado'], motivosCount['Pagou parcelas em atraso (Purgação da Mora)']], backgroundColor: ['#10b981', '#14b8a6', '#0ea5e9', '#059669', '#0284c7'], borderWidth: 1 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 11} } } } }
-            });
-        }
-
-        if(ctxComarcas && listaComarcas.length > 0) {
-            chartComarcasInstance = new Chart(ctxComarcas, {
-                type: 'bar',
-                data: { labels: topVol.map(c => c.nome.split(' ')[0]), datasets: [{ label: 'Processos', data: topVol.map(c => c.casos), backgroundColor: '#ea580c', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
-            });
-        }
     };
 
-    window.exportarRelatorioMestre = function() {
-        if(window.casosDb.length === 0) return alert("Base vazia.");
-        const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.\n`;
-        window.casosDb.forEach(c => {
-            let dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
-            let comarca = c.comarcaReq ? `${c.comarcaReq} (Req)` : (c.comarcaOrigem ? `${c.comarcaOrigem} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato};${c.cliente};${comarca};${c.status};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}\n`;
-        });
-        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
-    };
-
+    // ==========================================
+    // EQUIPE ADMIN
+    // ==========================================
     window.criarMembroEquipe = async function() {
         const nome = document.getElementById('novo-membro-nome').value.trim();
         const senha = document.getElementById('novo-membro-senha').value.trim();
         const role = document.getElementById('novo-membro-role').value;
-        if(!nome || !senha) return alert("Preencha o nome e a senha temporária.");
+        if(!nome || !senha) return alert("Preencha o nome e a senha.");
         
-        const usernameGerado = "1593" + nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        const usernameGerado = "1593" + nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
         if(!qSnap.empty) return alert(`O login ${usernameGerado} já existe na base.`);
         
         await addDoc(collection(db, "usuarios"), { nome, username: usernameGerado, password: senha, role });
-        alert(`Conta gerada!\nLOGIN: ${usernameGerado}\nSENHA: ${senha}`);
+        alert(`Conta gerada!
+LOGIN: ${usernameGerado}
+SENHA: ${senha}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -797,7 +872,7 @@
         const tbody = document.getElementById('lista-equipe-container'); if(!tbody) return;
         let html = '';
         window.usuariosDb.forEach(u => {
-            const badge = u.role === 'admin' ? '<span class="tag-status" style="background:#dcfce7;color:#166534;">Admin</span>' : '<span class="tag-status" style="background:#f1f5f9;color:#475569;">Equipe</span>';
+            const badge = u.role === 'admin' ? '<span class="tag-status" style="background:#dcfce7;color:#166534;">Admin Mestre</span>' : '<span class="tag-status" style="background:#f1f5f9;color:#475569;">Equipe (Triagem)</span>';
             let btnExcluir = window.usuarioLogado.id !== u.id ? `<button class="btn btn-small btn-danger" onclick="window.excluirMembroEquipe('${u.id}', '${u.nome}')">Remover</button>` : `<span style="color: #94a3b8; font-size: 0.8rem;">(Você)</span>`;
             html += `<tr><td><strong>${u.nome}</strong></td><td style="color: var(--laranja); font-weight:600;">${u.username}</td><td>${badge}</td><td>${btnExcluir}</td></tr>`;
         });
@@ -808,25 +883,6 @@
         if(confirm(`Bloquear e apagar o acesso de ${nome}?`)) await deleteDoc(doc(db, "usuarios", id));
     };
 
-    function analisarRegrasCopiloto() {
-        const hoje = Date.now(); let alertas = [];
-        window.casosDb.forEach(c => {
-            if((c.status || 'Aguardando recolhimento das custas iniciais') === 'Liminar Deferida') {
-                let ts = c.dataStatus || hoje; let dias = Math.floor((hoje - ts) / 86400000); 
-                if(dias >= 5) {
-                    alertas.push({ cliente: c.cliente, contrato: c.contrato, dias: dias, tipo: "🚨 Gargalo de Cartório", mensagem: "O juiz defere a liminar, mas o cartório demora a emitir. Despache com o escrivão ou chefe de secretaria para acelerar a expedição do mandado." });
-                }
-            }
-        });
-
-        const bell = document.getElementById('notif-badge'); const tbody = document.getElementById('notif-tbody');
-        if(alertas.length > 0) {
-            bell.style.display = 'flex'; bell.innerText = alertas.length;
-            tbody.innerHTML = alertas.map(a => `<tr><td><strong>${a.cliente}</strong><br><span style="font-size:0.75rem;color:#64748b;">${a.contrato}</span></td><td style="color:var(--erro); font-weight:bold; font-size:1.1rem; text-align:center;">${a.dias}</td><td><div style="color:var(--alerta); font-weight:bold; margin-bottom:5px;">${a.tipo}</div><div style="font-size: 0.85rem; color:var(--texto);">${a.mensagem}</div></td></tr>`).join('');
-        } else {
-            bell.style.display = 'none'; tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; padding:30px; color:var(--sucesso); font-weight:bold;">Tudo em dia! Sem gargalos nos processos. ✅</td></tr>';
-        }
-    }
 </script>
 </body>
 </html>
