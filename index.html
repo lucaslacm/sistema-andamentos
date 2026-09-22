@@ -184,7 +184,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban */
+        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -308,7 +308,7 @@
         <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
-            <div style="display: flex; gap: 15px; align-items: center;">
+            <div class="admin-only" style="display: none; gap: 15px; align-items: center;">
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
         </header>
@@ -326,16 +326,19 @@
             </div>
         </div>
 
-        <!-- ABA NOVA: TRIAGEM -->
+        <!-- ABA 1: TRIAGEM / LANÇAMENTOS -->
         <div id="tab-lancamentos" class="tab-content">
             <div class="top-bar">
-                <h2>Lançamentos Pendentes</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Processos adicionados pela equipa a aguardar aprovação do Administrador.</div>
+                <div>
+                    <h2>Lançamentos Pendentes</h2>
+                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
             </div>
-            <div id="triagem-container"></div>
+            <div id="lancamentos-container"></div>
         </div>
 
-        <!-- ABA 1: CASOS ATIVOS (LISTA) -->
+        <!-- ABA 2: CASOS ATIVOS (LISTA) -->
         <div id="tab-casos" class="tab-content active">
             <div class="top-bar">
                 <h2>Processos em Andamento</h2>
@@ -485,7 +488,6 @@
             <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div>
         </div>
         
-        <!-- Ocultos para Equipe -->
         <div class="grid-2" id="div-processo-vara">
             <div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div>
             <div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div>
@@ -513,8 +515,7 @@
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
-        <!-- / Ocultos para Equipe -->
-
+        
         <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;">
             <label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
@@ -758,8 +759,7 @@
             </div>
         `).join('');
 
-        window.switchTab('tab-casos'); window.atualizarFiltros(); 
-        try { window.renderizarGeral(); } catch(e){ console.error(e); }
+        window.switchTab('tab-casos'); window.atualizarFiltros(); window.renderizarGeral();
         if(isAdmin) window.desenharTabelaEquipe();
         
         const loadEl = document.getElementById('loading');
@@ -781,7 +781,6 @@
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
     
-    // Zera os ID's ao fechar a modal de cadastro para impedir sobrescrita acidental
     window.closeModal = function(id) { 
         document.getElementById(id).style.display = 'none'; 
         if(id === 'modal-novo-caso') {
@@ -901,7 +900,6 @@
         
         document.getElementById('novo-status').disabled = false;
         
-        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
         document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
         document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
@@ -941,17 +939,24 @@
                     hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
+                
+                if(payload.status === 'Apreendido' && (!casoAtual || casoAtual.status !== 'Apreendido')) {
+                    payload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                    payload.dataApreensao = now.toLocaleDateString('pt-BR');
+                }
+                
                 if(isLoc && casoAtual.isLocalizado !== true) {
                     let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
-                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo utilizador.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
                 
                 await updateDoc(doc(db, "casos", idCaso), payload);
             } else {
                 let isEquipe = window.usuarioLogado.role !== 'admin';
+                const now = new Date();
                 
-                payload.mesRegistro = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                payload.mesRegistro = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
                 payload.criadoPor = window.usuarioLogado.nome; 
                 payload.mandadoExpedido = false; 
                 payload.valorComissao = 0; 
@@ -962,8 +967,13 @@
                 payload.encerrado = false;
                 payload.emTriagem = isEquipe;
                 
+                if(payload.status === 'Apreendido') {
+                    payload.mesApreensao = payload.mesRegistro;
+                    payload.dataApreensao = now.toLocaleDateString('pt-BR');
+                }
+                
                 if(isLoc) {
-                    payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                 }
                 
                 await addDoc(collection(db, "casos"), payload);
@@ -980,7 +990,7 @@
             document.getElementById('novo-is-localizado').checked = false;
             
             window.closeModal('modal-novo-caso');
-        } catch(e) { alert("Erro ao salvar. Verifique a ligação."); console.error(e); }
+        } catch(e) { alert("Erro ao salvar. Verifique a conexão."); console.error(e); }
         btn.innerText = "Salvar Ficha"; btn.disabled = false;
     };
 
@@ -1007,7 +1017,6 @@
         
         document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
 
-        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
         document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
         document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
@@ -1044,15 +1053,22 @@
             responsavel: window.usuarioLogado.nome 
         });
         
-        await updateDoc(doc(db, "casos", idCaso), { 
+        let updatePayload = { 
             encerrado: true,
             motivoEncerramento: motivo,
             status: 'Encerrado',
             andamentos: andAtuais,
             dataEncerramento: now.toLocaleDateString('pt-BR'),
+            mesEncerramento: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
             ultimaAnaliseData: now.toLocaleDateString('pt-BR')
-        });
+        };
         
+        if (motivo === 'Apreensão') {
+            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
+        }
+
+        await updateDoc(doc(db, "casos", idCaso), updatePayload);
         window.closeModal('modal-encerrar');
     };
 
@@ -1130,7 +1146,14 @@
 
         let andamentos = Array.isArray(caso.andamentos) ? caso.andamentos : []; const now = new Date();
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
+        
+        let updatePayload = { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') };
+        if (novoStatus === 'Apreendido' && caso.status !== 'Apreendido') {
+            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
+        }
+
+        await updateDoc(doc(db, "casos", idCaso), updatePayload);
     };
 
     window.renderizarKanban = function() {
@@ -1194,9 +1217,14 @@
 
     window.atualizarFiltros = function() {
         const selCasos = document.getElementById('filtro-mes'); const selFin = document.getElementById('filtro-mes-fin');
+        const selApreendidos = document.getElementById('filtro-mes-apreendidos');
+
         const mCasos = [...new Set(window.casosDb.map(c => c.mesRegistro))].sort().reverse();
         const mFin = [...new Set(window.casosDb.filter(c => c.mandadoExpedido).map(c => c.mesExpedicao))].sort().reverse();
-        const aCasos = selCasos.value; const aFin = selFin.value;
+        let baseApreendidos = window.casosDb.filter(c => c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão'));
+        const mApreendidos = [...new Set(baseApreendidos.map(c => c.mesApreensao || c.mesRegistro))].filter(Boolean).sort().reverse();
+
+        const aCasos = selCasos.value; const aFin = selFin.value; const aApreendidos = selApreendidos ? selApreendidos.value : 'todos';
 
         if(selCasos) {
             selCasos.innerHTML = '<option value="todos">Todos os meses</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; });
@@ -1205,6 +1233,10 @@
         if(selFin) {
             selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
             if(mFin.includes(aFin)) selFin.value = aFin;
+        }
+        if(selApreendidos) {
+            selApreendidos.innerHTML = '<option value="todos">Todos os meses</option>'; mApreendidos.forEach(m => { if(m) selApreendidos.innerHTML += `<option value="${m}">${m}</option>`; });
+            if(mApreendidos.includes(aApreendidos)) selApreendidos.value = aApreendidos;
         }
     };
 
@@ -1293,7 +1325,7 @@
     }
 
     // LISTA 1: TRIAGEM (Lançamentos Pendentes)
-    window.renderizarLancamentos = function() {
+    window.renderizarTriagem = function() {
         const cont = document.getElementById('triagem-container');
         if(!cont) return;
         cont.innerHTML = '';
@@ -1437,6 +1469,7 @@
         });
     };
 
+    // RENDERIZAR CASOS ENCERRADOS
     window.renderizarEncerrados = function() {
         const container = document.getElementById('encerrados-container'); container.innerHTML = '';
         const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
