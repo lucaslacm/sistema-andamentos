@@ -326,7 +326,7 @@
             </div>
         </div>
 
-        <!-- ABA 1: TRIAGEM / LANÇAMENTOS -->
+        <!-- ABA NOVA: TRIAGEM -->
         <div id="tab-lancamentos" class="tab-content">
             <div class="top-bar">
                 <div>
@@ -335,10 +335,10 @@
                 </div>
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
             </div>
-            <div id="lancamentos-container"></div>
+            <div id="triagem-container"></div>
         </div>
 
-        <!-- ABA 2: CASOS ATIVOS (LISTA) -->
+        <!-- ABA 1: CASOS ATIVOS (LISTA) -->
         <div id="tab-casos" class="tab-content active">
             <div class="top-bar">
                 <h2>Processos em Andamento</h2>
@@ -467,7 +467,7 @@
                     <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome" placeholder="Ex: João Silva"></div>
                     <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha" placeholder="Ex: 1234"></div>
                     <div class="form-group" style="grid-column:span 2;"><label>Perfil de Acesso</label>
-                        <select id="novo-membro-role"><option value="cadastro">Equipe (Analista - Lançamentos para Triagem)</option><option value="admin">Administrador (Acesso Total)</option></select>
+                        <select id="novo-membro-role"><option value="cadastro">Equipe (Apenas visualiza e envia para triagem)</option><option value="admin">Administrador (Acesso Total)</option></select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
@@ -488,6 +488,7 @@
             <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div>
         </div>
         
+        <!-- Ocultos para Equipe -->
         <div class="grid-2" id="div-processo-vara">
             <div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div>
             <div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div>
@@ -515,7 +516,8 @@
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
-        
+        <!-- / Ocultos para Equipe -->
+
         <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;">
             <label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
@@ -638,7 +640,12 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
-        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações.`);
+        alert(`✅ Restauração Concluída!
+
+Seu Login: ${usernameGerado}
+Sua Senha: ${senha}
+
+Guarde essas informações.`);
         document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
         window.voltarLogin();
     };
@@ -717,7 +724,10 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
-        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
+        alert(`✅ Conta gerada com sucesso!
+
+LOGIN: ${usernameGerado}
+SENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -781,6 +791,7 @@
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
     
+    // Zera os ID's ao fechar a modal de cadastro para impedir sobrescrita acidental
     window.closeModal = function(id) { 
         document.getElementById(id).style.display = 'none'; 
         if(id === 'modal-novo-caso') {
@@ -805,7 +816,7 @@
         let alertas = [];
 
         window.casosDb.forEach(c => {
-            if(c.encerrado) return;
+            if(c.encerrado) return; // IA ignora casos encerrados
 
             let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             
@@ -814,38 +825,47 @@
                 ? Math.floor((Date.now() - arr[0].id) / 86400000) 
                 : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
 
+            // Regra 1: Aguardando Liminar > 10 dias
             if (c.status === 'Aguardando Liminar' && diasStatus >= 10) {
                 alertas.push({ caso: c, tipo: 'alerta', titulo: 'Liminar Atrasada', msg: `Aguardando liminar há ${diasStatus} dias. Peticione reiteração ou contate a Vara.`});
             }
+            // Regra 3: Em Busca > 15 dias
             if (c.status === 'Em Busca' && diasStatus >= 15) {
                 alertas.push({ caso: c, tipo: 'alerta', titulo: 'Mandado sem Retorno', msg: `Oficial de Justiça com o mandado há ${diasStatus} dias sem atualização. Contate a Central de Mandados.`});
             }
+            // Regra 4: Bloqueado > 30 dias
             if (c.status === 'Bloqueado' && diasStatus >= 30) {
                 alertas.push({ caso: c, tipo: 'aviso', titulo: 'Bloqueio Ineficaz', msg: `Veículo bloqueado há ${diasStatus} dias sem apreensão. Avalie oficiar PM/PRF ou Execução.`});
             }
+            // Regra 10: Abandono de Causa
             if (diasUltimoAndamento >= 45) {
                 alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de intimação para dar andamento sob pena de extinção (Art. 485, III, CPC).`});
             }
 
-            if (arr.length > 0) {
-                let textAndamentos = arr.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
-                let ultimoAndamentoText = arr[0].descricao ? arr[0].descricao.toLowerCase() : '';
+            // Análise de Texto dos Andamentos
+            if (c.andamentos && c.andamentos.length > 0) {
+                let textAndamentos = c.andamentos.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
+                let ultimoAndamentoText = c.andamentos[0].descricao ? c.andamentos[0].descricao.toLowerCase() : '';
                 
+                // Regra 6: Pátio / Diárias
                 if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) {
                     alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione IMEDIATAMENTE com ofício liberatório para estancar diárias.`});
                 }
                 
+                // Regra 2: Diligência Negativa
                 let countNegativas = (textAndamentos.match(/negativa|não encontrad|mudou|endereço incorreto/g) || []).length;
                 if (ultimoAndamentoText.match(/(negativa|não encontrad|mudou|endereço incorreto)/)) {
                     alertas.push({ caso: c, tipo: 'aviso', titulo: 'Diligência Negativa Recente', msg: `Diligência falhou recentemente. Peça Sisbajud/Infojud/Renajud para novos endereços e bloqueio de circulação.`});
                 }
                 
+                // Regra 7: Esgotamento de Endereços
                 if (countNegativas >= 3 && !textAndamentos.includes('edital')) {
                     alertas.push({ caso: c, tipo: 'alerta', titulo: 'Esgotamento de Endereços', msg: `Detectadas múltiplas diligências negativas. Avalie requerer Citação por Edital.`});
                 }
             }
         });
 
+        // Atualizar Badge de notificações
         const notifBadge = document.getElementById('notif-badge-copiloto');
         if(notifBadge) {
             notifBadge.innerText = alertas.length;
@@ -900,6 +920,7 @@
         
         document.getElementById('novo-status').disabled = false;
         
+        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
         document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
         document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
@@ -947,7 +968,7 @@
                 
                 if(isLoc && casoAtual.isLocalizado !== true) {
                     let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
-                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
                 
@@ -1017,6 +1038,7 @@
         
         document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
 
+        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
         document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
         document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
@@ -1146,14 +1168,7 @@
 
         let andamentos = Array.isArray(caso.andamentos) ? caso.andamentos : []; const now = new Date();
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        
-        let updatePayload = { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') };
-        if (novoStatus === 'Apreendido' && caso.status !== 'Apreendido') {
-            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
-            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
-        }
-
-        await updateDoc(doc(db, "casos", idCaso), updatePayload);
+        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
     };
 
     window.renderizarKanban = function() {
@@ -1164,7 +1179,7 @@
             document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
         });
 
-        // Só renderiza no kanban os casos que NÃO são triagem
+        // Só renderiza no kanban os casos que NÃO são triagem e NÂO encerrados
         let kanbanBase = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true);
         
         kanbanBase.sort((a, b) => {
@@ -1469,7 +1484,6 @@
         });
     };
 
-    // RENDERIZAR CASOS ENCERRADOS
     window.renderizarEncerrados = function() {
         const container = document.getElementById('encerrados-container'); container.innerHTML = '';
         const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
@@ -1593,17 +1607,20 @@
         if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
         if(casosFin.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
+        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO
+`;
         let total = 0;
         casosFin.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); total += v;
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq || comOri || '';
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}
+`;
         });
-        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
-        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
+`;
+        const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
     };
 
@@ -1611,16 +1628,22 @@
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.\n`;
+        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI
+Gerado em:;${dataHoje}
+Base total:;${window.casosDb.length} processos
+
+CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
+`;
         window.casosDb.forEach(c => {
             let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}\n`;
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
+`;
         });
-        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
