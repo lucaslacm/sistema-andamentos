@@ -184,7 +184,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
+        /* Cores das Colunas Kanban */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -267,7 +267,8 @@
                 <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
             </div>
             
-            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">
+            <!-- NOVA ABA: TRIAGEM -->
+            <div class="nav-item" onclick="window.switchTab('tab-triagem')" id="nav-triagem">
                 <div>📥 Triagem / Lançamentos</div>
             </div>
             
@@ -308,6 +309,8 @@
         <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
+            
+            <!-- ESCONDIDO PARA A EQUIPE, VISTO PELO ADMIN -->
             <div class="admin-only" style="display: none; gap: 15px; align-items: center;">
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
@@ -325,14 +328,15 @@
                 <!-- Cards de alertas do copiloto injetados via JS -->
             </div>
         </div>
-
+        
         <!-- ABA NOVA: TRIAGEM -->
-        <div id="tab-lancamentos" class="tab-content">
+        <div id="tab-triagem" class="tab-content">
             <div class="top-bar">
                 <div>
                     <h2>Lançamentos Pendentes</h2>
                     <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</p>
                 </div>
+                <!-- BOTAO PARA A EQUIPE ADICIONAR NA TRIAGEM -->
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
             </div>
             <div id="triagem-container"></div>
@@ -366,7 +370,7 @@
         <div id="tab-kanban" class="tab-content">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2>Quadro de Fluxo</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases. (Somente casos aprovados)</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
             </div>
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
@@ -467,7 +471,10 @@
                     <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome" placeholder="Ex: João Silva"></div>
                     <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha" placeholder="Ex: 1234"></div>
                     <div class="form-group" style="grid-column:span 2;"><label>Perfil de Acesso</label>
-                        <select id="novo-membro-role"><option value="cadastro">Equipe (Apenas visualiza e envia para triagem)</option><option value="admin">Administrador (Acesso Total)</option></select>
+                        <select id="novo-membro-role">
+                            <option value="cadastro">Equipe (Analista - Lançamentos para Triagem)</option>
+                            <option value="admin">Administrador (Acesso Total)</option>
+                        </select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
@@ -488,7 +495,7 @@
             <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div>
         </div>
         
-        <!-- Ocultos para Equipe -->
+        <!-- INÍCIO DAS DIVS ESCONDIDAS PARA A EQUIPE -->
         <div class="grid-2" id="div-processo-vara">
             <div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div>
             <div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div>
@@ -516,8 +523,8 @@
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
-        <!-- / Ocultos para Equipe -->
-
+        <!-- FIM DAS DIVS ESCONDIDAS PARA A EQUIPE -->
+        
         <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;">
             <label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
@@ -595,8 +602,15 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // CHAVES ORIGINAIS INTACTAS
-    const firebaseConfig = { apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", authDomain: "sistema-andamentos.firebaseapp.com", projectId: "sistema-andamentos", storageBucket: "sistema-andamentos.firebasestorage.app", messagingSenderId: "421431391255", appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" };
+    // CHAVES ORIGINAIS INTACTAS RETIRADAS DO SEU CÓDIGO
+    const firebaseConfig = { 
+        apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", 
+        authDomain: "sistema-andamentos.firebaseapp.com", 
+        projectId: "sistema-andamentos", 
+        storageBucket: "sistema-andamentos.firebasestorage.app", 
+        messagingSenderId: "421431391255", 
+        appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" 
+    };
     
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
@@ -640,12 +654,7 @@
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
-        alert(`✅ Restauração Concluída!
-
-Seu Login: ${usernameGerado}
-Sua Senha: ${senha}
-
-Guarde essas informações.`);
+        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações.`);
         document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
         window.voltarLogin();
     };
@@ -724,10 +733,7 @@ Guarde essas informações.`);
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
-        alert(`✅ Conta gerada com sucesso!
-
-LOGIN: ${usernameGerado}
-SENHA TEMP: ${senhaTemp}`);
+        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -800,7 +806,7 @@ SENHA TEMP: ${senhaTemp}`);
     };
 
     window.renderizarGeral = function() {
-        window.renderizarLancamentos();
+        window.renderizarTriagem();
         window.renderizarCasos();
         window.renderizarApreendidos();
         window.renderizarEncerrados();
@@ -825,47 +831,38 @@ SENHA TEMP: ${senhaTemp}`);
                 ? Math.floor((Date.now() - arr[0].id) / 86400000) 
                 : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
 
-            // Regra 1: Aguardando Liminar > 10 dias
             if (c.status === 'Aguardando Liminar' && diasStatus >= 10) {
                 alertas.push({ caso: c, tipo: 'alerta', titulo: 'Liminar Atrasada', msg: `Aguardando liminar há ${diasStatus} dias. Peticione reiteração ou contate a Vara.`});
             }
-            // Regra 3: Em Busca > 15 dias
             if (c.status === 'Em Busca' && diasStatus >= 15) {
                 alertas.push({ caso: c, tipo: 'alerta', titulo: 'Mandado sem Retorno', msg: `Oficial de Justiça com o mandado há ${diasStatus} dias sem atualização. Contate a Central de Mandados.`});
             }
-            // Regra 4: Bloqueado > 30 dias
             if (c.status === 'Bloqueado' && diasStatus >= 30) {
                 alertas.push({ caso: c, tipo: 'aviso', titulo: 'Bloqueio Ineficaz', msg: `Veículo bloqueado há ${diasStatus} dias sem apreensão. Avalie oficiar PM/PRF ou Execução.`});
             }
-            // Regra 10: Abandono de Causa
             if (diasUltimoAndamento >= 45) {
                 alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de intimação para dar andamento sob pena de extinção (Art. 485, III, CPC).`});
             }
 
-            // Análise de Texto dos Andamentos
-            if (c.andamentos && c.andamentos.length > 0) {
-                let textAndamentos = c.andamentos.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
-                let ultimoAndamentoText = c.andamentos[0].descricao ? c.andamentos[0].descricao.toLowerCase() : '';
+            if (arr.length > 0) {
+                let textAndamentos = arr.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
+                let ultimoAndamentoText = arr[0].descricao ? arr[0].descricao.toLowerCase() : '';
                 
-                // Regra 6: Pátio / Diárias
                 if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) {
                     alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione IMEDIATAMENTE com ofício liberatório para estancar diárias.`});
                 }
                 
-                // Regra 2: Diligência Negativa
                 let countNegativas = (textAndamentos.match(/negativa|não encontrad|mudou|endereço incorreto/g) || []).length;
                 if (ultimoAndamentoText.match(/(negativa|não encontrad|mudou|endereço incorreto)/)) {
                     alertas.push({ caso: c, tipo: 'aviso', titulo: 'Diligência Negativa Recente', msg: `Diligência falhou recentemente. Peça Sisbajud/Infojud/Renajud para novos endereços e bloqueio de circulação.`});
                 }
                 
-                // Regra 7: Esgotamento de Endereços
                 if (countNegativas >= 3 && !textAndamentos.includes('edital')) {
                     alertas.push({ caso: c, tipo: 'alerta', titulo: 'Esgotamento de Endereços', msg: `Detectadas múltiplas diligências negativas. Avalie requerer Citação por Edital.`});
                 }
             }
         });
 
-        // Atualizar Badge de notificações
         const notifBadge = document.getElementById('notif-badge-copiloto');
         if(notifBadge) {
             notifBadge.innerText = alertas.length;
@@ -962,8 +959,8 @@ SENHA TEMP: ${senhaTemp}`);
                 }
                 
                 if(payload.status === 'Apreendido' && (!casoAtual || casoAtual.status !== 'Apreendido')) {
-                    payload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
-                    payload.dataApreensao = now.toLocaleDateString('pt-BR');
+                    payload.mesApreensao = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                    payload.dataApreensao = new Date().toLocaleDateString('pt-BR');
                 }
                 
                 if(isLoc && casoAtual.isLocalizado !== true) {
@@ -1168,7 +1165,14 @@ SENHA TEMP: ${senhaTemp}`);
 
         let andamentos = Array.isArray(caso.andamentos) ? caso.andamentos : []; const now = new Date();
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        await updateDoc(doc(db, "casos", idCaso), { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
+        
+        let updatePayload = { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') };
+        if (novoStatus === 'Apreendido' && caso.status !== 'Apreendido') {
+            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
+        }
+
+        await updateDoc(doc(db, "casos", idCaso), updatePayload);
     };
 
     window.renderizarKanban = function() {
@@ -1607,20 +1611,17 @@ SENHA TEMP: ${senhaTemp}`);
         if (mesFiltro !== 'todos') casosFin = casosFin.filter(c => c.mesExpedicao === mesFiltro);
         if(casosFin.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO
-`;
+        let csv = `DATA;COMPETENCIA;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
         let total = 0;
         casosFin.forEach(c => {
             const v = parseFloat(c.valorComissao || 0); total += v;
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq || comOri || '';
-            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}
-`;
+            csv += `${c.dataExpedicao};${c.mesExpedicao};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
         });
-        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}
-`;
-        const blob = new Blob(["﻿" + csv], { type: 'text/csv;charset=utf-8;' });
+        csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Comissoes_${mesFiltro}.csv`; link.click();
     };
 
@@ -1628,22 +1629,16 @@ SENHA TEMP: ${senhaTemp}`);
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI
-Gerado em:;${dataHoje}
-Base total:;${window.casosDb.length} processos
-
-CONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.
-`;
+        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;FASE FINANCEIRA;DIAS SEM MOV.\n`;
         window.casosDb.forEach(c => {
             let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
             const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
             let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
-            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}
-`;
+            csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};${c.mandadoExpedido ? 'COMISSAO PAGA' : 'PENDENTE'};${dias}\n`;
         });
-        const blob = new Blob(["﻿" + csvFinal], { type: 'text/csv;charset=utf-8;' });
+        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
