@@ -40,7 +40,7 @@
             --kb-tentando: #eab308;
             --kb-em-busca: #f97316;
             --kb-localizado: #84cc16;
-            --kb-apreendido: #059669; /* Verde escuro */
+            --kb-apreendido: #059669;
         }
         
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -267,7 +267,8 @@
                 <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
             </div>
             
-            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">
+            <!-- NOVA ABA: TRIAGEM -->
+            <div class="nav-item" onclick="window.switchTab('tab-triagem')" id="nav-triagem">
                 <div>📥 Triagem / Lançamentos</div>
             </div>
             
@@ -308,6 +309,8 @@
         <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
+            
+            <!-- ESCONDIDO PARA A EQUIPE, VISTO PELO ADMIN -->
             <div class="admin-only" style="display: none; gap: 15px; align-items: center;">
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
@@ -326,13 +329,14 @@
             </div>
         </div>
         
-        <!-- ABA: TRIAGEM -->
-        <div id="tab-lancamentos" class="tab-content">
+        <!-- ABA NOVA: TRIAGEM -->
+        <div id="tab-triagem" class="tab-content">
             <div class="top-bar">
                 <div>
                     <h2>Lançamentos Pendentes</h2>
-                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</p>
+                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos cadastrados pela equipe aguardando a aprovação do Administrador.</p>
                 </div>
+                <!-- BOTAO PARA A EQUIPE ADICIONAR NA TRIAGEM -->
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
             </div>
             <div id="triagem-container"></div>
@@ -350,11 +354,14 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato/processo..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
                     
+                    <!-- NOVOS FILTROS -->
                     <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Origem (Todas)</option></select>
                     <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Req. (Todas)</option></select>
                     <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Status (Todos)</option></select>
+                    <!-- /NOVOS FILTROS -->
+
                     <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Mês Cad. (Todos)</option></select>
                 </div>
             </div>
@@ -452,6 +459,7 @@
                 <h2>Faturamento e Comissões</h2>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px;"><option value="todos">Todos os meses</option></select>
+                    <!-- BOTAO PARA LANCAR NOVO FATURAMENTO DIRETAMENTE -->
                     <button class="btn btn-primary" onclick="window.abrirModalFaturamento()">➕ Novo Faturamento</button>
                     <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
@@ -689,7 +697,9 @@
         const btn = document.getElementById('btn-login-submit');
         const err = document.getElementById('error-msg');
         const userRaw = document.getElementById('login-username').value.trim(); 
-        const pass = document.getElementById('login-password').value.trim();
+        
+        // CORREÇÃO DE SEGURANÇA: Removido o .trim() para garantir que senhas exatas, mesmo com espaços salvos antes, continuem conectando
+        const pass = document.getElementById('login-password').value;
         
         if (userRaw.toUpperCase() === 'RESGATE') { window.abrirCriarAdminMestre(); return; }
         if(!userRaw || !pass) return alert("Preencha as credenciais.");
