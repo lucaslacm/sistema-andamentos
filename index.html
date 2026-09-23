@@ -267,8 +267,7 @@
                 <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
             </div>
             
-            <!-- NOVA ABA: TRIAGEM -->
-            <div class="nav-item" onclick="window.switchTab('tab-triagem')" id="nav-triagem">
+            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">
                 <div>📥 Triagem / Lançamentos</div>
             </div>
             
@@ -309,8 +308,6 @@
         <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
-            
-            <!-- ESCONDIDO PARA A EQUIPE, VISTO PELO ADMIN -->
             <div class="admin-only" style="display: none; gap: 15px; align-items: center;">
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
@@ -330,13 +327,12 @@
         </div>
         
         <!-- ABA: TRIAGEM -->
-        <div id="tab-triagem" class="tab-content">
+        <div id="tab-lancamentos" class="tab-content">
             <div class="top-bar">
                 <div>
                     <h2>Lançamentos Pendentes</h2>
-                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos cadastrados pela equipe aguardando a aprovação do Administrador.</p>
+                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</p>
                 </div>
-                <!-- BOTAO PARA A EQUIPE ADICIONAR NA TRIAGEM -->
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
             </div>
             <div id="triagem-container"></div>
@@ -354,14 +350,11 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato/processo..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
                     
-                    <!-- NOVOS FILTROS -->
                     <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Origem (Todas)</option></select>
                     <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Req. (Todas)</option></select>
                     <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Status (Todos)</option></select>
-                    <!-- /NOVOS FILTROS -->
-
                     <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Mês Cad. (Todos)</option></select>
                 </div>
             </div>
@@ -459,7 +452,6 @@
                 <h2>Faturamento e Comissões</h2>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px;"><option value="todos">Todos os meses</option></select>
-                    <!-- BOTAO PARA LANCAR NOVO FATURAMENTO DIRETAMENTE -->
                     <button class="btn btn-primary" onclick="window.abrirModalFaturamento()">➕ Novo Faturamento</button>
                     <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
@@ -540,7 +532,7 @@
                 🚨 MARCAR COMO VEÍCULO LOCALIZADO (URGENTE)
             </label>
             <p style="margin: 5px 0 0 28px; font-size: 0.7rem; color: #991b1b; text-transform: none; font-weight: 500;">
-                Ative esta opção se já souber onde o veículo está, <b>independentemente do status atual do processo</b> (Aguardando Liminar, Custas, etc). O caso ficará destacado em vermelho no topo das listas.
+                Ative esta opção se já souber onde o veículo está, <b>independentemente do status atual do processo</b>. O caso ficará destacado em vermelho no topo das listas.
             </p>
         </div>
 
@@ -636,7 +628,6 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // CHAVES ORIGINAIS INTACTAS RETIRADAS DO SEU CÓDIGO
     const firebaseConfig = { 
         apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", 
         authDomain: "sistema-andamentos.firebaseapp.com", 
@@ -682,6 +673,7 @@
         const nome = document.getElementById('master-nome').value.trim();
         const senha = document.getElementById('master-senha').value;
         if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
+        // CORREÇÃO: Usando formato unicode seguro para substituir acentos sem quebrar o parser JS
         const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
@@ -727,7 +719,7 @@
             }
         } catch(e) {
             console.error("ERRO FIREBASE:", e);
-            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Verifique se a aba <b>Regras</b> do seu banco está como <i>allow read, write: if true;</i>`;
+            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Verifique a conexão de internet ou as regras de segurança do banco de dados.`;
             err.style.display = 'block';
         }
         btn.innerText = "Acessar Painel";
@@ -761,6 +753,7 @@
         const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
         const role = document.getElementById('novo-membro-role').value;
         if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
+        // CORREÇÃO: Usando formato unicode seguro
         const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
@@ -857,7 +850,7 @@
         let alertas = [];
 
         window.casosDb.forEach(c => {
-            if(c.encerrado) return;
+            if(c.encerrado) return; // IA ignora casos encerrados
 
             let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             
