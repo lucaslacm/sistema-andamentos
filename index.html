@@ -349,11 +349,9 @@
                     </div>
                     <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 250px;">
                     
-                    <!-- NOVOS FILTROS -->
                     <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Origem (Todas)</option></select>
                     <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Requerimento (Todas)</option></select>
                     <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Status (Todos)</option></select>
-                    <!-- /NOVOS FILTROS -->
                     
                     <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto;"><option value="todos">Todos os meses</option></select>
                 </div>
@@ -446,13 +444,12 @@
             </div>
         </div>
 
-        <!-- ABA 3: FINANCEIRO (MODIFICADA) -->
+        <!-- ABA 3: FINANCEIRO -->
         <div id="tab-financeiro" class="tab-content">
             <div class="top-bar">
                 <h2>Faturamento e Comissões</h2>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px;"><option value="todos">Todos os meses</option></select>
-                    <!-- BOTAO PARA LANCAR NOVO FATURAMENTO DIRETAMENTE -->
                     <button class="btn btn-primary" onclick="window.abrirModalFaturamento()">➕ Novo Faturamento</button>
                     <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
@@ -585,7 +582,6 @@
     </div>
 </div>
 
-<!-- MODAL FATURAMENTO ATUALIZADO -->
 <div id="modal-faturamento" class="modal">
     <div class="modal-content" style="max-width: 450px;">
         <div class="modal-header"><h3>💰 Lançar Faturamento</h3><button class="close-btn" onclick="window.closeModal('modal-faturamento')">&times;</button></div>
@@ -593,7 +589,6 @@
         
         <input type="hidden" id="faturamento-caso-id">
         
-        <!-- Aparece apenas quando aberto diretamente da aba Financeiro -->
         <div class="form-group" id="div-faturamento-caso" style="display: none;">
             <label>Selecione o Processo / Cliente</label>
             <select id="faturamento-select-caso">
@@ -626,7 +621,6 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // CHAVES ORIGINAIS INTACTAS RETIRADAS DO SEU CÓDIGO
     const firebaseConfig = { 
         apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", 
         authDomain: "sistema-andamentos.firebaseapp.com", 
@@ -672,7 +666,6 @@
         const nome = document.getElementById('master-nome').value.trim();
         const senha = document.getElementById('master-senha').value;
         if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
-        // CORREÇÃO: Usando formato unicode seguro para substituir acentos sem quebrar o parser JS
         const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
@@ -752,7 +745,6 @@
         const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
         const role = document.getElementById('novo-membro-role').value;
         if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
-        // CORREÇÃO: Usando formato unicode seguro
         const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
@@ -779,7 +771,6 @@
         tbody.innerHTML = html;
     };
 
-    // INTERFACE CORE E COPILOTO
     function mostrarPainel() {
         document.getElementById('auth-screen').style.display = 'none'; 
         document.getElementById('app-screen').style.display = 'flex';
@@ -824,7 +815,6 @@
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
     
-    // Zera os ID's ao fechar a modal de cadastro para impedir sobrescrita acidental
     window.closeModal = function(id) { 
         document.getElementById(id).style.display = 'none'; 
         if(id === 'modal-novo-caso') {
@@ -841,7 +831,6 @@
         if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
     };
 
-    // --- REGRAS DO COPILOTO IA ---
     window.renderizarCopiloto = function() {
         if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
         const container = document.getElementById('copiloto-container');
@@ -849,7 +838,7 @@
         let alertas = [];
 
         window.casosDb.forEach(c => {
-            if(c.encerrado) return; // IA ignora casos encerrados
+            if(c.encerrado) return;
 
             let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             
@@ -944,7 +933,6 @@
         
         document.getElementById('novo-status').disabled = false;
         
-        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
         document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
         document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
@@ -1062,7 +1050,6 @@
         
         document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
 
-        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
         document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
         document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
@@ -1073,7 +1060,6 @@
 
     window.excluirCaso = async function(idCaso) { if(confirm("Tem certeza que deseja APAGAR este processo definitivamente?")) await deleteDoc(doc(db, "casos", idCaso)); };
     
-    // ENCERRAMENTO E ARQUIVAMENTO DE CASOS
     window.abrirModalEncerrar = function(idCaso) {
         document.getElementById('encerrar-caso-id').value = idCaso;
         document.getElementById('encerrar-obs').value = '';
@@ -1109,7 +1095,6 @@
             ultimaAnaliseData: now.toLocaleDateString('pt-BR')
         };
         
-        // Se for apreensão e não tinha data antes, seta a data
         if (motivo === 'Apreensão' && !casoAtual.dataApreensao) {
             updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
             updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
@@ -1142,7 +1127,6 @@
         }
     };
 
-    // ANDAMENTOS E SELEÇÃO DE RESPONSÁVEL
     window.abrirModalAndamento = function(idCaso) { 
         document.getElementById('andamento-caso-id').value = idCaso; 
         document.getElementById('nova-acao').value = ''; 
@@ -1178,7 +1162,6 @@
     window.marcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: new Date().toLocaleDateString('pt-BR') }); };
     window.desmarcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: "" }); };
 
-    // KANBAN DRAG & DROP
     window.allowDrop = function(ev) { if(window.usuarioLogado.role !== 'admin') return; ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
     window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
     window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
@@ -1211,7 +1194,6 @@
             document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
         });
 
-        // Só renderiza no kanban os casos que NÃO são triagem e NÂO encerrados
         let kanbanBase = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true);
         
         kanbanBase.sort((a, b) => {
@@ -1260,69 +1242,6 @@
         });
     };
 
-    window.atualizarFiltros = function() {
-        const selCasos = document.getElementById('filtro-mes'); 
-        const selFin = document.getElementById('filtro-mes-fin');
-        const selApreendidos = document.getElementById('filtro-mes-apreendidos');
-
-        const mCasos = [...new Set(window.casosDb.map(c => c.mesRegistro))].sort().reverse();
-        
-        let faturamentosGlobais = [];
-        window.casosDb.forEach(c => {
-            if (c.faturamentos && c.faturamentos.length > 0) {
-                c.faturamentos.forEach(f => faturamentosGlobais.push(f.mes));
-            } else if (c.mandadoExpedido) {
-                faturamentosGlobais.push(c.mesExpedicao);
-            }
-        });
-        const mFin = [...new Set(faturamentosGlobais)].filter(Boolean).sort().reverse();
-
-        let baseApreendidos = window.casosDb.filter(c => c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão'));
-        const mApreendidos = [...new Set(baseApreendidos.map(c => c.mesApreensao || c.mesRegistro))].filter(Boolean).sort().reverse();
-
-        const aCasos = selCasos ? selCasos.value : 'todos'; 
-        const aFin = selFin ? selFin.value : 'todos'; 
-        const aApreendidos = selApreendidos ? selApreendidos.value : 'todos';
-
-        // Update Filters in Casos
-        const selOrigem = document.getElementById('filtro-comarca-origem');
-        const selReq = document.getElementById('filtro-comarca-req');
-        const selStatus = document.getElementById('filtro-status');
-
-        if (selOrigem && selReq && selStatus) {
-            const aOrigem = selOrigem.value; const aReq = selReq.value; const aStatus = selStatus.value;
-            let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(Boolean))].sort();
-            let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(Boolean))].sort();
-            
-            selOrigem.innerHTML = '<option value="todas">Origem (Todas)</option>';
-            mOrigem.forEach(o => { selOrigem.innerHTML += `<option value="${o}">${o}</option>`; });
-            
-            selReq.innerHTML = '<option value="todas">Requerimento (Todas)</option>';
-            mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
-
-            selStatus.innerHTML = '<option value="todos">Status (Todos)</option>';
-            STATUS_PHASES.forEach(s => { selStatus.innerHTML += `<option value="${s.id}">${s.id}</option>`; });
-
-            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
-            if(mReq.includes(aReq)) selReq.value = aReq;
-            if(STATUS_PHASES.some(s => s.id === aStatus)) selStatus.value = aStatus;
-        }
-
-        if(selCasos) {
-            selCasos.innerHTML = '<option value="todos">Mês Cad. (Todos)</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; });
-            if(mCasos.includes(aCasos)) selCasos.value = aCasos;
-        }
-        if(selFin) {
-            selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
-            if(mFin.includes(aFin)) selFin.value = aFin;
-        }
-        if(selApreendidos) {
-            selApreendidos.innerHTML = '<option value="todos">Todos os meses</option>'; mApreendidos.forEach(m => { if(m) selApreendidos.innerHTML += `<option value="${m}">${m}</option>`; });
-            if(mApreendidos.includes(aApreendidos)) selApreendidos.value = aApreendidos;
-        }
-    };
-
-    // HELPER PARA RENDERIZAR O HTML DE UM CARTÃO BASE
     function gerarHtmlCartaoBase(c, isAdmin, dataHoje) {
         let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
         if (st === 'Localizado') st = 'Veículo Localizado';
@@ -1401,11 +1320,8 @@
                         ${btnLancar}${btnsAdmin}
                     </div>
                 </div>
-                
                 ${obsHtml}${infoProcessoHtml}
-                
                 <div class="timeline">${andHTML || '<div class="tl-item"><span style="color:#94a3b8;">Sem diligências registradas.</span></div>'}</div>
-                
                 <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--borda); padding-top: 15px;">
                     <div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div>
                     <div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div>
@@ -1414,7 +1330,6 @@
         `;
     }
 
-    // LISTA 1: TRIAGEM (Lançamentos Pendentes)
     window.renderizarTriagem = function() {
         const cont = document.getElementById('triagem-container');
         if(!cont) return;
@@ -1449,12 +1364,6 @@
         });
     };
 
-    window.aprovarTriagem = async function(idCaso) {
-        if(window.usuarioLogado.role !== 'admin') return;
-        await updateDoc(doc(db, "casos", idCaso), { emTriagem: false });
-    };
-
-    // LISTA 2: CASOS ATIVOS (Separados em Localizados e Tramitação)
     window.renderizarCasos = function() {
         const contLoc = document.getElementById('cases-localizados-container');
         const contBusca = document.getElementById('cases-busca-container');
@@ -1466,12 +1375,10 @@
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-        // Pega casos que NÃO estão encerrados e NÃO estão na triagem e NÂO são Apreendidos
         let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true && c.status !== 'Apreendido');
         
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
         
-        // Novos Filtros Ativos
         const valOrigem = document.getElementById('filtro-comarca-origem') ? document.getElementById('filtro-comarca-origem').value : 'todas';
         const valReq = document.getElementById('filtro-comarca-req') ? document.getElementById('filtro-comarca-req').value : 'todas';
         const valStatus = document.getElementById('filtro-status') ? document.getElementById('filtro-status').value : 'todos';
@@ -1512,7 +1419,6 @@
         if (countBusca === 0) contBusca.innerHTML = `<div style="padding:20px; color:#94a3b8; font-size:0.9rem;">Nenhum processo em andamento regular.</div>`;
     };
 
-    // RENDERIZAR APREENDIDOS 
     window.renderizarApreendidos = function() {
         const container = document.getElementById('apreendidos-container'); 
         if(!container) return;
@@ -1521,14 +1427,13 @@
         const isAdmin = window.usuarioLogado.role === 'admin';
         const mesFiltro = document.getElementById('filtro-mes-apreendidos').value;
 
-        // Pega casos que tem status Apreendido OU encerrado com motivo Apreensão (e que passaram da triagem)
         let base = window.casosDb.filter(c => c.emTriagem !== true && (c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão')));
         
         if (mesFiltro !== 'todos') {
             base = base.filter(c => (c.mesApreensao || c.mesEncerramento || c.mesRegistro) === mesFiltro);
         }
 
-        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+        if(termoBusca) base = base.filter(c => (c.cliente||'').toLowerCase().includes(termoBusca) || (c.contrato||'').toLowerCase().includes(termoBusca) || ((c.processo||'').toLowerCase().includes(termoBusca)));
 
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🚔</div><h3>Nenhuma apreensão localizada neste mês.</h3></div>`;
 
@@ -1580,7 +1485,6 @@
         });
     };
 
-    // RENDERIZAR CASOS ENCERRADOS
     window.renderizarEncerrados = function() {
         const container = document.getElementById('encerrados-container'); container.innerHTML = '';
         const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
@@ -1588,7 +1492,7 @@
 
         let base = window.casosDb.filter(c => c.encerrado === true && c.emTriagem !== true);
         
-        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+        if(termoBusca) base = base.filter(c => (c.cliente||'').toLowerCase().includes(termoBusca) || (c.contrato||'').toLowerCase().includes(termoBusca) || ((c.processo||'').toLowerCase().includes(termoBusca)));
 
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">📁</div><h3>Nenhum caso no arquivo morto.</h3></div>`;
 
@@ -1646,23 +1550,20 @@
                         ${btnsAdmin}
                     </div>
                 </div>
-                
                 ${infoProcessoHtml}
-                
                 <div class="timeline">${andHTML}</div>
             `;
             container.appendChild(div);
         });
     };
 
-    // FINANCEIRO (Novo Sistema Múltiplo)
     window.atualizarValorFaturamento = function() {
         const tipo = document.getElementById('faturamento-tipo').value;
         const inputValor = document.getElementById('faturamento-valor');
         if (tipo === 'Mandado Expedido') inputValor.value = '30.00';
         else if (tipo === 'Apreensão - Moto') inputValor.value = '150.00';
         else if (tipo === 'Apreensão - Carro') inputValor.value = '250.00';
-        else inputValor.value = ''; // Caminhão e Amigável (a combinar, em branco)
+        else inputValor.value = '';
     };
 
     window.abrirModalFaturamento = function(idCaso = null) {
@@ -1678,7 +1579,6 @@
             const select = document.getElementById('faturamento-select-caso');
             select.innerHTML = '<option value="">-- Selecione um Cliente/Processo --</option>';
             
-            // Popula com todos os casos, ordenados alfabeticamente
             let casosOrd = [...window.casosDb].sort((a,b) => (a.cliente||'').localeCompare(b.cliente||''));
             casosOrd.forEach(c => {
                 select.innerHTML += `<option value="${c.id}">${c.cliente} (CT: ${c.contrato}) ${c.encerrado ? '- Encerrado' : ''}</option>`;
@@ -1689,9 +1589,7 @@
 
     window.salvarFaturamento = async function() {
         let idCaso = document.getElementById('faturamento-caso-id').value;
-        if (!idCaso) {
-            idCaso = document.getElementById('faturamento-select-caso').value;
-        }
+        if (!idCaso) idCaso = document.getElementById('faturamento-select-caso').value;
         if (!idCaso) return alert("Selecione um processo na lista!");
 
         const tipo = document.getElementById('faturamento-tipo').value;
@@ -1702,20 +1600,17 @@
         if (!casoAtual) return alert("Erro ao localizar processo.");
 
         const now = new Date();
-        
         let faturamentos = Array.isArray(casoAtual.faturamentos) ? casoAtual.faturamentos : [];
         let andamentos = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
 
-        const novoFat = {
+        faturamentos.push({
             id: Date.now().toString(),
             tipo: tipo,
             valor: valor,
             data: now.toLocaleDateString('pt-BR'),
             mes: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
             responsavel: window.usuarioLogado.nome
-        };
-
-        faturamentos.push(novoFat);
+        });
         
         andamentos.unshift({ 
             id: Date.now(), 
@@ -1728,7 +1623,7 @@
         await updateDoc(doc(db, "casos", idCaso), { 
             faturamentos: faturamentos, 
             andamentos: andamentos,
-            mandadoExpedido: true // mantido por compatibilidade
+            mandadoExpedido: true 
         });
 
         window.closeModal('modal-faturamento');
@@ -1744,7 +1639,7 @@
                 await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
             } else {
                 let novosFat = (casoAtual.faturamentos||[]).filter(f => f.id !== idFat);
-                let novosAndamentos = (casoAtual.andamentos||[]).filter(a => !(a.descricao.includes('Faturamento Lançado') && a.id > (Date.now() - 86400000))); 
+                let novosAndamentos = (casoAtual.andamentos||[]).filter(a => !(a.descricao.includes('Faturamento Lançado'))); 
                 await updateDoc(doc(db, "casos", idCaso), { faturamentos: novosFat, andamentos: novosAndamentos });
             }
         }
@@ -1752,29 +1647,22 @@
 
     window.renderizarFinanceiro = function() {
         const tbody = document.getElementById('financeiro-tbody'); tbody.innerHTML = '';
-        
         let faturamentosGerais = [];
         window.casosDb.forEach(c => {
             if (c.faturamentos && c.faturamentos.length > 0) {
-                c.faturamentos.forEach(fat => {
-                    faturamentosGerais.push({ caso: c, ...fat });
-                });
+                c.faturamentos.forEach(fat => { faturamentosGerais.push({ caso: c, ...fat }); });
             } else if (c.mandadoExpedido === true) {
-                faturamentosGerais.push({
-                    caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao
-                });
+                faturamentosGerais.push({ caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao });
             }
         });
 
         const mesFiltro = document.getElementById('filtro-mes-fin') ? document.getElementById('filtro-mes-fin').value : 'todos';
-        if (mesFiltro !== 'todos') {
-            faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
-        }
+        if (mesFiltro !== 'todos') faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
 
         let t = 0;
         if(faturamentosGerais.length === 0) {
             document.getElementById('total-financeiro').innerText = `R$ 0,00`;
-            return tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Nenhum lançamento no período.</td></tr>';
+            return tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">Nenhum lançamento no período.</td></tr>';
         }
 
         faturamentosGerais.sort((a,b) => b.id === 'legacy' ? -1 : b.id - a.id);
@@ -1808,7 +1696,7 @@
         if (mesFiltro !== 'todos') faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
         if(faturamentosGerais.length === 0) return alert("Sem comissões no período.");
         
-        let csv = `DATA;TIPO_LANCAMENTO;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
+        let csv = "DATA;TIPO_LANCAMENTO;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n";
         let total = 0;
         faturamentosGerais.forEach(f => {
             let c = f.caso;
@@ -1823,11 +1711,10 @@
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Financeiro_${mesFiltro}.csv`; link.click();
     };
 
-    // RELATÓRIOS E DASHBOARD
     window.exportarRelatorioMestre = function() {
         if(window.casosDb.length === 0) return alert("Base vazia.");
         const dataHoje = new Date().toLocaleDateString('pt-BR');
-        let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;TOTAL FATURADO;DIAS SEM MOV.\n`;
+        let csvFinal = "RELATÓRIO DE PERFORMANCE SGI\nGerado em:;" + dataHoje + "\nBase total:;" + window.casosDb.length + " processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;TOTAL FATURADO;DIAS SEM MOV.\n";
         window.casosDb.forEach(c => {
             let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
             let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
@@ -1848,118 +1735,7 @@
         const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
-    window.renderizarRelatorios = function() {
-        if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
-        
-        let baseValida = window.casosDb.filter(c => c.emTriagem !== true);
-        let ativos = baseValida.filter(c => c.encerrado !== true);
-        let totalAtivos = ativos.length;
-        
-        let faseMandadoId = STATUS_PHASES.findIndex(f => f.id === 'Mandado Expedido');
-        let expedidos = 0; 
-        let agil = 0, atencao = 0, criticos = 0; 
-        let comarcasMap = {};
-        
-        let motivosCount = { 'Apreensão': 0, 'Entrega Amigável': 0, 'Acordo Realizado': 0, 'Quitado': 0, 'Pagou parcelas em atraso (Purgação da Mora)': 0 };
-        let totalApreendidos = 0;
-
-        baseValida.forEach(c => {
-            let st = c.status; if(st === 'Localizado') st = 'Veículo Localizado';
-            let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === st);
-            
-            if (c.mandadoExpedido || idxFaseAtual >= faseMandadoId) {
-                expedidos++;
-            }
-            
-            if (c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão')) {
-                totalApreendidos++;
-            }
-
-            if(c.encerrado !== true) {
-                let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
-                if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
-            } else {
-                if(c.motivoEncerramento && motivosCount[c.motivoEncerramento] !== undefined) {
-                    motivosCount[c.motivoEncerramento]++;
-                } else if(c.motivoEncerramento && c.motivoEncerramento.includes('Apreens')) {
-                    motivosCount['Apreensão']++;
-                }
-            }
-            
-            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq.trim() : '';
-            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem.trim() : '';
-            let comarcaNome = comReq || comOri || 'Sem Comarca';
-            
-            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
-            comarcasMap[comarcaNome].total++;
-        });
-
-        document.getElementById('dash-total').innerText = totalAtivos; 
-        document.getElementById('dash-mandados').innerText = expedidos;
-        document.getElementById('dash-apreendidos').innerText = totalApreendidos;
-        
-        let taxaApreensao = baseValida.length > 0 ? ((totalApreendidos / baseValida.length) * 100).toFixed(1) : 0;
-        document.getElementById('dash-taxa').innerText = `${taxaApreensao}%`;
-
-        let listaComarcas = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total }));
-        let topVol = [...listaComarcas].sort((a,b) => b.casos - a.casos).slice(0, 5);
-
-        const ctxStatus = document.getElementById('chartStatus'); const ctxEncerramentos = document.getElementById('chartEncerramentos'); const ctxComarcas = document.getElementById('chartComarcas');
-        
-        if(chartStatusInstance) chartStatusInstance.destroy(); 
-        if(chartEncerramentosInstance) chartEncerramentosInstance.destroy(); 
-        if(chartComarcasInstance) chartComarcasInstance.destroy();
-
-        if(ctxStatus && totalAtivos > 0) {
-            chartStatusInstance = new Chart(ctxStatus, {
-                type: 'doughnut',
-                data: { labels: ['No Prazo', 'Atenção (>7d)', 'Crítico (>15d)'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right' } } }
-            });
-        }
-        
-        let totalEncerramentosExito = Object.values(motivosCount).reduce((a,b)=>a+b, 0);
-        if(ctxEncerramentos && totalEncerramentosExito > 0) {
-            chartEncerramentosInstance = new Chart(ctxEncerramentos, {
-                type: 'pie',
-                data: { labels: ['Apreensão', 'Amigável', 'Acordo', 'Quitado', 'Mora'], datasets: [{ data: [motivosCount['Apreensão'], motivosCount['Entrega Amigável'], motivosCount['Acordo Realizado'], motivosCount['Quitado'], motivosCount['Pagou parcelas em atraso (Purgação da Mora)']], backgroundColor: ['#10b981', '#14b8a6', '#0ea5e9', '#059669', '#0284c7'], borderWidth: 1 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 11} } } } }
-            });
-        }
-
-        if(ctxComarcas && listaComarcas.length > 0) {
-            chartComarcasInstance = new Chart(ctxComarcas, {
-                type: 'bar',
-                data: { labels: topVol.map(c => c.nome.split(' ')[0]), datasets: [{ label: 'Processos', data: topVol.map(c => c.casos), backgroundColor: '#ea580c', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
-            });
-        }
-    };
-
-    onSnapshot(collection(db, "usuarios"), (s) => { 
-        window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); 
-        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') {
-            try { window.desenharTabelaEquipe(); } catch(e) { console.error("Erro desenhar Equipe:", e); }
-        }
-    }, (error) => {
-        console.error("Firebase Sync Error (Usuarios):", error);
-    });
-    
-    onSnapshot(collection(db, "casos"), (snapshot) => {
-        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        if(window.usuarioLogado) { 
-            const loadEl = document.getElementById('loading');
-            if(loadEl) loadEl.style.display = 'none';
-            try { window.renderizarGeral(); } catch(e) { console.error("Erro renderizarGeral:", e); }
-        }
-    }, (error) => {
-        console.error("Firebase Sync Error (Casos):", error);
-        const loadEl = document.getElementById('loading');
-        if(loadEl) loadEl.innerHTML = `<span style="color:var(--erro);">Falha ao baixar dados. O Firebase recusou a leitura (Erro de Permissão). Verifique as regras.</span>`;
-    });
-
-    let s = localStorage.getItem('usuarioSessao');
-    if(s) { window.usuarioLogado = JSON.parse(s); mostrarPainel(); }
+    window.atualizarFiltros();
 </script>
 </body>
 </html>
