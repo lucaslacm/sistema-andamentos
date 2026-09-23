@@ -40,7 +40,7 @@
             --kb-tentando: #eab308;
             --kb-em-busca: #f97316;
             --kb-localizado: #84cc16;
-            --kb-apreendido: #059669;
+            --kb-apreendido: #059669; /* Verde escuro */
         }
         
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -267,8 +267,7 @@
                 <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
             </div>
             
-            <!-- NOVA ABA: TRIAGEM -->
-            <div class="nav-item" onclick="window.switchTab('tab-triagem')" id="nav-triagem">
+            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">
                 <div>📥 Triagem / Lançamentos</div>
             </div>
             
@@ -309,9 +308,7 @@
         <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
-            
-            <!-- ESCONDIDO PARA A EQUIPE, VISTO PELO ADMIN -->
-            <div class="admin-only" style="display: none; gap: 15px; align-items: center;">
+            <div style="display: flex; gap: 15px; align-items: center;">
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
         </header>
@@ -328,16 +325,12 @@
                 <!-- Cards de alertas do copiloto injetados via JS -->
             </div>
         </div>
-        
-        <!-- ABA NOVA: TRIAGEM -->
-        <div id="tab-triagem" class="tab-content">
+
+        <!-- ABA TRIAGEM -->
+        <div id="tab-lancamentos" class="tab-content">
             <div class="top-bar">
-                <div>
-                    <h2>Lançamentos Pendentes</h2>
-                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos cadastrados pela equipe aguardando a aprovação do Administrador.</p>
-                </div>
-                <!-- BOTAO PARA A EQUIPE ADICIONAR NA TRIAGEM -->
-                <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
+                <h2>Lançamentos Pendentes</h2>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;">Processos adicionados pela equipa a aguardar aprovação do Administrador.</div>
             </div>
             <div id="triagem-container"></div>
         </div>
@@ -346,27 +339,27 @@
         <div id="tab-casos" class="tab-content active">
             <div class="top-bar">
                 <h2>Processos em Andamento</h2>
-                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%;">
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <div class="toggle-wrapper admin-only" style="display: none;">
-                        <span>Ocultar vistos</span>
+                        <span>Ocultar já vistos</span>
                         <label class="switch">
                             <input type="checkbox" id="filtro-pendentes-hoje" onchange="window.renderizarCasos()">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato/processo..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 250px;">
                     
                     <!-- NOVOS FILTROS -->
                     <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Origem (Todas)</option></select>
-                    <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Req. (Todas)</option></select>
+                    <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Requerimento (Todas)</option></select>
                     <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Status (Todos)</option></select>
                     <!-- /NOVOS FILTROS -->
-
-                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Mês Cad. (Todos)</option></select>
+                    
+                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto;"><option value="todos">Todos os meses</option></select>
                 </div>
             </div>
             
-            <h3 class="section-title" style="color: var(--sucesso); border-color: var(--sucesso);">🟢 Veículos Localizados / Apreendidos</h3>
+            <h3 class="section-title" style="color: var(--sucesso); border-color: var(--sucesso);">🟢 Veículos Localizados</h3>
             <div id="cases-localizados-container"></div>
 
             <h3 class="section-title" style="color: var(--alerta); border-color: var(--alerta);">🟠 Em Busca / Tramitação</h3>
@@ -377,7 +370,7 @@
         <div id="tab-kanban" class="tab-content">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2>Quadro de Fluxo</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases. (Somente casos aprovados)</div>
             </div>
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
@@ -453,7 +446,7 @@
             </div>
         </div>
 
-        <!-- ABA 3: FINANCEIRO (MODIFICADA) -->
+        <!-- ABA 3: FINANCEIRO -->
         <div id="tab-financeiro" class="tab-content">
             <div class="top-bar">
                 <h2>Faturamento e Comissões</h2>
@@ -480,10 +473,7 @@
                     <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome" placeholder="Ex: João Silva"></div>
                     <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha" placeholder="Ex: 1234"></div>
                     <div class="form-group" style="grid-column:span 2;"><label>Perfil de Acesso</label>
-                        <select id="novo-membro-role">
-                            <option value="cadastro">Equipe (Analista - Lançamentos para Triagem)</option>
-                            <option value="admin">Administrador (Acesso Total)</option>
-                        </select>
+                        <select id="novo-membro-role"><option value="cadastro">Equipe (Analista - Lançamentos para Triagem)</option><option value="admin">Administrador (Acesso Total)</option></select>
                     </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
@@ -504,7 +494,7 @@
             <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div>
         </div>
         
-        <!-- INÍCIO DAS DIVS ESCONDIDAS PARA A EQUIPE -->
+        <!-- Ocultos para Equipe -->
         <div class="grid-2" id="div-processo-vara">
             <div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div>
             <div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div>
@@ -532,15 +522,15 @@
             <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
             <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
         </div>
-        <!-- FIM DAS DIVS ESCONDIDAS PARA A EQUIPE -->
-        
+        <!-- / Ocultos para Equipe -->
+
         <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;">
             <label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;">
                 <input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
                 🚨 MARCAR COMO VEÍCULO LOCALIZADO (URGENTE)
             </label>
             <p style="margin: 5px 0 0 28px; font-size: 0.7rem; color: #991b1b; text-transform: none; font-weight: 500;">
-                Ative esta opção se já souber onde o veículo está, <b>independentemente do status atual do processo</b>. O caso ficará destacado em vermelho no topo das listas.
+                Ative esta opção se já souber onde o veículo está, <b>independentemente do status atual do processo</b> (Aguardando Liminar, Custas, etc). O caso ficará destacado em vermelho no topo das listas.
             </p>
         </div>
 
@@ -636,6 +626,7 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+    // CHAVES ORIGINAIS INTACTAS RETIRADAS DO SEU CÓDIGO FONTE BASE
     const firebaseConfig = { 
         apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", 
         authDomain: "sistema-andamentos.firebaseapp.com", 
@@ -681,14 +672,14 @@
         const nome = document.getElementById('master-nome').value.trim();
         const senha = document.getElementById('master-senha').value;
         if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
-        // CORREÇÃO: Usando formato unicode seguro para substituir acentos sem quebrar o parser JS
+        // CORREÇÃO DA STRING DE REMOÇÃO DE ACENTOS DO CÓDIGO ORIGINAL
         const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
-        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha:${senha}\n\nGuarde essas informações.`);
+        alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha: ${senha}\n\nGuarde essas informações.`);
         document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
         window.voltarLogin();
     };
@@ -696,9 +687,9 @@
     window.doLogin = async function() {
         const btn = document.getElementById('btn-login-submit');
         const err = document.getElementById('error-msg');
-        const userRaw = document.getElementById('login-username').value.trim(); 
         
-        // CORREÇÃO DE SEGURANÇA: Removido o .trim() para garantir que senhas exatas, mesmo com espaços salvos antes, continuem conectando
+        // CORREÇÃO: Foi retirado o trim() da senha para garantir que senhas com espaços no final continuem a funcionar
+        const userRaw = document.getElementById('login-username').value.trim(); 
         const pass = document.getElementById('login-password').value;
         
         if (userRaw.toUpperCase() === 'RESGATE') { window.abrirCriarAdminMestre(); return; }
@@ -729,7 +720,7 @@
             }
         } catch(e) {
             console.error("ERRO FIREBASE:", e);
-            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Verifique a conexão de internet ou as regras de segurança do banco de dados.`;
+            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Verifique se a aba <b>Regras</b> do seu banco está como <i>allow read, write: if true;</i>`;
             err.style.display = 'block';
         }
         btn.innerText = "Acessar Painel";
@@ -763,14 +754,13 @@
         const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
         const role = document.getElementById('novo-membro-role').value;
         if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
-        // CORREÇÃO: Usando formato unicode seguro
         const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
-        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP:${senhaTemp}`);
+        alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP: ${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
@@ -970,6 +960,8 @@
 
         const idCaso = document.getElementById('novo-caso-id').value;
         const isLoc = document.getElementById('novo-is-localizado').checked;
+        const now = new Date(); // CORREÇÃO PARA A REFERÊNCIA NOW DO KANBAN DE APREENSÃO
+        
         const payload = {
             contrato: document.getElementById('novo-contrato').value.trim(),
             cliente: document.getElementById('novo-cliente').value.trim().toUpperCase(),
@@ -992,25 +984,24 @@
                 if(casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
                     payload.dataStatus = Date.now();
                     let hist = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-                    hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
                 
                 if(payload.status === 'Apreendido' && (!casoAtual || casoAtual.status !== 'Apreendido')) {
-                    payload.mesApreensao = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
-                    payload.dataApreensao = new Date().toLocaleDateString('pt-BR');
+                    payload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                    payload.dataApreensao = now.toLocaleDateString('pt-BR');
                 }
                 
                 if(isLoc && casoAtual.isLocalizado !== true) {
                     let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
-                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
                     payload.andamentos = hist;
                 }
                 
                 await updateDoc(doc(db, "casos", idCaso), payload);
             } else {
                 let isEquipe = window.usuarioLogado.role !== 'admin';
-                const now = new Date();
                 
                 payload.mesRegistro = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
                 payload.criadoPor = window.usuarioLogado.nome; 
@@ -1222,7 +1213,6 @@
             document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
         });
 
-        // Só renderiza no kanban os casos que NÃO são triagem e NÂO encerrados
         let kanbanBase = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true);
         
         kanbanBase.sort((a, b) => {
@@ -1333,99 +1323,6 @@
         }
     };
 
-    // HELPER PARA RENDERIZAR O HTML DE UM CARTÃO BASE
-    function gerarHtmlCartaoBase(c, isAdmin, dataHoje) {
-        let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
-        if (st === 'Localizado') st = 'Veículo Localizado';
-        const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
-
-        let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
-        
-        let somaFaturado = 0;
-        if (c.faturamentos && c.faturamentos.length > 0) {
-            somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f.valor || 0), 0);
-        } else if (c.mandadoExpedido) {
-            somaFaturado = parseFloat(c.valorComissao || 0);
-        }
-
-        if(isAdmin) {
-            btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>
-                         <button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')" title="Finalizar e Arquivar">🔒 Encerrar</button>`;
-            
-            badgeFin = somaFaturado > 0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0; font-size:0.7rem; padding: 4px 8px; border-radius:12px;">Faturado R$ ${somaFaturado.toFixed(2).replace('.',',')}</span>` : ``;
-            
-            bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`;
-            btnLancar = `<button class="btn btn-small btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>
-                         <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
-        } else {
-            btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
-        }
-        
-        const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-        const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
-        
-        let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => {
-            let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}',${a.id})" title="Excluir">✖</span>` : '';
-            let isRecent = i === 0 ? 'recent' : '';
-            let descFormatada = a.descricao || '';
-            
-            return `<div class="tl-item ${isRecent}">
-                <div><strong>${descFormatada}</strong>${dBtn}</div>
-                <div class="tl-meta">${a.data || ''} às ${a.hora \vert{}\vert{} ''} • 👤 ${a.responsavel || ''}</div>
-            </div>`;
-        }).join('');
-        
-        let obsHtml = c.obs ? `<div class="obs-box"><strong>📝 Observações Iniciais:</strong> ${c.obs}</div>` : '';
-
-        let infoProcessoHtml = '';
-        if(c.processo || c.vara) {
-            let txtP = c.processo ? `${c.processo} <span style="cursor:pointer; font-size:1rem;" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span>` : '-';
-            let txtV = c.vara || '-';
-            infoProcessoHtml = `<div class="info-grid">
-                <div><strong>Nº Processo CNJ</strong>${txtP}</div>
-                <div><strong>Vara de Tramitação</strong>${txtV}</div>
-            </div>`;
-        }
-
-        let origText = c.comarcaOrigem ? `📍 <strong>Origem:</strong> ${c.comarcaOrigem}` : '';
-        let reqText = c.comarcaReq ? `📨 <strong>Req:</strong> ${c.comarcaReq}` : '';
-        let infoComarcas = (origText && reqText) ? `${origText} &nbsp;\vert{}&nbsp; ${reqText}` : (origText || reqText || '📍 Comarca não informada');
-
-        const clienteFormatado = c.cliente || 'Sem Cliente';
-        const contratoFormatado = c.contrato || 'Sem Contrato';
-        const infoCriador = c.criadoPor ? ` | 👤 Cadastrado por: ${c.criadoPor}` : '';
-
-        let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px;">🚨 VEÍCULO LOCALIZADO</span>` : '';
-        let cardClass = c.isLocalizado ? 'card urgente-highlight' : 'card';
-
-        return `
-            <div class="${cardClass}">
-                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
-                    <div>
-                        ${isLocBadge}
-                        <span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span>
-                        <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${clienteFormatado}</h3>
-                        <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${contratoFormatado}${infoCriador}</p>
-                    </div>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados</button>
-                        ${btnLancar}${btnsAdmin}
-                    </div>
-                </div>
-                
-                ${obsHtml}${infoProcessoHtml}
-                
-                <div class="timeline">${andHTML || '<div class="tl-item"><span style="color:#94a3b8;">Sem diligências registradas.</span></div>'}</div>
-                
-                <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--borda); padding-top: 15px;">
-                    <div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div>
-                    <div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div>
-                </div>
-            </div>
-        `;
-    }
-
-    // LISTA 1: TRIAGEM (Lançamentos Pendentes)
     window.renderizarTriagem = function() {
         const cont = document.getElementById('triagem-container');
         if(!cont) return;
@@ -1443,11 +1340,80 @@
         }
 
         const dataHoje = new Date().toLocaleDateString('pt-BR');
+        const isAdmin = window.usuarioLogado.role === 'admin';
 
         base.forEach(c => {
-            let htmlBase = gerarHtmlCartaoBase(c, window.usuarioLogado.role === 'admin', dataHoje);
+            let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
+            if (st === 'Localizado') st = 'Veículo Localizado';
+            const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
+
+            let btnsAdmin = '', btnLancar = '';
             
-            let btnAprovar = window.usuarioLogado.role === 'admin' 
+            if(isAdmin) {
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>`;
+                btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
+            } else {
+                btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
+            }
+            
+            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
+            
+            let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => {
+                let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}',${a.id})" title="Excluir">✖</span>` : '';
+                let isRecent = i === 0 ? 'recent' : '';
+                return `<div class="tl-item ${isRecent}">
+                    <div><strong>${a.descricao \vert{}\vert{} ''}</strong>${dBtn}</div>
+                    <div class="tl-meta">${a.data || ''} às ${a.hora \vert{}\vert{} ''} • 👤 ${a.responsavel || ''}</div>
+                </div>`;
+            }).join('');
+            
+            let obsHtml = c.obs ? `<div class="obs-box"><strong>📝 Observações Iniciais:</strong> ${c.obs}</div>` : '';
+
+            let infoProcessoHtml = '';
+            if(c.processo || c.vara) {
+                let txtP = c.processo ? `${c.processo} <span style="cursor:pointer; font-size:1rem;" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span>` : '-';
+                let txtV = c.vara || '-';
+                infoProcessoHtml = `<div class="info-grid">
+                    <div><strong>Nº Processo CNJ</strong>${txtP}</div>
+                    <div><strong>Vara de Tramitação</strong>${txtV}</div>
+                </div>`;
+            }
+
+            let origText = c.comarcaOrigem ? `📍 <strong>Origem:</strong> ${c.comarcaOrigem}` : '';
+            let reqText = c.comarcaReq ? `📨 <strong>Req:</strong> ${c.comarcaReq}` : '';
+            let infoComarcas = (origText && reqText) ? `${origText} &nbsp;\vert{}&nbsp; ${reqText}` : (origText || reqText || '📍 Comarca não informada');
+
+            const clienteFormatado = c.cliente || 'Sem Cliente';
+            const contratoFormatado = c.contrato || 'Sem Contrato';
+            const infoCriador = c.criadoPor ? ` | 👤 Cadastrado por: ${c.criadoPor}` : '';
+
+            let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px;">🚨 VEÍCULO LOCALIZADO</span>` : '';
+            let cardClass = c.isLocalizado ? 'card urgente-highlight' : 'card';
+
+            let htmlCard = `
+                <div class="${cardClass}">
+                    <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            ${isLocBadge}
+                            <span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span>
+                            <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${clienteFormatado}</h3>
+                            <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${contratoFormatado}${infoCriador}</p>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados</button>
+                            ${btnLancar}${btnsAdmin}
+                        </div>
+                    </div>
+                    ${obsHtml}${infoProcessoHtml}
+                    <div class="timeline">${andHTML || '<div class="tl-item"><span style="color:#94a3b8;">Sem diligências registradas.</span></div>'}</div>
+                    <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--borda); padding-top: 15px;">
+                        <div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div>
+                    </div>
+                </div>
+            `;
+            
+            let btnAprovar = isAdmin 
                 ? `<div style="margin-bottom:15px; padding:10px; background:#fef3c7; border:1px solid #f59e0b; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
                     <span style="color:#b45309; font-weight:600; font-size:0.85rem;">Enviado por: ${c.criadoPor || 'Equipe'}</span>
                     <button class="btn btn-small" style="background:#10b981; color:white;" onclick="window.aprovarTriagem('${c.id}')">✅ Aprovar e Ativar</button>
@@ -1455,17 +1421,11 @@
                 : `<div style="margin-bottom:15px; padding:10px; background:#f1f5f9; border-radius:8px; text-align:center; color:#64748b; font-weight:600; font-size:0.85rem;">⏳ Aguardando aprovação do Admin</div>`;
             
             let wrap = document.createElement('div');
-            wrap.innerHTML = btnAprovar + htmlBase;
+            wrap.innerHTML = btnAprovar + htmlCard;
             cont.appendChild(wrap);
         });
     };
 
-    window.aprovarTriagem = async function(idCaso) {
-        if(window.usuarioLogado.role !== 'admin') return;
-        await updateDoc(doc(db, "casos", idCaso), { emTriagem: false });
-    };
-
-    // LISTA 2: CASOS ATIVOS (Separados em Localizados e Tramitação)
     window.renderizarCasos = function() {
         const contLoc = document.getElementById('cases-localizados-container');
         const contBusca = document.getElementById('cases-busca-container');
@@ -1477,12 +1437,10 @@
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-        // Pega casos que NÃO estão encerrados e NÃO estão na triagem e NÂO são Apreendidos
         let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true && c.status !== 'Apreendido');
         
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
         
-        // Novos Filtros Ativos
         const valOrigem = document.getElementById('filtro-comarca-origem') ? document.getElementById('filtro-comarca-origem').value : 'todas';
         const valReq = document.getElementById('filtro-comarca-req') ? document.getElementById('filtro-comarca-req').value : 'todas';
         const valStatus = document.getElementById('filtro-status') ? document.getElementById('filtro-status').value : 'todos';
@@ -1505,8 +1463,90 @@
         let countLoc = 0; let countBusca = 0;
 
         base.forEach(c => {
-            let st = c.status || ''; 
-            let htmlCard = gerarHtmlCartaoBase(c, isAdmin, dataHoje);
+            let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
+            if (st === 'Localizado') st = 'Veículo Localizado';
+            const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
+
+            let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
+            
+            let somaFaturado = 0;
+            if (c.faturamentos && c.faturamentos.length > 0) {
+                somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f.valor || 0), 0);
+            } else if (c.mandadoExpedido) {
+                somaFaturado = parseFloat(c.valorComissao || 0);
+            }
+
+            if(isAdmin) {
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>
+                             <button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')" title="Finalizar e Arquivar">🔒 Encerrar</button>`;
+                
+                badgeFin = somaFaturado > 0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0; font-size:0.7rem; padding: 4px 8px; border-radius:12px;">Faturado R$ ${somaFaturado.toFixed(2).replace('.',',')}</span>` : ``;
+                
+                bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`;
+                btnLancar = `<button class="btn btn-small btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>
+                             <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
+            } else {
+                btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
+            }
+            
+            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
+            
+            let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => {
+                let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}',${a.id})" title="Excluir">✖</span>` : '';
+                let isRecent = i === 0 ? 'recent' : '';
+                return `<div class="tl-item ${isRecent}">
+                    <div><strong>${a.descricao \vert{}\vert{} ''}</strong>${dBtn}</div>
+                    <div class="tl-meta">${a.data || ''} às ${a.hora \vert{}\vert{} ''} • 👤 ${a.responsavel || ''}</div>
+                </div>`;
+            }).join('');
+            
+            let obsHtml = c.obs ? `<div class="obs-box"><strong>📝 Observações Iniciais:</strong> ${c.obs}</div>` : '';
+
+            let infoProcessoHtml = '';
+            if(c.processo || c.vara) {
+                let txtP = c.processo ? `${c.processo} <span style="cursor:pointer; font-size:1rem;" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span>` : '-';
+                let txtV = c.vara || '-';
+                infoProcessoHtml = `<div class="info-grid">
+                    <div><strong>Nº Processo CNJ</strong>${txtP}</div>
+                    <div><strong>Vara de Tramitação</strong>${txtV}</div>
+                </div>`;
+            }
+
+            let origText = c.comarcaOrigem ? `📍 <strong>Origem:</strong> ${c.comarcaOrigem}` : '';
+            let reqText = c.comarcaReq ? `📨 <strong>Req:</strong> ${c.comarcaReq}` : '';
+            let infoComarcas = (origText && reqText) ? `${origText} &nbsp;\vert{}&nbsp; ${reqText}` : (origText || reqText || '📍 Comarca não informada');
+
+            const clienteFormatado = c.cliente || 'Sem Cliente';
+            const contratoFormatado = c.contrato || 'Sem Contrato';
+            const infoCriador = c.criadoPor ? ` | 👤 Cadastrado por: ${c.criadoPor}` : '';
+
+            let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px;">🚨 VEÍCULO LOCALIZADO</span>` : '';
+            let cardClass = c.isLocalizado ? 'card urgente-highlight' : 'card';
+
+            let htmlCard = `
+                <div class="${cardClass}">
+                    <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            ${isLocBadge}
+                            <span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span>
+                            <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${clienteFormatado}</h3>
+                            <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${contratoFormatado}${infoCriador}</p>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados</button>
+                            ${btnLancar}${btnsAdmin}
+                        </div>
+                    </div>
+                    ${obsHtml}${infoProcessoHtml}
+                    <div class="timeline">${andHTML || '<div class="tl-item"><span style="color:#94a3b8;">Sem diligências registradas.</span></div>'}</div>
+                    <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--borda); padding-top: 15px;">
+                        <div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div>
+                        <div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div>
+                    </div>
+                </div>
+            `;
+
             let wrap = document.createElement('div');
             wrap.innerHTML = htmlCard;
 
@@ -1523,7 +1563,6 @@
         if (countBusca === 0) contBusca.innerHTML = `<div style="padding:20px; color:#94a3b8; font-size:0.9rem;">Nenhum processo em andamento regular.</div>`;
     };
 
-    // RENDERIZAR APREENDIDOS 
     window.renderizarApreendidos = function() {
         const container = document.getElementById('apreendidos-container'); 
         if(!container) return;
@@ -1532,13 +1571,11 @@
         const isAdmin = window.usuarioLogado.role === 'admin';
         const mesFiltro = document.getElementById('filtro-mes-apreendidos').value;
 
-        // Pega casos que tem status Apreendido OU encerrado com motivo Apreensão (e que passaram da triagem)
         let base = window.casosDb.filter(c => c.emTriagem !== true && (c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão')));
         
         if (mesFiltro !== 'todos') {
             base = base.filter(c => (c.mesApreensao || c.mesEncerramento || c.mesRegistro) === mesFiltro);
         }
-
         if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
 
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🚔</div><h3>Nenhuma apreensão localizada neste mês.</h3></div>`;
@@ -1591,14 +1628,12 @@
         });
     };
 
-    // RENDERIZAR CASOS ENCERRADOS
     window.renderizarEncerrados = function() {
         const container = document.getElementById('encerrados-container'); container.innerHTML = '';
         const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
         const isAdmin = window.usuarioLogado.role === 'admin';
 
         let base = window.casosDb.filter(c => c.encerrado === true && c.emTriagem !== true);
-        
         if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
 
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">📁</div><h3>Nenhum caso no arquivo morto.</h3></div>`;
@@ -1636,30 +1671,24 @@
             if(c.motivoEncerramento === "Quitado") motivoColor = "#059669";
             if(c.motivoEncerramento && c.motivoEncerramento.includes("Mora")) motivoColor = "#0284c7";
 
-            const clienteFormatado = c.cliente || 'Sem Cliente';
-            const contratoFormatado = c.contrato || 'Sem Contrato';
-            
             let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px; background-color: #64748b; animation: none;">VEÍCULO ESTAVA LOCALIZADO</span>` : '';
 
-            let div = document.createElement('div'); div.className = 'card';
-            div.style.backgroundColor = "#fafbfc";
+            let div = document.createElement('div'); div.className = 'card'; div.style.backgroundColor = "#fafbfc";
             div.innerHTML = `
                 <div class="badge-encerrado">🔒 Arquivado</div>
                 <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
                     <div style="margin-top: 15px;">
                         ${isLocBadge}
                         <span class="tag-status" style="background-color:${motivoColor}; margin-bottom:8px; display:inline-block;">Finalizado: ${c.motivoEncerramento || 'Não informado'}</span>
-                        <h3 style="margin:5px 0; color:var(--texto); font-size: 1.3rem;">${clienteFormatado}</h3>
-                        <p style="margin:0; font-family:monospace; color:#64748b; font-weight:600;">Contrato: ${contratoFormatado}</p>
+                        <h3 style="margin:5px 0; color:var(--texto); font-size: 1.3rem;">${c.cliente || 'Sem Cliente'}</h3>
+                        <p style="margin:0; font-family:monospace; color:#64748b; font-weight:600;">Contrato: ${c.contrato || 'Sem Contrato'}</p>
                     </div>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
                         <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar Ficha</button>
                         ${btnsAdmin}
                     </div>
                 </div>
-                
                 ${infoProcessoHtml}
-                
                 <div class="timeline">${andHTML}</div>
             `;
             container.appendChild(div);
@@ -1673,7 +1702,7 @@
         if (tipo === 'Mandado Expedido') inputValor.value = '30.00';
         else if (tipo === 'Apreensão - Moto') inputValor.value = '150.00';
         else if (tipo === 'Apreensão - Carro') inputValor.value = '250.00';
-        else inputValor.value = ''; // Caminhão e Amigável (a combinar, em branco)
+        else inputValor.value = ''; 
     };
 
     window.abrirModalFaturamento = function(idCaso = null) {
@@ -1689,8 +1718,7 @@
             const select = document.getElementById('faturamento-select-caso');
             select.innerHTML = '<option value="">-- Selecione um Cliente/Processo --</option>';
             
-            // Popula com todos os casos, ordenados alfabeticamente
-            let casosOrd = [...window.casosDb].sort((a,b) => a.cliente.localeCompare(b.cliente));
+            let casosOrd = [...window.casosDb].sort((a,b) => (a.cliente||'').localeCompare(b.cliente||''));
             casosOrd.forEach(c => {
                 select.innerHTML += `<option value="${c.id}">${c.cliente} (CT: ${c.contrato}) ${c.encerrado ? '- Encerrado' : ''}</option>`;
             });
@@ -1700,9 +1728,7 @@
 
     window.salvarFaturamento = async function() {
         let idCaso = document.getElementById('faturamento-caso-id').value;
-        if (!idCaso) {
-            idCaso = document.getElementById('faturamento-select-caso').value;
-        }
+        if (!idCaso) idCaso = document.getElementById('faturamento-select-caso').value;
         if (!idCaso) return alert("Selecione um processo na lista!");
 
         const tipo = document.getElementById('faturamento-tipo').value;
@@ -1713,7 +1739,6 @@
         if (!casoAtual) return alert("Erro ao localizar processo.");
 
         const now = new Date();
-        
         let faturamentos = Array.isArray(casoAtual.faturamentos) ? casoAtual.faturamentos : [];
         let andamentos = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
 
@@ -1739,7 +1764,7 @@
         await updateDoc(doc(db, "casos", idCaso), { 
             faturamentos: faturamentos, 
             andamentos: andamentos,
-            mandadoExpedido: true // mantido por compatibilidade
+            mandadoExpedido: true 
         });
 
         window.closeModal('modal-faturamento');
@@ -1751,11 +1776,11 @@
             if(!casoAtual) return;
 
             if (idFat === 'legacy') {
-                let novosAndamentos = casoAtual.andamentos.filter(a => !(a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada') || a.descricao.includes('Faturamento Lançado')));
+                let novosAndamentos = (casoAtual.andamentos||[]).filter(a => !(a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada') || a.descricao.includes('Faturamento Lançado')));
                 await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
             } else {
-                let novosFat = casoAtual.faturamentos.filter(f => f.id !== idFat);
-                let novosAndamentos = casoAtual.andamentos.filter(a => !(a.descricao.includes('Faturamento Lançado'))); 
+                let novosFat = (casoAtual.faturamentos||[]).filter(f => f.id !== idFat);
+                let novosAndamentos = (casoAtual.andamentos||[]).filter(a => !(a.descricao.includes('Faturamento Lançado') && a.id > (Date.now() - 86400000))); 
                 await updateDoc(doc(db, "casos", idCaso), { faturamentos: novosFat, andamentos: novosAndamentos });
             }
         }
@@ -1767,20 +1792,14 @@
         let faturamentosGerais = [];
         window.casosDb.forEach(c => {
             if (c.faturamentos && c.faturamentos.length > 0) {
-                c.faturamentos.forEach(fat => {
-                    faturamentosGerais.push({ caso: c, ...fat });
-                });
+                c.faturamentos.forEach(fat => { faturamentosGerais.push({ caso: c, ...fat }); });
             } else if (c.mandadoExpedido === true) {
-                faturamentosGerais.push({
-                    caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao
-                });
+                faturamentosGerais.push({ caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao });
             }
         });
 
         const mesFiltro = document.getElementById('filtro-mes-fin') ? document.getElementById('filtro-mes-fin').value : 'todos';
-        if (mesFiltro !== 'todos') {
-            faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
-        }
+        if (mesFiltro !== 'todos') faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
 
         let t = 0;
         if(faturamentosGerais.length === 0) {
