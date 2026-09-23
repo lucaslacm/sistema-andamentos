@@ -1286,22 +1286,26 @@
         const selReq = document.getElementById('filtro-comarca-req');
         const selStatus = document.getElementById('filtro-status');
 
-        if (selOrigem && selReq && selStatus) {
-            const aOrigem = selOrigem.value; const aReq = selReq.value; const aStatus = selStatus.value;
-            let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(Boolean))].sort();
-            let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(Boolean))].sort();
-            
+        if (selOrigem) {
+            const aOrigem = selOrigem.value;
+            let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(val => val && val.trim() !== ''))].sort();
             selOrigem.innerHTML = '<option value="todas">Origem (Todas)</option>';
             mOrigem.forEach(o => { selOrigem.innerHTML += `<option value="${o}">${o}</option>`; });
-            
-            selReq.innerHTML = '<option value="todas">Req. (Todas)</option>';
-            mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
+            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
+        }
 
+        if (selReq) {
+            const aReq = selReq.value;
+            let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(val => val && val.trim() !== ''))].sort();
+            selReq.innerHTML = '<option value="todas">Requerimento (Todas)</option>';
+            mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
+            if(mReq.includes(aReq)) selReq.value = aReq;
+        }
+
+        if (selStatus) {
+            const aStatus = selStatus.value;
             selStatus.innerHTML = '<option value="todos">Status (Todos)</option>';
             STATUS_PHASES.forEach(s => { selStatus.innerHTML += `<option value="${s.id}">${s.id}</option>`; });
-
-            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
-            if(mReq.includes(aReq)) selReq.value = aReq;
             if(STATUS_PHASES.some(s => s.id === aStatus)) selStatus.value = aStatus;
         }
 
@@ -1463,7 +1467,7 @@
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-        // Pega casos que NÃO estão encerrados e NÃO estão na triagem e NÂO são Apreendidos
+        // Pega casos que NÃO estão encerrados, NÃO estão na triagem e NÃO são Apreendidos
         let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true && c.status !== 'Apreendido');
         
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
