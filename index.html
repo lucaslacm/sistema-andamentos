@@ -267,7 +267,8 @@
                 <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
             </div>
             
-            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">
+            <!-- NOVA ABA: TRIAGEM -->
+            <div class="nav-item" onclick="window.switchTab('tab-triagem')" id="nav-triagem">
                 <div>📥 Triagem / Lançamentos</div>
             </div>
             
@@ -308,6 +309,8 @@
         <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
+            
+            <!-- ESCONDIDO PARA A EQUIPE, VISTO PELO ADMIN -->
             <div class="admin-only" style="display: none; gap: 15px; align-items: center;">
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
@@ -327,12 +330,13 @@
         </div>
         
         <!-- ABA: TRIAGEM -->
-        <div id="tab-lancamentos" class="tab-content">
+        <div id="tab-triagem" class="tab-content">
             <div class="top-bar">
                 <div>
                     <h2>Lançamentos Pendentes</h2>
-                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</p>
+                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos cadastrados pela equipe aguardando a aprovação do Administrador.</p>
                 </div>
+                <!-- BOTAO PARA A EQUIPE ADICIONAR NA TRIAGEM -->
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
             </div>
             <div id="triagem-container"></div>
@@ -350,11 +354,14 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato/processo..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
                     
+                    <!-- NOVOS FILTROS -->
                     <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Origem (Todas)</option></select>
                     <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Req. (Todas)</option></select>
                     <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Status (Todos)</option></select>
+                    <!-- /NOVOS FILTROS -->
+
                     <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Mês Cad. (Todos)</option></select>
                 </div>
             </div>
@@ -370,7 +377,7 @@
         <div id="tab-kanban" class="tab-content">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2>Quadro de Fluxo</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases. (Somente casos aprovados)</div>
+                <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases.</div>
             </div>
             <div class="kanban-wrapper" id="kanban-board-container">
                 <!-- Colunas Geradas via JS -->
@@ -446,12 +453,14 @@
             </div>
         </div>
 
-        <!-- ABA 3: FINANCEIRO -->
+        <!-- ABA 3: FINANCEIRO (MODIFICADA) -->
         <div id="tab-financeiro" class="tab-content">
             <div class="top-bar">
                 <h2>Faturamento e Comissões</h2>
-                <div style="display: flex; gap: 10px;">
-                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()"><option value="todos">Todos os meses</option></select>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px;"><option value="todos">Todos os meses</option></select>
+                    <!-- BOTAO PARA LANCAR NOVO FATURAMENTO DIRETAMENTE -->
+                    <button class="btn btn-primary" onclick="window.abrirModalFaturamento()">➕ Novo Faturamento</button>
                     <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
             </div>
@@ -459,7 +468,7 @@
                 <div><h3 style="margin: 0; font-size: 1.1rem; color: var(--texto-claro);">Comissões Aprovadas (Mês)</h3></div>
                 <span id="total-financeiro" style="color: var(--sucesso); font-size: 2.2rem; font-weight: 700;">R$ 0,00</span>
             </div>
-            <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
+            <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente / Lançamento</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
         </div>
         
         <!-- ABA 4: EQUIPE -->
@@ -586,14 +595,39 @@
     </div>
 </div>
 
-<div id="modal-mandado" class="modal">
-    <div class="modal-content" style="max-width: 400px; text-align: center;">
-        <div class="modal-header" style="border: none; padding-bottom: 0;"><h3></h3><button class="close-btn" onclick="window.closeModal('modal-mandado')">&times;</button></div>
-        <h3 style="color: var(--azul); margin-top: 0;">Faturar Mandado</h3>
-        <p style="font-size: 0.85rem; color: #64748b;">Aprovar o pagamento de comissão referente à expedição.</p>
-        <input type="hidden" id="mandado-caso-id">
-        <div class="form-group" style="text-align: left;"><label>Valor da Comissão (R$)</label><input type="number" id="mandado-valor" value="30.00" step="0.01"></div>
-        <button class="btn btn-success" style="width: 100%; padding: 12px;" onclick="window.salvarMandado()">Confirmar Lançamento</button>
+<!-- MODAL FATURAMENTO ATUALIZADO -->
+<div id="modal-faturamento" class="modal">
+    <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header"><h3>💰 Lançar Faturamento</h3><button class="close-btn" onclick="window.closeModal('modal-faturamento')">&times;</button></div>
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 0;">Aprove comissões para mandados, apreensões e entregas amigáveis.</p>
+        
+        <input type="hidden" id="faturamento-caso-id">
+        
+        <!-- Aparece apenas quando aberto diretamente da aba Financeiro -->
+        <div class="form-group" id="div-faturamento-caso" style="display: none;">
+            <label>Selecione o Processo / Cliente</label>
+            <select id="faturamento-select-caso">
+                <option value="">-- Selecione --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo de Lançamento</label>
+            <select id="faturamento-tipo" onchange="window.atualizarValorFaturamento()">
+                <option value="Mandado Expedido">Mandado Expedido</option>
+                <option value="Apreensão - Moto">Apreensão - Moto</option>
+                <option value="Apreensão - Carro">Apreensão - Carro</option>
+                <option value="Apreensão - Caminhão">Apreensão - Caminhão</option>
+                <option value="Entrega Amigável">Entrega Amigável</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Valor da Comissão (R$)</label>
+            <input type="number" id="faturamento-valor" value="30.00" step="0.01" style="font-weight:bold; color:var(--sucesso); font-size: 1.2rem;">
+        </div>
+        
+        <button class="btn btn-success" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="window.salvarFaturamento()">Confirmar Lançamento</button>
     </div>
 </div>
 
@@ -648,7 +682,7 @@
         const nome = document.getElementById('master-nome').value.trim();
         const senha = document.getElementById('master-senha').value;
         if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
-        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
@@ -663,7 +697,7 @@
         const btn = document.getElementById('btn-login-submit');
         const err = document.getElementById('error-msg');
         const userRaw = document.getElementById('login-username').value.trim(); 
-        const pass = document.getElementById('login-password').value;
+        const pass = document.getElementById('login-password').value.trim();
         
         if (userRaw.toUpperCase() === 'RESGATE') { window.abrirCriarAdminMestre(); return; }
         if(!userRaw || !pass) return alert("Preencha as credenciais.");
@@ -727,7 +761,7 @@
         const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
         const role = document.getElementById('novo-membro-role').value;
         if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
-        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
+        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
         const qSnap = await getDocs(q);
@@ -823,7 +857,7 @@
         let alertas = [];
 
         window.casosDb.forEach(c => {
-            if(c.encerrado) return; // IA ignora casos encerrados
+            if(c.encerrado) return;
 
             let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
             
@@ -1271,7 +1305,7 @@
             selOrigem.innerHTML = '<option value="todas">Origem (Todas)</option>';
             mOrigem.forEach(o => { selOrigem.innerHTML += `<option value="${o}">${o}</option>`; });
             
-            selReq.innerHTML = '<option value="todas">Requerimento (Todas)</option>';
+            selReq.innerHTML = '<option value="todas">Req. (Todas)</option>';
             mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
 
             selStatus.innerHTML = '<option value="todos">Status (Todos)</option>';
@@ -1440,7 +1474,7 @@
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-        // Pega casos que NÃO estão encerrados e NÃO estão na triagem e NÃO são Apreendidos
+        // Pega casos que NÃO estão encerrados e NÃO estão na triagem e NÂO são Apreendidos
         let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true && c.status !== 'Apreendido');
         
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
