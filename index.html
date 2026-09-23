@@ -626,6 +626,7 @@
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
     from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+    // CHAVES ORIGINAIS INTACTAS RETIRADAS DO SEU CÓDIGO
     const firebaseConfig = { 
         apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", 
         authDomain: "sistema-andamentos.firebaseapp.com", 
@@ -671,6 +672,7 @@
         const nome = document.getElementById('master-nome').value.trim();
         const senha = document.getElementById('master-senha').value;
         if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
+        // CORREÇÃO: Usando formato unicode seguro para substituir acentos sem quebrar o parser JS
         const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
@@ -750,6 +752,7 @@
         const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
         const role = document.getElementById('novo-membro-role').value;
         if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
+        // CORREÇÃO: Usando formato unicode seguro
         const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
         const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
@@ -1286,26 +1289,22 @@
         const selReq = document.getElementById('filtro-comarca-req');
         const selStatus = document.getElementById('filtro-status');
 
-        if (selOrigem) {
-            const aOrigem = selOrigem.value;
-            let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(val => val && val.trim() !== ''))].sort();
+        if (selOrigem && selReq && selStatus) {
+            const aOrigem = selOrigem.value; const aReq = selReq.value; const aStatus = selStatus.value;
+            let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(Boolean))].sort();
+            let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(Boolean))].sort();
+            
             selOrigem.innerHTML = '<option value="todas">Origem (Todas)</option>';
             mOrigem.forEach(o => { selOrigem.innerHTML += `<option value="${o}">${o}</option>`; });
-            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
-        }
-
-        if (selReq) {
-            const aReq = selReq.value;
-            let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(val => val && val.trim() !== ''))].sort();
+            
             selReq.innerHTML = '<option value="todas">Requerimento (Todas)</option>';
             mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
-            if(mReq.includes(aReq)) selReq.value = aReq;
-        }
 
-        if (selStatus) {
-            const aStatus = selStatus.value;
             selStatus.innerHTML = '<option value="todos">Status (Todos)</option>';
             STATUS_PHASES.forEach(s => { selStatus.innerHTML += `<option value="${s.id}">${s.id}</option>`; });
+
+            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
+            if(mReq.includes(aReq)) selReq.value = aReq;
             if(STATUS_PHASES.some(s => s.id === aStatus)) selStatus.value = aStatus;
         }
 
@@ -1467,7 +1466,7 @@
         const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
         const dataHoje = new Date().toLocaleDateString('pt-BR');
 
-        // Pega casos que NÃO estão encerrados, NÃO estão na triagem e NÃO são Apreendidos
+        // Pega casos que NÃO estão encerrados e NÃO estão na triagem e NÂO são Apreendidos
         let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true && c.status !== 'Apreendido');
         
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
