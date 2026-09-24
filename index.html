@@ -14,11 +14,15 @@
             --azul-escuro: #020617;
             --laranja: #ea580c; 
             --laranja-hover: #c2410c;
+            
+            /* UI Moderna */
             --fundo: #f8fafc;
             --fundo-card: #ffffff;
             --texto: #334155;
             --texto-claro: #64748b;
             --borda: #e2e8f0;
+            
+            /* Semântica */
             --sucesso: #10b981;
             --alerta: #f59e0b;
             --erro: #ef4444;
@@ -52,8 +56,6 @@
         .btn-outline { background: transparent; border: 1px solid var(--borda); color: var(--texto); }
         .btn-outline:hover { background: var(--fundo); }
         .btn-small { padding: 6px 12px; font-size: 0.75rem; }
-        /* NOVO BOTÃO MENOR PARA OS CARDS */
-        .btn-micro { padding: 4px 10px; font-size: 0.7rem; gap: 4px; border-radius: 4px; }
         .btn-icon { background: transparent; border: none; cursor: pointer; font-size: 1.1rem; color: var(--texto-claro); transition: 0.2s; padding: 2px; }
         .btn-icon:hover { color: var(--laranja); }
         
@@ -106,9 +108,9 @@
         .notif-badge-copiloto { background: var(--erro); color: white; font-size: 0.65rem; font-weight: bold; width: 20px; height: 20px; border-radius: 50%; display: flex; justify-content: center; align-items: center; display: none; }
         
         .tab-content { display: none; animation: fadeIn 0.3s ease; padding: 25px 30px; overflow-y: auto; flex: 1; }
-        /* CORREÇÃO CRÍTICA DO KANBAN AQUI: Somente aplica flex se estiver .active também */
         .tab-content.active { display: block; }
-        .tab-content.active.kanban-active { display: flex; flex-direction: column; padding: 20px 30px 0 30px; overflow: hidden; }
+        
+        .tab-content.kanban-active { display: flex; flex-direction: column; padding: 20px 30px 0 30px; overflow: hidden; }
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -182,7 +184,7 @@
         #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 0.85rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s; }
         #toast.show { visibility: visible; opacity: 1; }
         
-        /* Cores das Colunas Kanban */
+        /* Cores das Colunas Kanban - Atualizado para abranger todos os status */
         .cor-custas { background-color: var(--kb-custas); color: white; } .borda-custas { border-bottom-color: var(--kb-custas); }
         .cor-distribuicao { background-color: var(--kb-distribuicao); color: white; } .borda-distribuicao { border-bottom-color: var(--kb-distribuicao); }
         .cor-aguardando { background-color: var(--kb-aguardando); color: white; } .borda-aguardando { border-bottom-color: var(--kb-aguardando); }
@@ -265,7 +267,8 @@
                 <div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div>
             </div>
             
-            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos">
+            <!-- NOVA ABA: TRIAGEM -->
+            <div class="nav-item" onclick="window.switchTab('tab-triagem')" id="nav-triagem">
                 <div>📥 Triagem / Lançamentos</div>
             </div>
             
@@ -303,8 +306,11 @@
     </aside>
     
     <main>
+        <!-- TOPO -->
         <header class="main-header">
             <div style="font-size: 1.1rem; font-weight: 600; color: var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
+            
+            <!-- ESCONDIDO PARA A EQUIPE, VISTO PELO ADMIN -->
             <div class="admin-only" style="display: none; gap: 15px; align-items: center;">
                 <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button>
             </div>
@@ -318,54 +324,64 @@
                 <h2>🤖 Copiloto SGI - Recomendações do Dia</h2>
                 <div style="font-size: 0.85rem; color: var(--texto-claro);">A inteligência artificial identificou os seguintes pontos de atenção nos seus processos ativos.</div>
             </div>
-            <div id="copiloto-container"></div>
+            <div id="copiloto-container">
+                <!-- Cards de alertas do copiloto injetados via JS -->
+            </div>
         </div>
-
-        <!-- ABA TRIAGEM -->
-        <div id="tab-lancamentos" class="tab-content">
+        
+        <!-- ABA NOVA: TRIAGEM -->
+        <div id="tab-triagem" class="tab-content">
             <div class="top-bar">
-                <h2>Lançamentos Pendentes</h2>
-                <div style="color: var(--texto-claro); font-size: 0.85rem;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</div>
+                <div>
+                    <h2>Lançamentos Pendentes</h2>
+                    <p style="color: var(--texto-claro); font-size: 0.9rem; margin-top: 5px; margin-bottom: 0;">Processos adicionados pela equipe aguardando a aprovação do Administrador.</p>
+                </div>
+                <!-- BOTAO PARA A EQUIPE ADICIONAR NA TRIAGEM -->
+                <button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Lançamento</button>
             </div>
             <div id="triagem-container"></div>
         </div>
 
-        <!-- ABA CASOS ATIVOS (LISTA) -->
+        <!-- ABA 1: CASOS ATIVOS (LISTA) -->
         <div id="tab-casos" class="tab-content active">
             <div class="top-bar">
                 <h2>Processos em Andamento</h2>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; width: 100%;">
+                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; width: 100%;">
                     <div class="toggle-wrapper admin-only" style="display: none;">
-                        <span>Ocultar já vistos</span>
+                        <span>Ocultar vistos</span>
                         <label class="switch">
                             <input type="checkbox" id="filtro-pendentes-hoje" onchange="window.renderizarCasos()">
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar cliente/contrato/processo..." onkeyup="window.renderizarCasos()" style="max-width: 200px;">
                     
-                    <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Origem (Todas)</option></select>
-                    <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todas">Requerimento (Todas)</option></select>
-                    <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Status (Todos)</option></select>
-                    
-                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Todos os meses</option></select>
+                    <!-- NOVOS FILTROS -->
+                    <select id="filtro-comarca-origem" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todas">Origem (Todas)</option></select>
+                    <select id="filtro-comarca-req" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todas">Requerimento (Todas)</option></select>
+                    <select id="filtro-status" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todos">Status (Todos)</option></select>
+                    <!-- /NOVOS FILTROS -->
+
+                    <select id="filtro-mes" onchange="window.renderizarCasos()" style="width: auto; padding: 8px;"><option value="todos">Mês Cad. (Todos)</option></select>
                 </div>
             </div>
             
-            <h3 class="section-title" style="color: var(--sucesso); border-color: var(--sucesso);">🟢 Veículos Localizados</h3>
+            <h3 class="section-title" style="color: var(--sucesso); border-color: var(--sucesso);">🟢 Veículos Localizados / Apreendidos</h3>
             <div id="cases-localizados-container"></div>
 
             <h3 class="section-title" style="color: var(--alerta); border-color: var(--alerta);">🟠 Em Busca / Tramitação</h3>
             <div id="cases-busca-container"></div>
         </div>
 
-        <!-- ABA KANBAN -->
+        <!-- ABA 0: KANBAN -->
         <div id="tab-kanban" class="tab-content">
             <div class="top-bar" style="margin-bottom: 15px;">
                 <h2>Quadro de Fluxo</h2>
                 <div style="color: var(--texto-claro); font-size: 0.85rem;" id="kb-subtitle">Arraste os cartões para atualizar as fases. (Somente casos aprovados)</div>
             </div>
-            <div class="kanban-wrapper" id="kanban-board-container"></div>
+            <div class="kanban-wrapper" id="kanban-board-container">
+                <!-- Colunas Geradas via JS -->
+            </div>
         </div>
 
         <!-- ABA APREENDIDOS -->
@@ -374,7 +390,7 @@
                 <h2>Veículos Apreendidos</h2>
                 <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <input type="text" id="search-apreendidos" placeholder="🔍 Buscar cliente..." onkeyup="window.renderizarApreendidos()" style="max-width: 250px;">
-                    <select id="filtro-mes-apreendidos" onchange="window.renderizarApreendidos()" style="width: auto; padding: 8px; border: 1px solid var(--borda); border-radius: 6px;">
+                    <select id="filtro-mes-apreendidos" onchange="window.renderizarApreendidos()" style="width: auto;">
                         <option value="todos">Todos os meses</option>
                     </select>
                 </div>
@@ -382,7 +398,7 @@
             <div id="apreendidos-container"></div>
         </div>
 
-        <!-- ABA ENCERRADOS -->
+        <!-- ABA NOVA: ENCERRADOS -->
         <div id="tab-encerrados" class="tab-content">
             <div class="top-bar">
                 <h2>Arquivo de Casos Encerrados</h2>
@@ -393,7 +409,7 @@
             <div id="encerrados-container"></div>
         </div>
 
-        <!-- ABA DASHBOARD GERENCIAL -->
+        <!-- ABA 2: DASHBOARD GERENCIAL -->
         <div id="tab-relatorios" class="tab-content">
             <div class="top-bar">
                 <h2>Performance Geral</h2>
@@ -401,25 +417,49 @@
             </div>
             
             <div class="dash-grid">
-                <div class="dash-card primary"><h4>Processos Ativos</h4><p class="number" id="dash-total">0</p></div>
-                <div class="dash-card info"><h4>Total Trabalhados</h4><p class="number" id="dash-mandados">0</p><p style="font-size:0.7rem;color:#64748b;margin-top:5px;">Mandado Expedido ou Superior</p></div>
-                <div class="dash-card success"><h4>Apreendidos</h4><p class="number" id="dash-apreendidos" style="color: var(--sucesso);">0</p></div>
-                <div class="dash-card warning"><h4>Taxa de Sucesso</h4><p class="number" id="dash-taxa">0%</p><p style="font-size:0.7rem;color:#64748b;margin-top:5px;">Apreensões / Processos Ativos</p></div>
+                <div class="dash-card primary">
+                    <h4>Processos Ativos</h4>
+                    <p class="number" id="dash-total">0</p>
+                </div>
+                <div class="dash-card info">
+                    <h4>Total de Processos Trabalhados</h4>
+                    <p class="number" id="dash-mandados">0</p>
+                    <p style="font-size:0.7rem;color:#64748b;margin-top:5px;">Mandado Expedido ou Superior</p>
+                </div>
+                <div class="dash-card success">
+                    <h4>Total de Casos Encerrados</h4>
+                    <p class="number" id="dash-apreendidos" style="color: var(--sucesso);">0</p>
+                </div>
+                <div class="dash-card warning">
+                    <h4>Taxa de Apreensão (Sucesso)</h4>
+                    <p class="number" id="dash-taxa">0%</p>
+                    <p style="font-size:0.7rem;color:#64748b;margin-top:5px;">Apreensões / Processos Ativos</p>
+                </div>
             </div>
 
             <div class="grid-3">
-                <div class="chart-container"><h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📊 Fases (Ativos)</h3><div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartStatus"></canvas></div></div>
-                <div class="chart-container"><h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">🏆 Motivos de Encerramento</h3><div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartEncerramentos"></canvas></div></div>
-                <div class="chart-container"><h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📈 Top Comarcas</h3><div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartComarcas"></canvas></div></div>
+                <div class="chart-container">
+                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📊 Fases (Ativos)</h3>
+                    <div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartStatus"></canvas></div>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">🏆 Motivos de Encerramento</h3>
+                    <div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartEncerramentos"></canvas></div>
+                </div>
+                <div class="chart-container">
+                    <h3 style="margin-top:0; color:var(--azul); font-size: 1rem; border-bottom: 1px solid var(--borda); padding-bottom: 10px;">📈 Top Comarcas</h3>
+                    <div style="height:250px; position:relative; margin-top: 15px;"><canvas id="chartComarcas"></canvas></div>
+                </div>
             </div>
         </div>
 
-        <!-- ABA FINANCEIRO (MÚLTIPLO) -->
+        <!-- ABA 3: FINANCEIRO (MODIFICADA) -->
         <div id="tab-financeiro" class="tab-content">
             <div class="top-bar">
                 <h2>Faturamento e Comissões</h2>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px; border: 1px solid var(--borda); border-radius: 6px;"><option value="todos">Todos os meses</option></select>
+                    <select id="filtro-mes-fin" onchange="window.renderizarFinanceiro()" style="padding: 8px;"><option value="todos">Todos os meses</option></select>
+                    <!-- BOTAO PARA LANCAR NOVO FATURAMENTO DIRETAMENTE -->
                     <button class="btn btn-primary" onclick="window.abrirModalFaturamento()">➕ Novo Faturamento</button>
                     <button class="btn btn-success" onclick="window.exportarExcelFinanceiro()">📥 Planilha Financeira</button>
                 </div>
@@ -431,7 +471,7 @@
             <div class="table-container"><table class="audit-table"><thead><tr><th>Data</th><th>Contrato</th><th>Cliente / Lançamento</th><th>Valor R$</th><th>Ação</th></tr></thead><tbody id="financeiro-tbody"></tbody></table></div>
         </div>
         
-        <!-- ABA EQUIPE -->
+        <!-- ABA 4: EQUIPE -->
         <div id="tab-equipe" class="tab-content">
             <div class="top-bar"><h2>Gestão de Equipe</h2></div>
             <div class="card">
@@ -439,7 +479,12 @@
                 <div class="grid-2">
                     <div class="form-group"><label>Nome Completo</label><input type="text" id="novo-membro-nome" placeholder="Ex: João Silva"></div>
                     <div class="form-group"><label>Senha Temporária</label><input type="text" id="novo-membro-senha" placeholder="Ex: 1234"></div>
-                    <div class="form-group" style="grid-column:span 2;"><label>Perfil de Acesso</label><select id="novo-membro-role"><option value="cadastro">Equipe (Analista - Lançamentos para Triagem)</option><option value="admin">Administrador (Acesso Total)</option></select></div>
+                    <div class="form-group" style="grid-column:span 2;"><label>Perfil de Acesso</label>
+                        <select id="novo-membro-role">
+                            <option value="cadastro">Equipe (Analista - Lançamentos para Triagem)</option>
+                            <option value="admin">Administrador (Acesso Total)</option>
+                        </select>
+                    </div>
                 </div>
                 <button class="btn btn-primary" onclick="window.criarMembroEquipe()">Criar Acesso</button>
             </div>
@@ -453,11 +498,52 @@
     <div class="modal-content">
         <div class="modal-header"><h3 id="titulo-modal-caso">📄 Ficha do Processo</h3><button class="close-btn" onclick="window.closeModal('modal-novo-caso')">&times;</button></div>
         <input type="hidden" id="novo-caso-id">
-        <div class="grid-2"><div class="form-group"><label>Nº Contrato</label><input type="text" id="novo-contrato" placeholder="Ex: 101593..."></div><div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div></div>
-        <div class="grid-2" id="div-processo-vara"><div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div><div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div></div>
-        <div class="form-group" id="div-status-fase"><label>Status / Fase Atual do Processo</label><select id="novo-status"><option value="Aguardando recolhimento das custas iniciais">Aguardando recolhimento das custas iniciais</option><option value="Aguardando distribuição da ação">Aguardando distribuição da ação</option><option value="Aguardando Liminar">Aguardando Liminar</option><option value="Liminar Deferida">Liminar Deferida</option><option value="Aguardando Mandado">Aguardando Mandado</option><option value="Solicitado Bloqueio">Solicitado Bloqueio</option><option value="Bloqueado">Bloqueado</option><option value="Mandado Expedido">Mandado Expedido</option><option value="Tentando Localização">Tentando Localização</option><option value="Em Busca">Em Busca</option><option value="Veículo Localizado">Veículo Localizado</option><option value="Apreendido">Apreendido</option></select></div>
-        <div class="grid-2" id="div-comarcas"><div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div><div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div></div>
-        <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;"><label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;"><input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">🚨 MARCAR COMO VEÍCULO LOCALIZADO (URGENTE)</label><p style="margin: 5px 0 0 28px; font-size: 0.7rem; color: #991b1b; text-transform: none; font-weight: 500;">Ative esta opção se já souber onde o veículo está. O caso ficará destacado em vermelho no topo das listas.</p></div>
+        
+        <div class="grid-2">
+            <div class="form-group"><label>Nº Contrato</label><input type="text" id="novo-contrato" placeholder="Ex: 101593..."></div>
+            <div class="form-group"><label>Cliente / Réu</label><input type="text" id="novo-cliente" placeholder="Nome Completo"></div>
+        </div>
+        
+        <!-- INÍCIO DAS DIVS ESCONDIDAS PARA A EQUIPE -->
+        <div class="grid-2" id="div-processo-vara">
+            <div class="form-group"><label>Nº do Processo (CNJ)</label><input type="text" id="novo-processo" placeholder="0000000-00.0000.8.13.0000"></div>
+            <div class="form-group"><label>Vara de Tramitação</label><input type="text" id="novo-vara" placeholder="Ex: 2ª Vara Cível"></div>
+        </div>
+        
+        <div class="form-group" id="div-status-fase">
+            <label>Status / Fase Atual do Processo</label>
+            <select id="novo-status">
+                <option value="Aguardando recolhimento das custas iniciais">Aguardando recolhimento das custas iniciais</option>
+                <option value="Aguardando distribuição da ação">Aguardando distribuição da ação</option>
+                <option value="Aguardando Liminar">Aguardando Liminar</option>
+                <option value="Liminar Deferida">Liminar Deferida</option>
+                <option value="Aguardando Mandado">Aguardando Mandado</option>
+                <option value="Solicitado Bloqueio">Solicitado Bloqueio</option>
+                <option value="Bloqueado">Bloqueado</option>
+                <option value="Mandado Expedido">Mandado Expedido</option>
+                <option value="Tentando Localização">Tentando Localização</option>
+                <option value="Em Busca">Em Busca</option>
+                <option value="Veículo Localizado">Veículo Localizado</option>
+                <option value="Apreendido">Apreendido</option>
+            </select>
+        </div>
+
+        <div class="grid-2" id="div-comarcas">
+            <div class="form-group"><label>📍 Comarca de Origem</label><input type="text" id="novo-comarca-origem" placeholder="Ex: Sete Lagoas"></div>
+            <div class="form-group"><label>📨 Comarca Requerimento</label><input type="text" id="novo-comarca-req" placeholder="Ex: Paraopeba"></div>
+        </div>
+        <!-- FIM DAS DIVS ESCONDIDAS PARA A EQUIPE -->
+        
+        <div class="form-group" style="background: #fee2e2; padding: 12px; border-radius: 8px; border: 1px dashed var(--erro); margin-top: 10px;">
+            <label style="color: var(--erro); display: flex; align-items: center; gap: 10px; margin: 0; font-size: 0.85rem; cursor: pointer;">
+                <input type="checkbox" id="novo-is-localizado" style="width: 18px; height: 18px; margin: 0; cursor: pointer;">
+                🚨 MARCAR COMO VEÍCULO LOCALIZADO (URGENTE)
+            </label>
+            <p style="margin: 5px 0 0 28px; font-size: 0.7rem; color: #991b1b; text-transform: none; font-weight: 500;">
+                Ative esta opção se já souber onde o veículo está, <b>independentemente do status atual do processo</b> (Aguardando Liminar, Custas, etc). O caso ficará destacado em vermelho no topo das listas.
+            </p>
+        </div>
+
         <div class="form-group"><label>Observações Iniciais</label><textarea id="novo-obs" placeholder="Detalhes adicionais do caso..."></textarea></div>
         <button class="btn btn-primary" style="width: 100%; padding: 12px;" id="btn-salvar-caso" onclick="window.salvarCasoFull()">Salvar Ficha</button>
     </div>
@@ -467,7 +553,16 @@
     <div class="modal-content" style="max-width: 500px;">
         <div class="modal-header"><h3>📝 Lançar Andamento</h3><button class="close-btn" onclick="window.closeModal('modal-novo-andamento')">&times;</button></div>
         <input type="hidden" id="andamento-caso-id">
-        <div class="form-group" id="div-responsavel-andamento" style="display: none; background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba;"><label style="color: #856404;">Responsável pela Diligência</label><select id="nova-acao-responsavel" style="border-color: #ffeeba;"><option value="Lucas">Lucas</option><option value="Bárbara">Bárbara</option><option value="Equipe Externa">Equipe Externa</option></select></div>
+        
+        <div class="form-group" id="div-responsavel-andamento" style="display: none; background: #fff3cd; padding: 10px; border-radius: 6px; border: 1px solid #ffeeba;">
+            <label style="color: #856404;">Responsável pela Diligência</label>
+            <select id="nova-acao-responsavel" style="border-color: #ffeeba;">
+                <option value="Lucas">Lucas</option>
+                <option value="Bárbara">Bárbara</option>
+                <option value="Equipe Externa">Equipe Externa</option>
+            </select>
+        </div>
+
         <div class="form-group"><label>Descrição da Diligência</label><textarea id="nova-acao" placeholder="O que foi feito?"></textarea></div>
         <button class="btn btn-primary" style="width: 100%;" onclick="window.salvarAndamento()">Registrar Atividade</button>
     </div>
@@ -475,34 +570,73 @@
 
 <div id="modal-encerrar" class="modal">
     <div class="modal-content" style="max-width: 450px;">
-        <div class="modal-header"><h3>🔒 Encerrar Processo</h3><button class="close-btn" onclick="window.closeModal('modal-encerrar')">&times;</button></div>
+        <div class="modal-header">
+            <h3>🔒 Encerrar Processo</h3>
+            <button class="close-btn" onclick="window.closeModal('modal-encerrar')">&times;</button>
+        </div>
         <input type="hidden" id="encerrar-caso-id">
         <p style="font-size: 0.85rem; color: #64748b; margin-top: 0;">O caso será movido para o arquivo de Encerrados e atualizará as estatísticas de desfecho.</p>
-        <div class="form-group"><label>Motivo do Encerramento</label><select id="encerrar-motivo"><option value="Apreensão">Apreensão</option><option value="Entrega Amigável">Entrega Amigável</option><option value="Acordo Realizado">Acordo Realizado</option><option value="Quitado">Quitado</option><option value="Pagou parcelas em atraso (Purgação da Mora)">Pagou parcelas em atraso (Purgação da Mora)</option></select></div>
-        <div class="form-group"><label>Observação Final (Opcional)</label><textarea id="encerrar-obs" placeholder="Descreva os detalhes do encerramento (opcional)..."></textarea></div>
+        
+        <div class="form-group">
+            <label>Motivo do Encerramento</label>
+            <select id="encerrar-motivo">
+                <option value="Apreensão">Apreensão</option>
+                <option value="Entrega Amigável">Entrega Amigável</option>
+                <option value="Acordo Realizado">Acordo Realizado</option>
+                <option value="Quitado">Quitado</option>
+                <option value="Pagou parcelas em atraso (Purgação da Mora)">Pagou parcelas em atraso (Purgação da Mora)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Observação Final (Opcional)</label>
+            <textarea id="encerrar-obs" placeholder="Descreva os detalhes do encerramento (opcional)..."></textarea>
+        </div>
         <button class="btn btn-danger" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="window.confirmarEncerramento()">Finalizar e Arquivar Caso</button>
     </div>
 </div>
 
-<!-- MODAL FATURAMENTO AVULSO -->
+<!-- MODAL FATURAMENTO ATUALIZADO -->
 <div id="modal-faturamento" class="modal">
     <div class="modal-content" style="max-width: 450px;">
         <div class="modal-header"><h3>💰 Lançar Faturamento</h3><button class="close-btn" onclick="window.closeModal('modal-faturamento')">&times;</button></div>
         <p style="font-size: 0.85rem; color: #64748b; margin-top: 0;">Aprove comissões para mandados, apreensões e entregas amigáveis.</p>
+        
         <input type="hidden" id="faturamento-caso-id">
-        <div class="form-group" id="div-faturamento-caso" style="display: none;"><label>Selecione o Processo / Cliente (Opcional se Avulso)</label><select id="faturamento-select-caso"><option value="">-- Lançamento Avulso (Sem Cliente) --</option></select></div>
-        <div class="form-group"><label>Tipo de Lançamento</label><select id="faturamento-tipo" onchange="window.atualizarValorFaturamento()"><option value="Mandado Expedido">Mandado Expedido</option><option value="Apreensão - Moto">Apreensão - Moto</option><option value="Apreensão - Carro">Apreensão - Carro</option><option value="Apreensão - Caminhão">Apreensão - Caminhão</option><option value="Entrega Amigável">Entrega Amigável</option></select></div>
-        <div class="form-group"><label>Observação / Descrição (Obrigatório se Avulso)</label><input type="text" id="faturamento-obs" placeholder="Ex: Custo extra, diária de pátio, honorários..."></div>
-        <div class="form-group"><label>Valor da Comissão (R$)</label><input type="number" id="faturamento-valor" value="30.00" step="0.01" style="font-weight:bold; color:var(--sucesso); font-size: 1.2rem;"></div>
+        
+        <!-- Aparece apenas quando aberto diretamente da aba Financeiro -->
+        <div class="form-group" id="div-faturamento-caso" style="display: none;">
+            <label>Selecione o Processo / Cliente</label>
+            <select id="faturamento-select-caso">
+                <option value="">-- Selecione --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Tipo de Lançamento</label>
+            <select id="faturamento-tipo" onchange="window.atualizarValorFaturamento()">
+                <option value="Mandado Expedido">Mandado Expedido</option>
+                <option value="Apreensão - Moto">Apreensão - Moto</option>
+                <option value="Apreensão - Carro">Apreensão - Carro</option>
+                <option value="Apreensão - Caminhão">Apreensão - Caminhão</option>
+                <option value="Entrega Amigável">Entrega Amigável</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Valor da Comissão (R$)</label>
+            <input type="number" id="faturamento-valor" value="30.00" step="0.01" style="font-weight:bold; color:var(--sucesso); font-size: 1.2rem;">
+        </div>
+        
         <button class="btn btn-success" style="width: 100%; padding: 12px; font-size: 1rem;" onclick="window.salvarFaturamento()">Confirmar Lançamento</button>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } 
+    from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    // COLE SUAS CHAVES DO FIREBASE AQUI EMBAIXO NA LINHA 434
+    // CHAVES ORIGINAIS INTACTAS RETIRADAS DO SEU CÓDIGO
     const firebaseConfig = { 
         apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", 
         authDomain: "sistema-andamentos.firebaseapp.com", 
@@ -535,7 +669,9 @@
     window.copiarTexto = function(texto) {
         if(!texto) return;
         navigator.clipboard.writeText(texto).then(() => {
-            const toast = document.getElementById("toast"); toast.className = "show"; setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 2500);
         });
     };
 
@@ -543,20 +679,25 @@
     window.voltarLogin = function() { document.getElementById('master-admin-box').style.display = 'none'; document.getElementById('login-box').style.display = 'block'; };
     
     window.criarAdminMestre = async function() {
-        const nome = document.getElementById('master-nome').value.trim(); const senha = document.getElementById('master-senha').value;
+        const nome = document.getElementById('master-nome').value.trim();
+        const senha = document.getElementById('master-senha').value;
         if(!nome || !senha) { alert("Preencha seu nome e senha para criar o admin."); return; }
-        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        const primeiroNome = nome.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
-        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado)); const qSnap = await getDocs(q);
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe. Tente logar com ele!`); window.voltarLogin(); return; }
         await addDoc(collection(db, "usuarios"), { nome: nome, username: usernameGerado, password: senha, role: 'admin', precisaTrocarSenha: false });
         alert(`✅ Restauração Concluída!\n\nSeu Login: ${usernameGerado}\nSua Senha:${senha}\n\nGuarde essas informações.`);
-        document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha; window.voltarLogin();
+        document.getElementById('login-username').value = usernameGerado; document.getElementById('login-password').value = senha;
+        window.voltarLogin();
     };
 
     window.doLogin = async function() {
-        const btn = document.getElementById('btn-login-submit'); const err = document.getElementById('error-msg');
-        const userRaw = document.getElementById('login-username').value.trim(); const pass = document.getElementById('login-password').value;
+        const btn = document.getElementById('btn-login-submit');
+        const err = document.getElementById('error-msg');
+        const userRaw = document.getElementById('login-username').value.trim(); 
+        const pass = document.getElementById('login-password').value;
         
         if (userRaw.toUpperCase() === 'RESGATE') { window.abrirCriarAdminMestre(); return; }
         if(!userRaw || !pass) return alert("Preencha as credenciais.");
@@ -571,10 +712,24 @@
             
             if (!qSnap.empty) {
                 const uData = { id: qSnap.docs[0].id, ...qSnap.docs[0].data() };
-                if (uData.precisaTrocarSenha) { window.usuarioPendenteTrocaSenha = uData; document.getElementById('login-box').style.display='none'; document.getElementById('force-password-box').style.display='block'; } 
-                else { window.usuarioLogado = uData; localStorage.setItem('usuarioSessao', JSON.stringify(uData)); mostrarPainel(); }
-            } else { err.innerHTML = "<b>Credenciais incorretas!</b>"; err.style.display = 'block'; }
-        } catch(e) { console.error(e); err.innerHTML = `<b>Erro de Conexão.</b>`; err.style.display = 'block'; }
+                if (uData.precisaTrocarSenha) { 
+                    window.usuarioPendenteTrocaSenha = uData; 
+                    document.getElementById('login-box').style.display='none'; 
+                    document.getElementById('force-password-box').style.display='block'; 
+                } else { 
+                    window.usuarioLogado = uData; 
+                    localStorage.setItem('usuarioSessao', JSON.stringify(uData)); 
+                    mostrarPainel(); 
+                }
+            } else {
+                err.innerHTML = "<b>Credenciais incorretas!</b>";
+                err.style.display = 'block';
+            }
+        } catch(e) {
+            console.error("ERRO FIREBASE:", e);
+            err.innerHTML = `<b>Erro de Conexão com Firebase!</b><br><br>Verifique se a aba <b>Regras</b> do seu banco está como <i>allow read, write: if true;</i>`;
+            err.style.display = 'block';
+        }
         btn.innerText = "Acessar Painel";
     };
 
@@ -582,106 +737,177 @@
         const novaSenha = document.getElementById('nova-senha-input').value.trim();
         if(novaSenha.length < 4) { alert("Sua nova senha precisa ter pelo menos 4 caracteres."); return; }
         await updateDoc(doc(db, "usuarios", window.usuarioPendenteTrocaSenha.id), { password: novaSenha, precisaTrocarSenha: false });
-        window.usuarioPendenteTrocaSenha.password = novaSenha; window.usuarioPendenteTrocaSenha.precisaTrocarSenha = false;
-        window.usuarioLogado = window.usuarioPendenteTrocaSenha; localStorage.setItem('usuarioSessao', JSON.stringify(window.usuarioLogado));
-        document.getElementById('force-password-box').style.display = 'none'; mostrarPainel();
+        window.usuarioPendenteTrocaSenha.password = novaSenha;
+        window.usuarioPendenteTrocaSenha.precisaTrocarSenha = false;
+        window.usuarioLogado = window.usuarioPendenteTrocaSenha;
+        localStorage.setItem('usuarioSessao', JSON.stringify(window.usuarioLogado));
+        document.getElementById('force-password-box').style.display = 'none';
+        mostrarPainel();
     };
 
-    window.doLogout = function() { window.usuarioLogado = null; localStorage.removeItem('usuarioSessao'); window.location.reload(); };
+    window.doLogout = function() { 
+        window.usuarioLogado = null; 
+        localStorage.removeItem('usuarioSessao'); 
+        document.getElementById('app-screen').style.display = 'none';
+        document.getElementById('auth-screen').style.display = 'flex';
+        document.getElementById('login-box').style.display = 'block';
+        document.getElementById('master-admin-box').style.display = 'none';
+        document.getElementById('force-password-box').style.display = 'none';
+        document.getElementById('login-username').value = ''; document.getElementById('login-password').value = '';
+    };
 
     window.criarMembroEquipe = async function() {
-        const nomeCompleto = document.getElementById('novo-membro-nome').value.trim(); const senhaTemp = document.getElementById('novo-membro-senha').value.trim(); const role = document.getElementById('novo-membro-role').value;
+        const nomeCompleto = document.getElementById('novo-membro-nome').value.trim();
+        const senhaTemp = document.getElementById('novo-membro-senha').value.trim();
+        const role = document.getElementById('novo-membro-role').value;
         if(!nomeCompleto || !senhaTemp) { alert("Preencha o nome e a senha temporária."); return; }
-        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+        const primeiroNome = nomeCompleto.split(' ')[0].normalize("NFD").replace(/[̀-ͯ]/g, "").toUpperCase();
         const usernameGerado = "1593" + primeiroNome;
-        const qSnap = await getDocs(query(collection(db, "usuarios"), where("username", "==", usernameGerado)));
+        const q = query(collection(db, "usuarios"), where("username", "==", usernameGerado));
+        const qSnap = await getDocs(q);
         if(!qSnap.empty) { alert(`O login ${usernameGerado} já existe na base.`); return; }
         await addDoc(collection(db, "usuarios"), { nome: nomeCompleto, username: usernameGerado, password: senhaTemp, role: role, precisaTrocarSenha: true });
         alert(`✅ Conta gerada com sucesso!\n\nLOGIN: ${usernameGerado}\nSENHA TEMP:${senhaTemp}`);
         document.getElementById('novo-membro-nome').value = ''; document.getElementById('novo-membro-senha').value = '';
     };
 
-    window.excluirMembroEquipe = async function(idUsuario, nomeUsuario) { if(confirm(`Bloquear o acesso de ${nomeUsuario}?`)) await deleteDoc(doc(db, "usuarios", idUsuario)); };
+    window.excluirMembroEquipe = async function(idUsuario, nomeUsuario) {
+        if(confirm(`Bloquear e apagar o acesso de ${nomeUsuario}?`)) await deleteDoc(doc(db, "usuarios", idUsuario));
+    };
 
     window.desenharTabelaEquipe = function() {
         if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
         const tbody = document.getElementById('lista-equipe-container'); if(!tbody) return;
         let html = '';
         window.usuariosDb.forEach(u => {
-            const perfilBadge = u.role === 'admin' ? '<span class="badge" style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;">Admin</span>' : '<span class="badge" style="background:#f1f5f9;color:#475569;padding:4px 8px;border-radius:12px;">Equipe</span>';
-            let btnExcluir = window.usuarioLogado.id !== u.id ? `<button class="btn btn-micro btn-danger" onclick="window.excluirMembroEquipe('${u.id}', '${u.nome}')">Bloquear</button>` : `<span style="color: #94a3b8; font-size: 0.8rem;">(Você)</span>`;
+            const perfilBadge = u.role === 'admin' ? '<span class="badge" style="background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;">Admin</span>' : '<span class="badge" style="background:#f1f5f9;color:#475569;padding:4px 8px;border-radius:12px;">Analista</span>';
+            let btnExcluir = window.usuarioLogado.id !== u.id ? `<button class="btn btn-small btn-danger" style="padding:4px 8px;" onclick="window.excluirMembroEquipe('${u.id}', '${u.nome}')">Bloquear</button>` : `<span style="color: #94a3b8; font-size: 0.8rem;">(Você)</span>`;
             html += `<tr><td><strong>${u.nome}</strong></td><td style="font-family: monospace; color: var(--laranja); font-size: 1rem;">${u.username}</td><td>${perfilBadge}</td><td>${btnExcluir}</td></tr>`;
         });
         tbody.innerHTML = html;
     };
 
+    // INTERFACE CORE E COPILOTO
     function mostrarPainel() {
-        document.getElementById('auth-screen').style.display = 'none'; document.getElementById('app-screen').style.display = 'flex';
-        document.getElementById('user-display').innerText = window.usuarioLogado.nome; document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase(); document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Gestor' : 'Equipe';
+        document.getElementById('auth-screen').style.display = 'none'; 
+        document.getElementById('app-screen').style.display = 'flex';
+        document.getElementById('user-display').innerText = window.usuarioLogado.nome;
+        document.getElementById('user-avatar').innerText = window.usuarioLogado.nome.charAt(0).toUpperCase();
+        document.getElementById('role-badge').innerText = window.usuarioLogado.role === 'admin' ? 'Gestor' : 'Equipe';
         
         const isAdmin = window.usuarioLogado.role === 'admin';
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = isAdmin ? 'flex' : 'none');
         document.querySelector('.toggle-wrapper.admin-only').style.display = isAdmin ? 'flex' : 'none';
         
+        document.getElementById('kb-subtitle').innerText = isAdmin ? "Arraste os cartões para atualizar as fases." : "Modo leitura (Apenas Gestão move os cartões).";
+
         const kbContainer = document.getElementById('kanban-board-container');
-        kbContainer.innerHTML = STATUS_PHASES.map(fase => `<div class="kanban-col" ondrop="window.dropKanban(event, '${fase.id}')" ondragover="window.allowDrop(event)" ondragleave="window.dragLeave(event)"><div class="kanban-header ${fase.borda}">${fase.id} <span class="k-count" id="count-${fase.id.replace(/\s+/g, '')}">0</span></div><div class="kanban-cards" id="col-${fase.id.replace(/\s+/g, '')}"></div></div>`).join('');
+        kbContainer.innerHTML = STATUS_PHASES.map(fase => `
+            <div class="kanban-col" ondrop="window.dropKanban(event, '${fase.id}')" ondragover="window.allowDrop(event)" ondragleave="window.dragLeave(event)">
+                <div class="kanban-header ${fase.borda}">${fase.id} <span class="k-count" id="count-${fase.id.replace(/\s+/g, '')}">0</span></div>
+                <div class="kanban-cards" id="col-${fase.id.replace(/\s+/g, '')}"></div>
+            </div>
+        `).join('');
 
         window.switchTab('tab-casos'); window.atualizarFiltros(); 
         try { window.renderizarGeral(); } catch(e){ console.error(e); }
         if(isAdmin) window.desenharTabelaEquipe();
-        const loadEl = document.getElementById('loading'); if(loadEl) loadEl.style.display = 'none';
+        
+        const loadEl = document.getElementById('loading');
+        if(loadEl) loadEl.style.display = 'none';
     }
 
-    // CORREÇÃO DO KANBAN: Remove a classe kanban-active sempre que trocar de aba
     window.switchTab = function(tabId) {
-        document.querySelectorAll('.tab-content').forEach(el => { el.classList.remove('active'); el.classList.remove('kanban-active'); });
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
         
         const content = document.getElementById(tabId);
         content.classList.add('active');
         if (tabId === 'tab-kanban') content.classList.add('kanban-active');
+        else document.getElementById('tab-kanban').classList.remove('kanban-active');
 
         const trigger = document.getElementById('nav-' + tabId.split('-')[1]); if(trigger) trigger.classList.add('active');
         if(tabId === 'tab-relatorios') setTimeout(window.renderizarRelatorios, 100);
     };
 
     window.openModal = function(id) { document.getElementById(id).style.display = 'flex'; };
-    window.closeModal = function(id) { document.getElementById(id).style.display = 'none'; if(id === 'modal-novo-caso') { document.getElementById('novo-caso-id').value = ''; } };
+    
+    // Zera os ID's ao fechar a modal de cadastro para impedir sobrescrita acidental
+    window.closeModal = function(id) { 
+        document.getElementById(id).style.display = 'none'; 
+        if(id === 'modal-novo-caso') {
+            document.getElementById('novo-caso-id').value = '';
+        }
+    };
 
     window.renderizarGeral = function() {
-        window.renderizarTriagem(); window.renderizarCasos(); window.renderizarApreendidos(); window.renderizarEncerrados(); window.renderizarKanban();
+        window.renderizarTriagem();
+        window.renderizarCasos();
+        window.renderizarApreendidos();
+        window.renderizarEncerrados();
+        window.renderizarKanban();
         if(window.usuarioLogado && window.usuarioLogado.role === 'admin') { window.renderizarCopiloto(); window.renderizarFinanceiro(); window.renderizarRelatorios(); }
     };
 
+    // --- REGRAS DO COPILOTO IA ---
     window.renderizarCopiloto = function() {
         if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
-        const container = document.getElementById('copiloto-container'); container.innerHTML = ''; let alertas = [];
+        const container = document.getElementById('copiloto-container');
+        container.innerHTML = '';
+        let alertas = [];
 
         window.casosDb.forEach(c => {
-            if(c.encerrado || c.isAvulso) return;
-            let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
-            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            let diasUltimoAndamento = (arr.length > 0) ? Math.floor((Date.now() - arr[0].id) / 86400000) : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
+            if(c.encerrado) return;
 
-            if (c.status === 'Aguardando Liminar' && diasStatus >= 10) alertas.push({ caso: c, tipo: 'alerta', titulo: 'Liminar Atrasada', msg: `Aguardando liminar há ${diasStatus} dias. Peticione reiteração ou contate a Vara.`});
-            if (c.status === 'Em Busca' && diasStatus >= 15) alertas.push({ caso: c, tipo: 'alerta', titulo: 'Mandado sem Retorno', msg: `Oficial de Justiça com o mandado há ${diasStatus} dias sem atualização. Contate a Central de Mandados.`});
-            if (c.status === 'Bloqueado' && diasStatus >= 30) alertas.push({ caso: c, tipo: 'aviso', titulo: 'Bloqueio Ineficaz', msg: `Veículo bloqueado há ${diasStatus} dias sem apreensão. Avalie oficiar PM/PRF ou Execução.`});
-            if (diasUltimoAndamento >= 45) alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de extinção (Art. 485, III, CPC).`});
+            let diasStatus = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
+            
+            const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
+            let diasUltimoAndamento = (arr.length > 0) 
+                ? Math.floor((Date.now() - arr[0].id) / 86400000) 
+                : Math.floor((Date.now() - (c.timestamp || Date.now())) / 86400000);
+
+            if (c.status === 'Aguardando Liminar' && diasStatus >= 10) {
+                alertas.push({ caso: c, tipo: 'alerta', titulo: 'Liminar Atrasada', msg: `Aguardando liminar há ${diasStatus} dias. Peticione reiteração ou contate a Vara.`});
+            }
+            if (c.status === 'Em Busca' && diasStatus >= 15) {
+                alertas.push({ caso: c, tipo: 'alerta', titulo: 'Mandado sem Retorno', msg: `Oficial de Justiça com o mandado há ${diasStatus} dias sem atualização. Contate a Central de Mandados.`});
+            }
+            if (c.status === 'Bloqueado' && diasStatus >= 30) {
+                alertas.push({ caso: c, tipo: 'aviso', titulo: 'Bloqueio Ineficaz', msg: `Veículo bloqueado há ${diasStatus} dias sem apreensão. Avalie oficiar PM/PRF ou Execução.`});
+            }
+            if (diasUltimoAndamento >= 45) {
+                alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Abandono', msg: `Processo sem andamento há ${diasUltimoAndamento} dias. Risco de intimação para dar andamento sob pena de extinção (Art. 485, III, CPC).`});
+            }
 
             if (arr.length > 0) {
-                let textAndamentos = arr.map(a => a && a.descricao ? a.descricao.toLowerCase() : '').join(' ');
-                let ultimoAndamentoText = (arr[0] && arr[0].descricao) ? arr[0].descricao.toLowerCase() : '';
-                if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione com ofício liberatório para estancar diárias.`});
+                let textAndamentos = arr.map(a => a.descricao ? a.descricao.toLowerCase() : '').join(' ');
+                let ultimoAndamentoText = arr[0].descricao ? arr[0].descricao.toLowerCase() : '';
+                
+                if (ultimoAndamentoText.match(/(pátio|apreendido pela polícia|blitz|detran)/)) {
+                    alertas.push({ caso: c, tipo: 'erro', titulo: 'Risco de Diárias de Pátio', msg: `Último andamento cita pátio/polícia. Peticione IMEDIATAMENTE com ofício liberatório para estancar diárias.`});
+                }
+                
                 let countNegativas = (textAndamentos.match(/negativa|não encontrad|mudou|endereço incorreto/g) || []).length;
-                if (ultimoAndamentoText.match(/(negativa|não encontrad|mudou|endereço incorreto)/)) alertas.push({ caso: c, tipo: 'aviso', titulo: 'Diligência Negativa Recente', msg: `Diligência falhou recentemente. Peça Sisbajud/Infojud/Renajud para novos endereços.`});
-                if (countNegativas >= 3 && !textAndamentos.includes('edital')) alertas.push({ caso: c, tipo: 'alerta', titulo: 'Esgotamento de Endereços', msg: `Detectadas múltiplas diligências negativas. Avalie requerer Citação por Edital.`});
+                if (ultimoAndamentoText.match(/(negativa|não encontrad|mudou|endereço incorreto)/)) {
+                    alertas.push({ caso: c, tipo: 'aviso', titulo: 'Diligência Negativa Recente', msg: `Diligência falhou recentemente. Peça Sisbajud/Infojud/Renajud para novos endereços e bloqueio de circulação.`});
+                }
+                
+                if (countNegativas >= 3 && !textAndamentos.includes('edital')) {
+                    alertas.push({ caso: c, tipo: 'alerta', titulo: 'Esgotamento de Endereços', msg: `Detectadas múltiplas diligências negativas. Avalie requerer Citação por Edital.`});
+                }
             }
         });
 
         const notifBadge = document.getElementById('notif-badge-copiloto');
-        if(notifBadge) { notifBadge.innerText = alertas.length; notifBadge.style.display = alertas.length > 0 ? 'flex' : 'none'; }
+        if(notifBadge) {
+            notifBadge.innerText = alertas.length;
+            notifBadge.style.display = alertas.length > 0 ? 'flex' : 'none';
+        }
 
-        if(alertas.length === 0) { container.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🤖</div><h3>Tudo sob controle!</h3><p>A IA não encontrou nenhum gargalo nos seus processos ativos no momento.</p></div>`; return; }
+        if(alertas.length === 0) {
+            container.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🤖</div><h3>Tudo sob controle!</h3><p>A IA não encontrou nenhum gargalo nos seus processos ativos no momento.</p></div>`;
+            return;
+        }
 
         let html = '<div class="grid-2">';
         alertas.forEach(a => {
@@ -689,279 +915,652 @@
             if(a.tipo === 'aviso') { corBorda = '#f59e0b'; bgIcon = '#fef3c7'; icon = '⚠️'; }
             if(a.tipo === 'alerta') { corBorda = '#ea580c'; bgIcon = '#ffedd5'; icon = '⏰'; }
             if(a.tipo === 'erro') { corBorda = '#ef4444'; bgIcon = '#fee2e2'; icon = '🚨'; }
-            html += `<div class="card" style="border-left: 4px solid ${corBorda}; padding: 15px; margin-bottom: 0;"><div style="display: flex; gap: 15px;"><div style="font-size: 1.5rem; background: ${bgIcon}; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink: 0;">${icon}</div><div><h4 style="margin: 0 0 5px 0; color: var(--azul); font-size: 1rem;">${a.titulo}</h4><div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><strong>${a.caso.cliente \vert{}\vert{} ''}</strong> (Contrato:${a.caso.contrato || ''})</div><p style="margin: 0; font-size: 0.85rem; color: var(--texto); line-height: 1.4;">${a.msg}</p><div style="margin-top: 10px; display: flex; gap: 8px;"><button class="btn btn-micro btn-outline" onclick="window.abrirModalAndamento('${a.caso.id}')">Lançar Ação</button><button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${a.caso.id}')">Ver Ficha</button></div></div></div></div>`;
-        }); html += '</div>'; container.innerHTML = html;
+            if(a.tipo === 'sucesso') { corBorda = '#10b981'; bgIcon = '#d1fae5'; icon = '✅'; }
+            
+            html += `
+            <div class="card" style="border-left: 4px solid ${corBorda}; padding: 15px; margin-bottom: 0;">
+                <div style="display: flex; gap: 15px;">
+                    <div style="font-size: 1.5rem; background: ${bgIcon}; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 8px; flex-shrink: 0;">${icon}</div>
+                    <div>
+                        <h4 style="margin: 0 0 5px 0; color: var(--azul); font-size: 1rem;">${a.titulo}</h4>
+                        <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><strong>${a.caso.cliente}</strong> (Contrato:${a.caso.contrato})</div>
+                        <p style="margin: 0; font-size: 0.85rem; color: var(--texto); line-height: 1.4;">${a.msg}</p>
+                        <div style="margin-top: 10px; display: flex; gap: 8px;">
+                            <button class="btn btn-outline btn-small" onclick="window.abrirModalAndamento('${a.caso.id}')">Lançar Ação</button>
+                            <button class="btn btn-outline btn-small" onclick="window.abrirModalEditarCaso('${a.caso.id}')">Ver Ficha</button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+        html += '</div>';
+        container.innerHTML = html;
     };
 
     window.abrirModalNovoCaso = function() {
         document.getElementById('titulo-modal-caso').innerText = '📄 Novo Processo';
-        document.getElementById('novo-caso-id').value = ''; document.getElementById('novo-contrato').value = ''; document.getElementById('novo-cliente').value = ''; document.getElementById('novo-processo').value = ''; document.getElementById('novo-vara').value = ''; document.getElementById('novo-comarca-origem').value = ''; document.getElementById('novo-comarca-req').value = ''; document.getElementById('novo-obs').value = ''; document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais'; document.getElementById('novo-is-localizado').checked = false; document.getElementById('novo-status').disabled = false;
+        document.getElementById('novo-caso-id').value = '';
+        document.getElementById('novo-contrato').value = '';
+        document.getElementById('novo-cliente').value = '';
+        document.getElementById('novo-processo').value = '';
+        document.getElementById('novo-vara').value = '';
+        document.getElementById('novo-comarca-origem').value = '';
+        document.getElementById('novo-comarca-req').value = '';
+        document.getElementById('novo-obs').value = '';
+        document.getElementById('novo-status').value = 'Aguardando recolhimento das custas iniciais';
+        document.getElementById('novo-is-localizado').checked = false;
+        
+        document.getElementById('novo-status').disabled = false;
+        
+        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
-        document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none'; document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none'; document.getElementById('div-comarcas').style.display = isAdmin ? 'grid' : 'none';
+        document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
+        document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('div-comarcas').style.display = isAdmin ? 'grid' : 'none';
+
         window.openModal('modal-novo-caso');
     };
 
     window.salvarCasoFull = async function() {
-        const btn = document.getElementById('btn-salvar-caso'); btn.innerText = "Salvando..."; btn.disabled = true;
-        const idCaso = document.getElementById('novo-caso-id').value; const isLoc = document.getElementById('novo-is-localizado').checked;
-        const payload = { contrato: document.getElementById('novo-contrato').value.trim(), cliente: document.getElementById('novo-cliente').value.trim().toUpperCase(), processo: document.getElementById('novo-processo').value.trim(), vara: document.getElementById('novo-vara').value.trim(), comarcaOrigem: document.getElementById('novo-comarca-origem').value.trim(), comarcaReq: document.getElementById('novo-comarca-req').value.trim(), obs: document.getElementById('novo-obs').value.trim(), status: document.getElementById('novo-status').value, isLocalizado: isLoc };
+        const btn = document.getElementById('btn-salvar-caso');
+        btn.innerText = "Salvando..."; btn.disabled = true;
+
+        const idCaso = document.getElementById('novo-caso-id').value;
+        const isLoc = document.getElementById('novo-is-localizado').checked;
+        const payload = {
+            contrato: document.getElementById('novo-contrato').value.trim(),
+            cliente: document.getElementById('novo-cliente').value.trim().toUpperCase(),
+            processo: document.getElementById('novo-processo').value.trim(),
+            vara: document.getElementById('novo-vara').value.trim(),
+            comarcaOrigem: document.getElementById('novo-comarca-origem').value.trim(),
+            comarcaReq: document.getElementById('novo-comarca-req').value.trim(),
+            obs: document.getElementById('novo-obs').value.trim(),
+            status: document.getElementById('novo-status').value,
+            isLocalizado: isLoc
+        };
         
-        if (!payload.contrato || !payload.cliente) { alert('Preencha contrato e cliente!'); btn.innerText = "Salvar Ficha"; btn.disabled = false; return; }
+        if (!payload.contrato || !payload.cliente) { 
+            alert('Preencha contrato e cliente!'); btn.innerText = "Salvar Ficha"; btn.disabled = false; return; 
+        }
         
         try {
             if(idCaso) {
                 const casoAtual = window.casosDb.find(c => c.id === idCaso);
                 if(casoAtual.status !== payload.status && window.usuarioLogado.role === 'admin') {
-                    payload.dataStatus = Date.now(); let hist = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []; hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome }); payload.andamentos = hist;
-                }
-                if(payload.status === 'Apreendido' && (!casoAtual || casoAtual.status !== 'Apreendido')) {
-                    payload.mesApreensao = new Date().toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }); payload.dataApreensao = new Date().toLocaleDateString('pt-BR');
+                    payload.dataStatus = Date.now();
+                    let hist = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+                    hist.unshift({ id: Date.now(), descricao: `🔄 Status atualizado para: ${payload.status} (via Edição)`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    payload.andamentos = hist;
                 }
                 if(isLoc && casoAtual.isLocalizado !== true) {
-                    let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []); hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome }); payload.andamentos = hist;
+                    let hist = payload.andamentos || (Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : []);
+                    hist.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Veículo marcado como LOCALIZADO pelo usuário.`, data: new Date().toLocaleDateString('pt-BR'), hora: new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                    payload.andamentos = hist;
                 }
+                
                 await updateDoc(doc(db, "casos", idCaso), payload);
             } else {
-                let isEquipe = window.usuarioLogado.role !== 'admin'; const now = new Date();
-                payload.mesRegistro = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }); payload.criadoPor = window.usuarioLogado.nome; payload.mandadoExpedido = false; payload.valorComissao = 0; payload.ultimaAnaliseData = ""; payload.andamentos = []; payload.timestamp = Date.now(); payload.dataStatus = Date.now(); payload.encerrado = false; payload.emTriagem = isEquipe;
-                if(payload.status === 'Apreendido') { payload.mesApreensao = payload.mesRegistro; payload.dataApreensao = now.toLocaleDateString('pt-BR'); }
-                if(isLoc) { payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome }); }
+                let isEquipe = window.usuarioLogado.role !== 'admin';
+                const now = new Date();
+                
+                payload.mesRegistro = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+                payload.criadoPor = window.usuarioLogado.nome; 
+                payload.mandadoExpedido = false; 
+                payload.valorComissao = 0; 
+                payload.ultimaAnaliseData = ""; 
+                payload.andamentos = []; 
+                payload.timestamp = Date.now(); 
+                payload.dataStatus = Date.now();
+                payload.encerrado = false;
+                payload.emTriagem = isEquipe;
+                
+                if(isLoc) {
+                    payload.andamentos.unshift({ id: Date.now(), descricao: `🚨 ATENÇÃO: Processo cadastrado com veículo já LOCALIZADO.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+                }
+                
                 await addDoc(collection(db, "casos"), payload);
-                if(isEquipe) alert("Processo enviado para Triagem! Aguarde a aprovação do Administrador.");
+                if(isEquipe) {
+                    alert("Processo enviado para Triagem! Aguarde a aprovação do Administrador.");
+                }
             }
+            
+            document.getElementById('novo-caso-id').value = '';
+            document.getElementById('novo-contrato').value = ''; document.getElementById('novo-cliente').value = '';
+            document.getElementById('novo-processo').value = ''; document.getElementById('novo-vara').value = '';
+            document.getElementById('novo-comarca-origem').value = ''; document.getElementById('novo-comarca-req').value = '';
+            document.getElementById('novo-obs').value = '';
+            document.getElementById('novo-is-localizado').checked = false;
+            
             window.closeModal('modal-novo-caso');
         } catch(e) { alert("Erro ao salvar. Verifique a conexão."); console.error(e); }
         btn.innerText = "Salvar Ficha"; btn.disabled = false;
     };
 
-    window.aprovarTriagem = async function(idCaso) { if(window.usuarioLogado.role !== 'admin') return; await updateDoc(doc(db, "casos", idCaso), { emTriagem: false }); };
+    window.aprovarTriagem = async function(idCaso) {
+        if(window.usuarioLogado.role !== 'admin') return;
+        await updateDoc(doc(db, "casos", idCaso), { emTriagem: false });
+    };
 
     window.abrirModalEditarCaso = function(idCaso) {
         const c = window.casosDb.find(x => x.id === idCaso); if(!c) return;
         document.getElementById('titulo-modal-caso').innerText = '✏️ Editar Processo';
-        document.getElementById('novo-caso-id').value = c.id; document.getElementById('novo-contrato').value = c.contrato || ''; document.getElementById('novo-cliente').value = c.cliente || ''; document.getElementById('novo-processo').value = c.processo || ''; document.getElementById('novo-vara').value = c.vara || ''; document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; document.getElementById('novo-comarca-req').value = c.comarcaReq || ''; document.getElementById('novo-obs').value = c.obs || ''; document.getElementById('novo-is-localizado').checked = c.isLocalizado === true;
-        let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; if (st === 'Localizado') st = 'Veículo Localizado';
-        const validStatus = STATUS_PHASES.find(f => f.id === st); document.getElementById('novo-status').value = validStatus ? validStatus.id : 'Aguardando recolhimento das custas iniciais';
+        document.getElementById('novo-caso-id').value = c.id;
+        document.getElementById('novo-contrato').value = c.contrato || ''; document.getElementById('novo-cliente').value = c.cliente || '';
+        document.getElementById('novo-processo').value = c.processo || ''; document.getElementById('novo-vara').value = c.vara || '';
+        document.getElementById('novo-comarca-origem').value = c.comarcaOrigem || ''; document.getElementById('novo-comarca-req').value = c.comarcaReq || '';
+        document.getElementById('novo-obs').value = c.obs || ''; 
+        document.getElementById('novo-is-localizado').checked = c.isLocalizado === true;
+        
+        let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
+        if (st === 'Localizado') st = 'Veículo Localizado';
+
+        const validStatus = STATUS_PHASES.find(f => f.id === st);
+        document.getElementById('novo-status').value = validStatus ? validStatus.id : 'Aguardando recolhimento das custas iniciais';
+        
         document.getElementById('novo-status').disabled = window.usuarioLogado.role !== 'admin' || c.encerrado === true;
+
+        // CONTROLO DE VISIBILIDADE POR PERFIL
         const isAdmin = window.usuarioLogado && window.usuarioLogado.role === 'admin';
-        document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none'; document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none'; document.getElementById('div-comarcas').style.display = isAdmin ? 'grid' : 'none';
+        document.getElementById('div-processo-vara').style.display = isAdmin ? 'grid' : 'none';
+        document.getElementById('div-status-fase').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('div-comarcas').style.display = isAdmin ? 'grid' : 'none';
+
         window.openModal('modal-novo-caso');
     };
 
     window.excluirCaso = async function(idCaso) { if(confirm("Tem certeza que deseja APAGAR este processo definitivamente?")) await deleteDoc(doc(db, "casos", idCaso)); };
     
-    window.abrirModalEncerrar = function(idCaso) { document.getElementById('encerrar-caso-id').value = idCaso; document.getElementById('encerrar-obs').value = ''; window.openModal('modal-encerrar'); };
+    // ENCERRAMENTO E ARQUIVAMENTO DE CASOS
+    window.abrirModalEncerrar = function(idCaso) {
+        document.getElementById('encerrar-caso-id').value = idCaso;
+        document.getElementById('encerrar-obs').value = '';
+        window.openModal('modal-encerrar');
+    };
 
     window.confirmarEncerramento = async function() {
-        const idCaso = document.getElementById('encerrar-caso-id').value; const motivo = document.getElementById('encerrar-motivo').value; const obs = document.getElementById('encerrar-obs').value.trim();
-        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-        let msgEncerramento = `🔒 CASO ENCERRADO: ${motivo}.`; if (obs) msgEncerramento += ` Obs: ${obs}`;
-        andAtuais.unshift({ id: Date.now(), descricao: msgEncerramento, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-        let updatePayload = { encerrado: true, motivoEncerramento: motivo, status: 'Encerrado', andamentos: andAtuais, dataEncerramento: now.toLocaleDateString('pt-BR'), mesEncerramento: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }), ultimaAnaliseData: now.toLocaleDateString('pt-BR') };
-        if (motivo === 'Apreensão' && !casoAtual.dataApreensao) { updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }); updatePayload.dataApreensao = now.toLocaleDateString('pt-BR'); }
-        await updateDoc(doc(db, "casos", idCaso), updatePayload); window.closeModal('modal-encerrar');
+        const idCaso = document.getElementById('encerrar-caso-id').value;
+        const motivo = document.getElementById('encerrar-motivo').value;
+        const obs = document.getElementById('encerrar-obs').value.trim();
+        
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+        
+        let msgEncerramento = `🔒 CASO ENCERRADO: ${motivo}.`;
+        if (obs) msgEncerramento += ` Obs: ${obs}`;
+
+        andAtuais.unshift({ 
+            id: Date.now(), 
+            descricao: msgEncerramento, 
+            data: now.toLocaleDateString('pt-BR'), 
+            hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 
+            responsavel: window.usuarioLogado.nome 
+        });
+        
+        let updatePayload = { 
+            encerrado: true,
+            motivoEncerramento: motivo,
+            status: 'Encerrado',
+            andamentos: andAtuais,
+            dataEncerramento: now.toLocaleDateString('pt-BR'),
+            mesEncerramento: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
+            ultimaAnaliseData: now.toLocaleDateString('pt-BR')
+        };
+        
+        // Se for apreensão e não tinha data antes, seta a data
+        if (motivo === 'Apreensão' && !casoAtual.dataApreensao) {
+            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
+        }
+
+        await updateDoc(doc(db, "casos", idCaso), updatePayload);
+        window.closeModal('modal-encerrar');
     };
 
     window.reabrirCaso = async function(idCaso) {
-        if(confirm("Deseja reativar este processo? Ele voltará para a fila de 'Aguardando Liminar'.")) {
-            const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-            andAtuais.unshift({ id: Date.now(), descricao: `🔓 CASO REABERTO pelo administrador.`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
-            await updateDoc(doc(db, "casos", idCaso), { encerrado: false, motivoEncerramento: null, status: 'Aguardando Liminar', dataStatus: Date.now(), andamentos: andAtuais });
+        if(confirm("Deseja reativar este processo? Ele voltará para a fila de 'Aguardando Liminar' e aparecerá no Kanban novamente.")) {
+            const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+            
+            andAtuais.unshift({ 
+                id: Date.now(), 
+                descricao: `🔓 CASO REABERTO pelo administrador.`, 
+                data: now.toLocaleDateString('pt-BR'), 
+                hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), 
+                responsavel: window.usuarioLogado.nome 
+            });
+            
+            await updateDoc(doc(db, "casos", idCaso), { 
+                encerrado: false,
+                motivoEncerramento: null,
+                status: 'Aguardando Liminar',
+                dataStatus: Date.now(),
+                andamentos: andAtuais
+            });
         }
     };
 
+    // ANDAMENTOS E SELEÇÃO DE RESPONSÁVEL
     window.abrirModalAndamento = function(idCaso) { 
-        document.getElementById('andamento-caso-id').value = idCaso; document.getElementById('nova-acao').value = ''; 
-        if(window.usuarioLogado.role === 'admin') { document.getElementById('div-responsavel-andamento').style.display = 'block'; document.getElementById('nova-acao-responsavel').value = window.usuarioLogado.nome.toUpperCase().includes('LUCAS') ? 'Lucas' : 'Bárbara'; } 
-        else { document.getElementById('div-responsavel-andamento').style.display = 'none'; }
+        document.getElementById('andamento-caso-id').value = idCaso; 
+        document.getElementById('nova-acao').value = ''; 
+        
+        if(window.usuarioLogado.role === 'admin') {
+            document.getElementById('div-responsavel-andamento').style.display = 'block';
+            document.getElementById('nova-acao-responsavel').value = window.usuarioLogado.nome.toUpperCase().includes('LUCAS') ? 'Lucas' : 'Bárbara';
+        } else {
+            document.getElementById('div-responsavel-andamento').style.display = 'none';
+        }
         window.openModal('modal-novo-andamento'); 
     };
 
     window.salvarAndamento = async function() {
-        const idCaso = document.getElementById('andamento-caso-id').value; const acaoText = document.getElementById('nova-acao').value.trim();
+        const idCaso = document.getElementById('andamento-caso-id').value; 
+        const acaoText = document.getElementById('nova-acao').value.trim();
+        
         if (!acaoText) return alert('Descreva o andamento!'); 
-        let responsavelDaAcao = window.usuarioLogado.nome; if(window.usuarioLogado.role === 'admin') { responsavelDaAcao = document.getElementById('nova-acao-responsavel').value; }
-        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso); let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+        
+        let responsavelDaAcao = window.usuarioLogado.nome;
+        if(window.usuarioLogado.role === 'admin') { responsavelDaAcao = document.getElementById('nova-acao-responsavel').value; }
+
+        const now = new Date(); const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        let andAtuais = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+        
         andAtuais.unshift({ id: Date.now(), descricao: acaoText, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: responsavelDaAcao });
-        await updateDoc(doc(db, "casos", idCaso), { andamentos: andAtuais, ultimaAnaliseData: now.toLocaleDateString('pt-BR') }); window.closeModal('modal-novo-andamento');
+        await updateDoc(doc(db, "casos", idCaso), { andamentos: andAtuais, ultimaAnaliseData: now.toLocaleDateString('pt-BR') });
+        window.closeModal('modal-novo-andamento');
     };
     
-    window.excluirAndamento = async function(id, idA) { if(confirm("Deletar andamento?")){ const c = window.casosDb.find(x=>x.id===id); await updateDoc(doc(db,"casos",id),{andamentos: (c.andamentos||[]).filter(a=>a && a.id!==idA)}); } };
+    window.excluirAndamento = async function(id, idA) { if(confirm("Deletar andamento?")){ const c = window.casosDb.find(x=>x.id===id); await updateDoc(doc(db,"casos",id),{andamentos: c.andamentos.filter(a=>a.id!==idA)}); } };
 
     window.marcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: new Date().toLocaleDateString('pt-BR') }); };
     window.desmarcarVistoHoje = async function(id) { await updateDoc(doc(db, "casos", id), { ultimaAnaliseData: "" }); };
 
+    // KANBAN DRAG & DROP
     window.allowDrop = function(ev) { if(window.usuarioLogado.role !== 'admin') return; ev.preventDefault(); ev.currentTarget.classList.add('drop-hover'); };
     window.dragLeave = function(ev) { ev.currentTarget.classList.remove('drop-hover'); };
     window.dragKanban = function(ev, idCaso) { ev.dataTransfer.setData("caseId", idCaso); };
     window.dropKanban = async function(ev, novoStatus) {
-        if(window.usuarioLogado.role !== 'admin') return; ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
+        if(window.usuarioLogado.role !== 'admin') return;
+        ev.preventDefault(); ev.currentTarget.classList.remove('drop-hover');
         const idCaso = ev.dataTransfer.getData("caseId"); const caso = window.casosDb.find(c => c.id === idCaso);
-        let st = caso.status; if (st === 'Localizado') st = 'Veículo Localizado';
+        
+        let st = caso.status;
+        if (st === 'Localizado') st = 'Veículo Localizado';
         if(!caso || st === novoStatus) return;
+
         let andamentos = Array.isArray(caso.andamentos) ? caso.andamentos : []; const now = new Date();
         andamentos.unshift({ id: Date.now(), descricao: `🔄 Fase alterada: movido para ${novoStatus}`, data: now.toLocaleDateString('pt-BR'), hora: now.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'}), responsavel: window.usuarioLogado.nome });
+        
         let updatePayload = { status: novoStatus, dataStatus: Date.now(), andamentos: andamentos, ultimaAnaliseData: now.toLocaleDateString('pt-BR') };
-        if (novoStatus === 'Apreendido' && caso.status !== 'Apreendido') { updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }); updatePayload.dataApreensao = now.toLocaleDateString('pt-BR'); }
+        if (novoStatus === 'Apreendido' && caso.status !== 'Apreendido') {
+            updatePayload.mesApreensao = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
+            updatePayload.dataApreensao = now.toLocaleDateString('pt-BR');
+        }
+
         await updateDoc(doc(db, "casos", idCaso), updatePayload);
     };
 
     window.renderizarKanban = function() {
         const isAdmin = window.usuarioLogado.role === 'admin';
-        STATUS_PHASES.forEach(f => { const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) col.innerHTML = ''; document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0'; });
-        let kanbanBase = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true && c.isAvulso !== true);
-        kanbanBase.sort((a, b) => { if(a.isLocalizado && !b.isLocalizado) return -1; if(!a.isLocalizado && b.isLocalizado) return 1; return 0; });
+        STATUS_PHASES.forEach(f => {
+            const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
+            if(col) col.innerHTML = '';
+            document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = '0';
+        });
+
+        // Só renderiza no kanban os casos que NÃO são triagem e NÂO encerrados
+        let kanbanBase = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true);
+        
+        kanbanBase.sort((a, b) => {
+            if(a.isLocalizado && !b.isLocalizado) return -1;
+            if(!a.isLocalizado && b.isLocalizado) return 1;
+            return 0;
+        });
+
         kanbanBase.forEach(c => {
             let statusStr = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais';
             if (statusStr === 'Localizado') statusStr = 'Veículo Localizado';
+
             const col = document.getElementById('col-' + statusStr.replace(/\s+/g, ''));
+            
             if(col) {
-                const conf = STATUS_PHASES.find(x => x.id === statusStr) || STATUS_PHASES[0]; const dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
+                const conf = STATUS_PHASES.find(x => x.id === statusStr) || STATUS_PHASES[0];
+                const dias = c.dataStatus ? Math.floor((Date.now() - c.dataStatus) / 86400000) : 0;
                 let diasHtml = dias > 0 ? `<span style="color:${dias > 5 ? 'var(--erro)' : 'var(--texto-claro)'}; font-weight: 600;">⏱️ ${dias}d</span>` : '<span>✨ Novo</span>';
-                let dragAttr = isAdmin ? `draggable="true" ondragstart="window.dragKanban(event, '${c.id}')"` : ''; let cursorStyle = isAdmin ? 'cursor: grab;' : 'cursor: default;';
-                let cmc = `${c.comarcaOrigem?`Orig: ${c.comarcaOrigem}`:''} ${c.comarcaReq?`| Req: ${c.comarcaReq}`:''}`.trim() || 'N/A';
+                
+                let dragAttr = isAdmin ? `draggable="true" ondragstart="window.dragKanban(event, '${c.id}')"` : '';
+                let cursorStyle = isAdmin ? 'cursor: grab;' : 'cursor: default;';
+                
+                let origKb = c.comarcaOrigem ? `Orig: ${c.comarcaOrigem}` : '';
+                let reqKb = c.comarcaReq ? `Req: ${c.comarcaReq}` : '';
+                let kbComarcas = (origKb && reqKb) ? `${origKb} \vert{}${reqKb}` : (origKb || reqKb || 'N/A');
+
+                const clienteFormatado = c.cliente || 'Sem Cliente';
+                const contratoFormatado = c.contrato || 'Sem Contrato';
+                
                 let isLocBadge = c.isLocalizado ? `<div class="urgente-badge">🚨 LOCALIZADO</div>` : '';
                 let cardClass = c.isLocalizado ? `k-card urgente-highlight ${isAdmin ? 'draggable' : ''}` : `k-card ${isAdmin ? 'draggable' : ''}`;
-                col.innerHTML += `<div class="${cardClass}" ${dragAttr} style="${cursorStyle}"><div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${statusStr}</div>${isLocBadge}<h4 onclick="window.abrirModalEditarCaso('${c.id}')" style="cursor:pointer;">${c.cliente||''}</h4><p>${c.contrato\vert{}\vert{}''}</p>${c.processo ? `<p style="color:var(--info); font-size:0.7rem; margin-top:2px;">${c.processo} <span style="cursor:pointer" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span></p>` : ''}<div class="k-meta"><span>📍 ${cmc}</span>${diasHtml}</div></div>`;
+
+                col.innerHTML += `
+                    <div class="${cardClass}" ${dragAttr} style="${cursorStyle}">
+                        <div class="tag-status ${conf.cor}" style="position:absolute; top:-10px; right:10px; font-size:0.6rem; padding:2px 8px;">${statusStr}</div>${isLocBadge}
+                        <h4 onclick="window.abrirModalEditarCaso('${c.id}')" style="cursor:pointer;">${clienteFormatado}</h4>
+                        <p>${contratoFormatado}</p>${c.processo ? `<p style="color:var(--info); font-size:0.7rem; margin-top:2px;">${c.processo} <span style="cursor:pointer" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span></p>` : ''}
+                        <div class="k-meta"><span>📍 ${kbComarcas}</span>${diasHtml}</div>
+                    </div>`;
             }
         });
-        STATUS_PHASES.forEach(f => { const col = document.getElementById('col-' + f.id.replace(/\s+/g, '')); if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length; });
+        
+        STATUS_PHASES.forEach(f => {
+            const col = document.getElementById('col-' + f.id.replace(/\s+/g, ''));
+            if(col) document.getElementById('count-' + f.id.replace(/\s+/g, '')).innerText = col.children.length;
+        });
     };
 
     window.atualizarFiltros = function() {
-        const selCasos = document.getElementById('filtro-mes'); const selFin = document.getElementById('filtro-mes-fin'); const selApreendidos = document.getElementById('filtro-mes-apreendidos');
+        const selCasos = document.getElementById('filtro-mes'); const selFin = document.getElementById('filtro-mes-fin');
+        const selApreendidos = document.getElementById('filtro-mes-apreendidos');
+
         const mCasos = [...new Set(window.casosDb.map(c => c.mesRegistro))].sort().reverse();
-        let faturamentosGlobais = []; window.casosDb.forEach(c => { if (c.faturamentos && c.faturamentos.length > 0) { c.faturamentos.forEach(f => { if(f && f.mes) faturamentosGlobais.push(f.mes); }); } else if (c.mandadoExpedido) { if(c.mesExpedicao) faturamentosGlobais.push(c.mesExpedicao); } });
-        const mFin = [...new Set(faturamentosGlobais)].filter(Boolean).sort().reverse();
+        
+        let faturamentosGlobais = [];
+        window.casosDb.forEach(c => {
+            if (c.faturamentos && c.faturamentos.length > 0) {
+                c.faturamentos.forEach(f => faturamentosGlobais.push(f.mes));
+            } else if (c.mandadoExpedido) {
+                faturamentosGlobais.push(c.mesExpedicao);
+            }
+        });
+        const mFin = [...new Set(faturamentosGlobais)].sort().reverse();
+
         let baseApreendidos = window.casosDb.filter(c => c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão'));
         const mApreendidos = [...new Set(baseApreendidos.map(c => c.mesApreensao || c.mesRegistro))].filter(Boolean).sort().reverse();
 
-        const aCasos = selCasos ? selCasos.value : 'todos'; const aFin = selFin ? selFin.value : 'todos'; const aApreendidos = selApreendidos ? selApreendidos.value : 'todos';
-        const selOrigem = document.getElementById('filtro-comarca-origem'); const selReq = document.getElementById('filtro-comarca-req'); const selStatus = document.getElementById('filtro-status');
+        const aCasos = selCasos.value; const aFin = selFin.value; const aApreendidos = selApreendidos ? selApreendidos.value : 'todos';
 
-        if (selOrigem) {
-            const aOrigem = selOrigem.value; let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(val => typeof val === 'string' && val.trim() !== ''))].sort();
-            selOrigem.innerHTML = '<option value="todas">Origem (Todas)</option>'; mOrigem.forEach(o => { selOrigem.innerHTML += `<option value="${o}">${o}</option>`; });
-            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
-        }
-        if (selReq) {
-            const aReq = selReq.value; let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(val => typeof val === 'string' && val.trim() !== ''))].sort();
-            selReq.innerHTML = '<option value="todas">Requerimento (Todas)</option>'; mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
-            if(mReq.includes(aReq)) selReq.value = aReq;
-        }
-        if (selStatus) {
-            const aStatus = selStatus.value; selStatus.innerHTML = '<option value="todos">Status (Todos)</option>';
+        // Update Filters in Casos
+        const selOrigem = document.getElementById('filtro-comarca-origem');
+        const selReq = document.getElementById('filtro-comarca-req');
+        const selStatus = document.getElementById('filtro-status');
+
+        if (selOrigem && selReq && selStatus) {
+            const aOrigem = selOrigem.value; const aReq = selReq.value; const aStatus = selStatus.value;
+            let mOrigem = [...new Set(window.casosDb.map(c => c.comarcaOrigem).filter(Boolean))].sort();
+            let mReq = [...new Set(window.casosDb.map(c => c.comarcaReq).filter(Boolean))].sort();
+            
+            selOrigem.innerHTML = '<option value="todas">Origem (Todas)</option>';
+            mOrigem.forEach(o => { selOrigem.innerHTML += `<option value="${o}">${o}</option>`; });
+            
+            selReq.innerHTML = '<option value="todas">Requerimento (Todas)</option>';
+            mReq.forEach(r => { selReq.innerHTML += `<option value="${r}">${r}</option>`; });
+
+            selStatus.innerHTML = '<option value="todos">Status (Todos)</option>';
             STATUS_PHASES.forEach(s => { selStatus.innerHTML += `<option value="${s.id}">${s.id}</option>`; });
+
+            if(mOrigem.includes(aOrigem)) selOrigem.value = aOrigem;
+            if(mReq.includes(aReq)) selReq.value = aReq;
             if(STATUS_PHASES.some(s => s.id === aStatus)) selStatus.value = aStatus;
         }
-        if(selCasos) { selCasos.innerHTML = '<option value="todos">Mês Cad. (Todos)</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; }); if(mCasos.includes(aCasos)) selCasos.value = aCasos; }
-        if(selFin) { selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; }); if(mFin.includes(aFin)) selFin.value = aFin; }
-        if(selApreendidos) { selApreendidos.innerHTML = '<option value="todos">Todos os meses</option>'; mApreendidos.forEach(m => { if(m) selApreendidos.innerHTML += `<option value="${m}">${m}</option>`; }); if(mApreendidos.includes(aApreendidos)) selApreendidos.value = aApreendidos; }
+
+        if(selCasos) {
+            selCasos.innerHTML = '<option value="todos">Mês Cad. (Todos)</option>'; mCasos.forEach(m => { if(m) selCasos.innerHTML += `<option value="${m}">${m}</option>`; });
+            if(mCasos.includes(aCasos)) selCasos.value = aCasos;
+        }
+        if(selFin) {
+            selFin.innerHTML = '<option value="todos">Todos os meses</option>'; mFin.forEach(m => { if(m) selFin.innerHTML += `<option value="${m}">${m}</option>`; });
+            if(mFin.includes(aFin)) selFin.value = aFin;
+        }
+        if(selApreendidos) {
+            selApreendidos.innerHTML = '<option value="todos">Todos os meses</option>'; mApreendidos.forEach(m => { if(m) selApreendidos.innerHTML += `<option value="${m}">${m}</option>`; });
+            if(mApreendidos.includes(aApreendidos)) selApreendidos.value = aApreendidos;
+        }
     };
 
+    // HELPER PARA RENDERIZAR O HTML DE UM CARTÃO BASE
     function gerarHtmlCartaoBase(c, isAdmin, dataHoje) {
-        let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; if (st === 'Localizado') st = 'Veículo Localizado';
+        let st = (typeof c.status === 'string' && c.status.trim() !== '') ? c.status : 'Aguardando recolhimento das custas iniciais'; 
+        if (st === 'Localizado') st = 'Veículo Localizado';
         const conf = STATUS_PHASES.find(x => x.id === st) || STATUS_PHASES[0];
+
         let btnsAdmin = '', badgeFin = '', bVisto = '', btnLancar = '';
+        
         let somaFaturado = 0;
-        if (c.faturamentos && c.faturamentos.length > 0) somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f?.valor || 0), 0); else if (c.mandadoExpedido) somaFaturado = parseFloat(c.valorComissao || 0);
+        if (c.faturamentos && c.faturamentos.length > 0) {
+            somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f.valor || 0), 0);
+        } else if (c.mandadoExpedido) {
+            somaFaturado = parseFloat(c.valorComissao || 0);
+        }
 
         if(isAdmin) {
-            btnsAdmin = `<button class="btn btn-micro btn-danger" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button><button class="btn btn-micro btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')" title="Finalizar e Arquivar">🔒 Encerrar</button>`;
-            badgeFin = somaFaturado > 0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0; font-size:0.7rem; padding: 4px 8px; border-radius:12px;">Fat. R$ ${somaFaturado.toFixed(2).replace('.',',')}</span>` : ``;
-            bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-micro" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto</button>` : `<button class="btn btn-micro btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Ciente</button>`;
-            btnLancar = `<button class="btn btn-micro btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button><button class="btn btn-micro btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Ação</button>`;
+            btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir">🗑️</button>
+                         <button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')" title="Finalizar e Arquivar">🔒 Encerrar</button>`;
+            
+            badgeFin = somaFaturado > 0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0; font-size:0.7rem; padding: 4px 8px; border-radius:12px;">Faturado R$ ${somaFaturado.toFixed(2).replace('.',',')}</span>` : ``;
+            
+            bVisto = c.ultimaAnaliseData === dataHoje ? `<button class="btn btn-small" style="background:#dbeafe; color:var(--info); border:1px solid #bfdbfe; font-weight:bold;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto (Desfazer)</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`;
+            btnLancar = `<button class="btn btn-small btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>
+                         <button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
         } else {
-            btnLancar = `<button class="btn btn-micro btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Ação</button>`;
+            btnLancar = `<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Lançar Diligência</button>`;
         }
         
         const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-        const andamentosVisiveis = isAdmin ? arr : arr.filter(a => a && !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
-        let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => { if(!a) return ''; let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}',${a.id})" title="Excluir">✖</span>` : ''; let isRecent = i === 0 ? 'recent' : ''; let descFormatada = a.descricao || ''; return `<div class="tl-item ${isRecent}"><div><strong>${descFormatada}</strong>${dBtn}</div><div class="tl-meta">${a.data || ''} às ${a.hora \vert{}\vert{} ''} • 👤 ${a.responsavel || ''}</div></div>`; }).join('');
+        const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
+        
+        let andHTML = andamentosVisiveis.slice(0,4).map((a, i) => {
+            let dBtn = isAdmin && a.responsavel !== 'SISTEMA' ? `<span class="btn-icon" onclick="window.excluirAndamento('${c.id}', ${a.id})" title="Excluir">✖</span>` : '';
+            let isRecent = i === 0 ? 'recent' : '';
+            let descFormatada = a.descricao || '';
+            
+            return `<div class="tl-item ${isRecent}">
+                <div><strong>${descFormatada}</strong> ${dBtn}</div>
+                <div class="tl-meta">${a.data || ''} às ${a.hora || ''} • 👤 ${a.responsavel || ''}</div>
+            </div>`;
+        }).join('');
         
         let obsHtml = c.obs ? `<div class="obs-box"><strong>📝 Observações Iniciais:</strong> ${c.obs}</div>` : '';
-        let infoProcessoHtml = ''; if(c.processo || c.vara) { let txtP = c.processo ? `${c.processo} <span style="cursor:pointer; font-size:1rem;" onclick="window.copiarTexto('${c.processo}')">📋</span>` : '-'; let txtV = c.vara || '-'; infoProcessoHtml = `<div class="info-grid"><div><strong>Nº Processo CNJ</strong>${txtP}</div><div><strong>Vara de Tramitação</strong>${txtV}</div></div>`; }
-        let origText = c.comarcaOrigem ? `📍 <strong>Origem:</strong> ${c.comarcaOrigem}` : ''; let reqText = c.comarcaReq ? `📨 <strong>Req:</strong> ${c.comarcaReq}` : ''; let infoComarcas = (origText && reqText) ? `${origText} &nbsp;\vert{}&nbsp; ${reqText}` : (origText || reqText || '📍 Comarca não informada');
-        
+
+        let infoProcessoHtml = '';
+        if(c.processo || c.vara) {
+            let txtP = c.processo ? `${c.processo} <span style="cursor:pointer; font-size:1rem;" onclick="window.copiarTexto('${c.processo}')" title="Copiar Processo">📋</span>` : '-';
+            let txtV = c.vara || '-';
+            infoProcessoHtml = `<div class="info-grid">
+                <div><strong>Nº Processo CNJ</strong>${txtP}</div>
+                <div><strong>Vara de Tramitação</strong>${txtV}</div>
+            </div>`;
+        }
+
+        let origText = c.comarcaOrigem ? `📍 <strong>Origem:</strong> ${c.comarcaOrigem}` : '';
+        let reqText = c.comarcaReq ? `📨 <strong>Req:</strong> ${c.comarcaReq}` : '';
+        let infoComarcas = (origText && reqText) ? `${origText} &nbsp;|&nbsp; ${reqText}` : (origText || reqText || '📍 Comarca não informada');
+
+        const clienteFormatado = c.cliente || 'Sem Cliente';
+        const contratoFormatado = c.contrato || 'Sem Contrato';
+        const infoCriador = c.criadoPor ? ` | 👤 Cadastrado por: ${c.criadoPor}` : '';
+
         let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px;">🚨 VEÍCULO LOCALIZADO</span>` : '';
         let cardClass = c.isLocalizado ? 'card urgente-highlight' : 'card';
 
-        return `<div class="${cardClass}"><div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;"><div>${isLocBadge}<span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span><h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${c.cliente||''}</h3><p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${c.contrato\vert{}\vert{}''}${c.criadoPor ? ` | 👤 Cadastrado por: ${c.criadoPor}` : ''}</p></div><div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;"><button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>${btnLancar}${btnsAdmin}</div></div>${obsHtml}${infoProcessoHtml}<div class="timeline">${andHTML || '<div class="tl-item"><span style="color:#94a3b8;">Sem diligências registradas.</span></div>'}</div><div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--borda); padding-top: 15px;"><div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div><div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div></div></div>`;
+        return `
+            <div class="${cardClass}">
+                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        ${isLocBadge}
+                        <span class="tag-status ${conf.cor}" style="margin-bottom:8px; display:inline-block;">${st}</span>
+                        <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${clienteFormatado}</h3>
+                        <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${contratoFormatado}${infoCriador}</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Dados</button>
+                        ${btnLancar}
+                        ${btnsAdmin}
+                    </div>
+                </div>
+                
+                ${obsHtml}
+                ${infoProcessoHtml}
+                
+                <div class="timeline">${andHTML || '<div class="tl-item"><span style="color:#94a3b8;">Sem diligências registradas.</span></div>'}</div>
+                
+                <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; border-top: 1px solid var(--borda); padding-top: 15px;">
+                    <div style="font-size:0.85rem; color:#64748b;">${infoComarcas}</div>
+                    <div style="display:flex; gap:10px;">${bVisto}${badgeFin}</div>
+                </div>
+            </div>
+        `;
     }
 
+    // LISTA 1: TRIAGEM (Lançamentos Pendentes)
     window.renderizarTriagem = function() {
-        const cont = document.getElementById('triagem-container'); if(!cont) return; cont.innerHTML = '';
-        let base = window.casosDb.filter(c => c.emTriagem === true && !c.isAvulso);
-        if (window.usuarioLogado.role !== 'admin') base = base.filter(c => c.criadoPor === window.usuarioLogado.nome);
-        if (base.length === 0) { cont.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8;">Nenhum caso na triagem no momento.</div>`; return; }
+        const cont = document.getElementById('triagem-container');
+        if(!cont) return;
+        cont.innerHTML = '';
+        
+        let base = window.casosDb.filter(c => c.emTriagem === true);
+        
+        if (window.usuarioLogado.role !== 'admin') {
+            base = base.filter(c => c.criadoPor === window.usuarioLogado.nome);
+        }
+
+        if (base.length === 0) {
+            cont.innerHTML = `<div style="text-align:center; padding: 40px; color: #94a3b8;">Nenhum caso na triagem no momento.</div>`;
+            return;
+        }
+
         const dataHoje = new Date().toLocaleDateString('pt-BR');
+
         base.forEach(c => {
             let htmlBase = gerarHtmlCartaoBase(c, window.usuarioLogado.role === 'admin', dataHoje);
-            let btnAprovar = window.usuarioLogado.role === 'admin' ? `<div style="margin-bottom:15px; padding:10px; background:#fef3c7; border:1px solid #f59e0b; border-radius:8px; display:flex; justify-content:space-between; align-items:center;"><span style="color:#b45309; font-weight:600; font-size:0.85rem;">Enviado por: ${c.criadoPor || 'Equipe'}</span><button class="btn btn-small" style="background:#10b981; color:white;" onclick="window.aprovarTriagem('${c.id}')">✅ Aprovar e Ativar</button></div>` : `<div style="margin-bottom:15px; padding:10px; background:#f1f5f9; border-radius:8px; text-align:center; color:#64748b; font-weight:600; font-size:0.85rem;">⏳ Aguardando aprovação do Admin</div>`;
-            let wrap = document.createElement('div'); wrap.innerHTML = btnAprovar + htmlBase; cont.appendChild(wrap);
+            
+            let btnAprovar = window.usuarioLogado.role === 'admin' 
+                ? `<div style="margin-bottom:15px; padding:10px; background:#fef3c7; border:1px solid #f59e0b; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="color:#b45309; font-weight:600; font-size:0.85rem;">Enviado por: ${c.criadoPor || 'Equipe'}</span>
+                    <button class="btn btn-small" style="background:#10b981; color:white;" onclick="window.aprovarTriagem('${c.id}')">✅ Aprovar e Ativar</button>
+                   </div>`
+                : `<div style="margin-bottom:15px; padding:10px; background:#f1f5f9; border-radius:8px; text-align:center; color:#64748b; font-weight:600; font-size:0.85rem;">⏳ Aguardando aprovação do Admin</div>`;
+            
+            let wrap = document.createElement('div');
+            wrap.innerHTML = btnAprovar + htmlBase;
+            cont.appendChild(wrap);
         });
     };
 
-    window.renderizarCasos = function() {
-        const contLoc = document.getElementById('cases-localizados-container'); const contBusca = document.getElementById('cases-busca-container');
-        if(!contLoc || !contBusca) return; contLoc.innerHTML = ''; contBusca.innerHTML = '';
-        const searchInput = document.getElementById('search-input'); const termoBusca = searchInput ? searchInput.value.toLowerCase() : '';
-        const isAdmin = window.usuarioLogado.role === 'admin'; const checkboxPend = document.getElementById('filtro-pendentes-hoje'); const ocVistos = checkboxPend ? checkboxPend.checked : false; const dataHoje = new Date().toLocaleDateString('pt-BR');
+    window.aprovarTriagem = async function(idCaso) {
+        if(window.usuarioLogado.role !== 'admin') return;
+        await updateDoc(doc(db, "casos", idCaso), { emTriagem: false });
+    };
 
-        // REGRA APLICADA AQUI: Ignora "Apreendido"
-        let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true && c.status !== 'Apreendido' && c.isAvulso !== true);
+    // LISTA 2: CASOS ATIVOS (Separados em Localizados e Tramitação)
+    window.renderizarCasos = function() {
+        const contLoc = document.getElementById('cases-localizados-container');
+        const contBusca = document.getElementById('cases-busca-container');
+        if(!contLoc || !contBusca) return;
+        contLoc.innerHTML = ''; contBusca.innerHTML = '';
+
+        const termoBusca = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        const ocVistos = document.getElementById('filtro-pendentes-hoje') ? document.getElementById('filtro-pendentes-hoje').checked : false;
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+        // Pega casos que NÃO estão encerrados e NÃO estão na triagem
+        let base = window.casosDb.filter(c => c.encerrado !== true && c.emTriagem !== true);
+        
         if(isAdmin && ocVistos) base = base.filter(c => c.ultimaAnaliseData !== dataHoje);
         
-        const selOrigem = document.getElementById('filtro-comarca-origem'); const selReq = document.getElementById('filtro-comarca-req'); const selStatus = document.getElementById('filtro-status'); const selMes = document.getElementById('filtro-mes');
-        const valOrigem = selOrigem ? selOrigem.value : 'todas'; const valReq = selReq ? selReq.value : 'todas'; const valStatus = selStatus ? selStatus.value : 'todos';
+        // Novos Filtros Ativos
+        const valOrigem = document.getElementById('filtro-comarca-origem') ? document.getElementById('filtro-comarca-origem').value : 'todas';
+        const valReq = document.getElementById('filtro-comarca-req') ? document.getElementById('filtro-comarca-req').value : 'todas';
+        const valStatus = document.getElementById('filtro-status') ? document.getElementById('filtro-status').value : 'todos';
+
         if(valOrigem !== 'todas') base = base.filter(c => c.comarcaOrigem === valOrigem);
         if(valReq !== 'todas') base = base.filter(c => c.comarcaReq === valReq);
         if(valStatus !== 'todos') base = base.filter(c => c.status === valStatus || (c.status === 'Localizado' && valStatus === 'Veículo Localizado'));
-        if(selMes && selMes.value !== 'todos') base = base.filter(c => c.mesRegistro === selMes.value);
+
+        if(document.getElementById('filtro-mes') && document.getElementById('filtro-mes').value !== 'todos') {
+            base = base.filter(c => c.mesRegistro === document.getElementById('filtro-mes').value);
+        }
         if(termoBusca) base = base.filter(c => (c.cliente||'').toLowerCase().includes(termoBusca) || (c.contrato||'').toLowerCase().includes(termoBusca) || ((c.processo||'').toLowerCase().includes(termoBusca)));
 
-        base.sort((a, b) => { if(a.isLocalizado && !b.isLocalizado) return -1; if(!a.isLocalizado && b.isLocalizado) return 1; return 0; });
+        base.sort((a, b) => {
+            if(a.isLocalizado && !b.isLocalizado) return -1;
+            if(!a.isLocalizado && b.isLocalizado) return 1;
+            return 0;
+        });
+
         let countLoc = 0; let countBusca = 0;
 
         base.forEach(c => {
-            let st = c.status || ''; let htmlCard = gerarHtmlCartaoBase(c, isAdmin, dataHoje); let wrap = document.createElement('div'); wrap.innerHTML = htmlCard;
-            if (c.isLocalizado || ['Veículo Localizado', 'Acordo Realizado'].includes(st)) { contLoc.appendChild(wrap); countLoc++; } else { contBusca.appendChild(wrap); countBusca++; }
+            let st = c.status || ''; 
+            let htmlCard = gerarHtmlCartaoBase(c, isAdmin, dataHoje);
+            let wrap = document.createElement('div');
+            wrap.innerHTML = htmlCard;
+
+            if (c.isLocalizado || ['Veículo Localizado', 'Apreendido', 'Acordo Realizado'].includes(st)) {
+                contLoc.appendChild(wrap);
+                countLoc++;
+            } else {
+                contBusca.appendChild(wrap);
+                countBusca++;
+            }
         });
 
         if (countLoc === 0) contLoc.innerHTML = `<div style="padding:20px; color:#94a3b8; font-size:0.9rem;">Nenhum veículo localizado.</div>`;
         if (countBusca === 0) contBusca.innerHTML = `<div style="padding:20px; color:#94a3b8; font-size:0.9rem;">Nenhum processo em andamento regular.</div>`;
     };
 
+    // RENDERIZAR APREENDIDOS 
     window.renderizarApreendidos = function() {
-        const container = document.getElementById('apreendidos-container'); if(!container) return; container.innerHTML = '';
-        const searchInput = document.getElementById('search-apreendidos'); const termoBusca = searchInput ? searchInput.value.toLowerCase() : '';
-        const isAdmin = window.usuarioLogado.role === 'admin'; const selMesApre = document.getElementById('filtro-mes-apreendidos'); const mesFiltro = selMesApre ? selMesApre.value : 'todos';
+        const container = document.getElementById('apreendidos-container'); 
+        if(!container) return;
+        container.innerHTML = '';
+        const termoBusca = document.getElementById('search-apreendidos').value.toLowerCase();
+        const isAdmin = window.usuarioLogado.role === 'admin';
+        const mesFiltro = document.getElementById('filtro-mes-apreendidos').value;
 
-        // REGRA APLICADA AQUI: Inclui os Apreendidos
-        let base = window.casosDb.filter(c => c.emTriagem !== true && c.isAvulso !== true && (c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão')));
-        if (mesFiltro !== 'todos') base = base.filter(c => (c.mesApreensao || c.mesEncerramento || c.mesRegistro) === mesFiltro);
-        if(termoBusca) base = base.filter(c => (c.cliente||'').toLowerCase().includes(termoBusca) || (c.contrato||'').toLowerCase().includes(termoBusca) || ((c.processo||'').toLowerCase().includes(termoBusca)));
+        // Pega casos que tem status Apreendido OU encerrado com motivo Apreensão (e que passaram da triagem)
+        let base = window.casosDb.filter(c => c.emTriagem !== true && (c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão')));
+        
+        if (mesFiltro !== 'todos') {
+            base = base.filter(c => (c.mesApreensao || c.mesEncerramento || c.mesRegistro) === mesFiltro);
+        }
+
+        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
+
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">🚔</div><h3>Nenhuma apreensão localizada neste mês.</h3></div>`;
 
         base.forEach(c => {
-            let btnsAdmin = ''; let somaFaturado = 0;
-            if (c.faturamentos && c.faturamentos.length > 0) somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f?.valor || 0), 0); else if (c.mandadoExpedido) somaFaturado = parseFloat(c.valorComissao || 0);
-
+            let btnsAdmin = '';
             if(isAdmin) {
-                btnsAdmin = `<button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar Ficha</button>`;
-                if (!c.encerrado) btnsAdmin += `<button class="btn btn-micro btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')">🔒 Encerrar</button>`;
-                else btnsAdmin += `<button class="btn btn-micro btn-outline" style="color:var(--sucesso); border-color:var(--sucesso);" onclick="window.reabrirCaso('${c.id}')">🔓 Reabrir</button>`;
-                btnsAdmin += `<button class="btn btn-micro btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>`;
+                btnsAdmin = `<button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar Ficha</button>`;
+                if (!c.encerrado) {
+                    btnsAdmin += `<button class="btn btn-small btn-outline" style="color:var(--erro); border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')">🔒 Arquivar/Encerrar</button>`;
+                } else {
+                    btnsAdmin += `<button class="btn btn-small btn-outline" style="color:var(--sucesso); border-color:var(--sucesso);" onclick="window.reabrirCaso('${c.id}')">🔓 Reabrir</button>`;
+                }
             } else {
-                btnsAdmin = `<button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar</button>`;
+                btnsAdmin = `<button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar</button>`;
             }
             
-            let badgeFin = somaFaturado > 0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;margin-left:10px;padding:4px 8px;border-radius:12px;font-size:0.7rem;font-weight:bold;">Faturado R$ ${somaFaturado.toFixed(2).replace('.',',')}</span>` : ``;
             let dataTag = c.dataApreensao ? `Data da Apreensão: ${c.dataApreensao}` : `Mês Ref: ${c.mesApreensao || c.mesEncerramento || c.mesRegistro}`;
             let encStatus = c.encerrado ? `<span class="badge" style="background:#e2e8f0;color:#475569;margin-left:10px;padding:4px 8px;border-radius:12px;font-size:0.7rem;font-weight:bold;">🔒 Caso Arquivado</span>` : '';
 
             let div = document.createElement('div'); div.className = 'card';
-            div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;"><div><span class="tag-status" style="background-color: var(--kb-apreendido); margin-bottom:8px; display:inline-block;">🚔 VEÍCULO APREENDIDO</span>${encStatus}${badgeFin}<h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${c.cliente || ''}</h3><p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${c.contrato || ''}</p></div><div style="display:flex; gap:8px; flex-wrap:wrap;">${btnsAdmin}</div></div><div style="margin-top:15px; padding-top: 15px; border-top: 1px solid var(--borda); font-size: 0.85rem; color: var(--texto-claro); font-weight: 600;">📅 ${dataTag}</div>`;
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div>
+                        <span class="tag-status" style="background-color: var(--kb-apreendido); margin-bottom:8px; display:inline-block;">🚔 VEÍCULO APREENDIDO</span>
+                        ${encStatus}
+                        <h3 style="margin:5px 0; color:var(--azul); font-size: 1.3rem;">${c.cliente || ''}</h3>
+                        <p style="margin:0; font-family:monospace; color:var(--texto-claro); font-weight:600; font-size: 0.8rem;">Contrato: ${c.contrato || ''}</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        ${btnsAdmin}
+                    </div>
+                </div>
+                <div style="margin-top:15px; padding-top: 15px; border-top: 1px solid var(--borda); font-size: 0.85rem; color: var(--texto-claro); font-weight: 600;">
+                    📅 ${dataTag}
+                </div>
+            `;
             container.appendChild(div);
         });
     };
@@ -971,97 +1570,209 @@
         const termoBusca = document.getElementById('search-encerrados').value.toLowerCase();
         const isAdmin = window.usuarioLogado.role === 'admin';
 
-        let base = window.casosDb.filter(c => c.encerrado === true && c.emTriagem !== true && c.isAvulso !== true);
-        if(termoBusca) base = base.filter(c => (c.cliente||'').toLowerCase().includes(termoBusca) || (c.contrato||'').toLowerCase().includes(termoBusca) || ((c.processo||'').toLowerCase().includes(termoBusca)));
+        let base = window.casosDb.filter(c => c.encerrado === true && c.emTriagem !== true);
+        
+        if(termoBusca) base = base.filter(c => c.cliente.toLowerCase().includes(termoBusca) || c.contrato.toLowerCase().includes(termoBusca) || (c.processo && c.processo.toLowerCase().includes(termoBusca)));
 
         if (base.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 60px; color: #94a3b8;"><div style="font-size:3rem; margin-bottom:15px;">📁</div><h3>Nenhum caso no arquivo morto.</h3></div>`;
 
         base.forEach(c => {
             let btnsAdmin = '';
             if(isAdmin) {
-                btnsAdmin = `<button class="btn btn-micro btn-danger" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button><button class="btn btn-micro btn-outline" style="color:var(--sucesso); border-color:var(--sucesso);" onclick="window.reabrirCaso('${c.id}')">🔓 Reabrir Processo</button><button class="btn btn-micro btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>`;
+                btnsAdmin = `<button class="btn btn-small btn-danger" style="padding:6px 10px;" onclick="window.excluirCaso('${c.id}')" title="Excluir Definitivamente">🗑️</button>
+                             <button class="btn btn-small btn-outline" style="color:var(--sucesso); border-color:var(--sucesso);" onclick="window.reabrirCaso('${c.id}')">🔓 Reabrir Processo</button>`;
             }
             
             const arr = Array.isArray(c.andamentos) ? c.andamentos : [];
-            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => a && !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
+            const andamentosVisiveis = isAdmin ? arr : arr.filter(a => !(a.descricao && (a.descricao.includes('Faturamento Lançado') || a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada'))));
             
-            let andHTML = andamentosVisiveis.slice(0,5).map((a, i) => { if(!a) return ''; let isRecent = i === 0 ? 'recent' : ''; return `<div class="tl-item ${isRecent}"><div><strong>${a.descricao || ''}</strong></div><div class="tl-meta">${a.data || ''} às ${a.hora || ''} • 👤 ${a.responsavel || ''}</div></div>`; }).join('');
+            let andHTML = andamentosVisiveis.slice(0,5).map((a, i) => {
+                let isRecent = i === 0 ? 'recent' : '';
+                return `<div class="tl-item ${isRecent}">
+                    <div><strong>${a.descricao || ''}</strong></div>
+                    <div class="tl-meta">${a.data || ''} às ${a.hora || ''} • 👤 ${a.responsavel || ''}</div>
+                </div>`;
+            }).join('');
             
             let infoProcessoHtml = '';
-            if(c.processo || c.vara) { let txtP = c.processo ? `${c.processo}` : '-'; let txtV = c.vara || '-'; infoProcessoHtml = `<div class="info-grid" style="background:#f1f5f9;"><div><strong>Nº Processo CNJ</strong>${txtP}</div><div><strong>Vara de Tramitação</strong>${txtV}</div></div>`; }
-            let motivoColor = "#10b981"; if(c.motivoEncerramento === "Quitado") motivoColor = "#059669"; if(c.motivoEncerramento && c.motivoEncerramento.includes("Mora")) motivoColor = "#0284c7";
+            if(c.processo || c.vara) {
+                let txtP = c.processo ? `${c.processo}` : '-';
+                let txtV = c.vara || '-';
+                infoProcessoHtml = `<div class="info-grid" style="background:#f1f5f9;">
+                    <div><strong>Nº Processo CNJ</strong>${txtP}</div>
+                    <div><strong>Vara de Tramitação</strong>${txtV}</div>
+                </div>`;
+            }
+
+            let motivoColor = "#10b981"; 
+            if(c.motivoEncerramento === "Quitado") motivoColor = "#059669";
+            if(c.motivoEncerramento && c.motivoEncerramento.includes("Mora")) motivoColor = "#0284c7";
+
+            const clienteFormatado = c.cliente || 'Sem Cliente';
+            const contratoFormatado = c.contrato || 'Sem Contrato';
+            
             let isLocBadge = c.isLocalizado ? `<span class="urgente-badge" style="margin-right: 8px; background-color: #64748b; animation: none;">VEÍCULO ESTAVA LOCALIZADO</span>` : '';
 
-            let div = document.createElement('div'); div.className = 'card'; div.style.backgroundColor = "#fafbfc";
-            div.innerHTML = `<div class="badge-encerrado">🔒 Arquivado</div><div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;"><div style="margin-top: 15px;">${isLocBadge}<span class="tag-status" style="background-color:${motivoColor}; margin-bottom:8px; display:inline-block;">Finalizado: ${c.motivoEncerramento || 'Não informado'}</span><h3 style="margin:5px 0; color:var(--texto); font-size: 1.3rem;">${c.cliente||''}</h3><p style="margin:0; font-family:monospace; color:#64748b; font-weight:600;">Contrato: ${c.contrato||''}</p></div><div style="display:flex; gap:8px; flex-wrap:wrap;"><button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar Ficha</button>${btnsAdmin}</div></div>${infoProcessoHtml}<div class="timeline">${andHTML}</div>`;
+            let div = document.createElement('div'); div.className = 'card';
+            div.style.backgroundColor = "#fafbfc";
+            div.innerHTML = `
+                <div class="badge-encerrado">🔒 Arquivado</div>
+                <div style="display:flex; justify-content:space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px;">
+                    <div style="margin-top: 15px;">
+                        ${isLocBadge}
+                        <span class="tag-status" style="background-color:${motivoColor}; margin-bottom:8px; display:inline-block;">Finalizado: ${c.motivoEncerramento || 'Não informado'}</span>
+                        <h3 style="margin:5px 0; color:var(--texto); font-size: 1.3rem;">${clienteFormatado}</h3>
+                        <p style="margin:0; font-family:monospace; color:#64748b; font-weight:600;">Contrato: ${contratoFormatado}</p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Visualizar Ficha</button>
+                        ${btnsAdmin}
+                    </div>
+                </div>
+                
+                ${infoProcessoHtml}
+                
+                <div class="timeline">${andHTML}</div>
+            `;
             container.appendChild(div);
         });
     };
 
+    // FINANCEIRO (Novo Sistema Múltiplo)
     window.atualizarValorFaturamento = function() {
-        const tipo = document.getElementById('faturamento-tipo').value; const inputValor = document.getElementById('faturamento-valor');
-        if (tipo === 'Mandado Expedido') inputValor.value = '30.00'; else if (tipo === 'Apreensão - Moto') inputValor.value = '150.00'; else if (tipo === 'Apreensão - Carro') inputValor.value = '250.00'; else inputValor.value = ''; 
+        const tipo = document.getElementById('faturamento-tipo').value;
+        const inputValor = document.getElementById('faturamento-valor');
+        if (tipo === 'Mandado Expedido') inputValor.value = '30.00';
+        else if (tipo === 'Apreensão - Moto') inputValor.value = '150.00';
+        else if (tipo === 'Apreensão - Carro') inputValor.value = '250.00';
+        else inputValor.value = ''; // Caminhão e Amigável (a combinar, em branco)
     };
 
     window.abrirModalFaturamento = function(idCaso = null) {
-        document.getElementById('faturamento-tipo').value = 'Mandado Expedido'; window.atualizarValorFaturamento(); document.getElementById('faturamento-obs').value = '';
+        document.getElementById('faturamento-tipo').value = 'Mandado Expedido';
+        window.atualizarValorFaturamento();
+        
         if (idCaso) {
-            document.getElementById('faturamento-caso-id').value = idCaso; document.getElementById('div-faturamento-caso').style.display = 'none';
+            document.getElementById('faturamento-caso-id').value = idCaso;
+            document.getElementById('div-faturamento-caso').style.display = 'none';
         } else {
-            document.getElementById('faturamento-caso-id').value = ''; document.getElementById('div-faturamento-caso').style.display = 'block';
-            const select = document.getElementById('faturamento-select-caso'); select.innerHTML = '<option value="">-- Lançamento Avulso (Sem Cliente) --</option>';
-            let casosOrd = [...window.casosDb].filter(c=>!c.isAvulso).sort((a,b) => (a.cliente||'').localeCompare(b.cliente||''));
-            casosOrd.forEach(c => { select.innerHTML += `<option value="${c.id}">${c.cliente} (CT: ${c.contrato}) ${c.encerrado ? '- Encerrado' : ''}</option>`; });
+            document.getElementById('faturamento-caso-id').value = '';
+            document.getElementById('div-faturamento-caso').style.display = 'block';
+            const select = document.getElementById('faturamento-select-caso');
+            select.innerHTML = '<option value="">-- Selecione um Cliente/Processo --</option>';
+            
+            // Popula com todos os casos, ordenados alfabeticamente
+            let casosOrd = [...window.casosDb].sort((a,b) => a.cliente.localeCompare(b.cliente));
+            casosOrd.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.cliente} (CT: ${c.contrato}) ${c.encerrado ? '- Encerrado' : ''}</option>`;
+            });
         }
         window.openModal('modal-faturamento');
     };
 
     window.salvarFaturamento = async function() {
-        let idCaso = document.getElementById('faturamento-caso-id').value; if (!idCaso) idCaso = document.getElementById('faturamento-select-caso').value;
-        const tipo = document.getElementById('faturamento-tipo').value; const valor = parseFloat(document.getElementById('faturamento-valor').value); const obs = document.getElementById('faturamento-obs').value.trim();
-        if (isNaN(valor) || valor <= 0) return alert("Por favor, informe um valor válido de comissão.");
-        if (!idCaso && !obs) return alert("Para lançamentos avulsos, é obrigatório preencher a observação (ex: Custo extra).");
-
-        const now = new Date(); const dt = now.toLocaleDateString('pt-BR'); const mes = now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' });
-        
-        if (idCaso) {
-            const casoAtual = window.casosDb.find(c => c.id === idCaso); if (!casoAtual) return alert("Processo não encontrado.");
-            let faturamentos = Array.isArray(casoAtual.faturamentos) ? casoAtual.faturamentos : []; let andamentos = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
-            faturamentos.push({ id: Date.now().toString(), tipo: tipo, valor: valor, data: dt, mes: mes, responsavel: window.usuarioLogado.nome, obs: obs });
-            let msgAnd = `💰 Faturamento Lançado: ${tipo} (R$ ${valor.toFixed(2).replace('.',',')}).`; if(obs) msgAnd += ` Obs: ${obs}`;
-            andamentos.unshift({ id: Date.now(), descricao: msgAnd, data: dt, hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), responsavel: window.usuarioLogado.nome });
-            await updateDoc(doc(db, "casos", idCaso), { faturamentos: faturamentos, andamentos: andamentos, mandadoExpedido: true });
-        } else {
-            await addDoc(collection(db, "casos"), { isAvulso: true, cliente: "Lançamento Avulso", contrato: "-", encerrado: true, emTriagem: false, motivoEncerramento: "Avulso", faturamentos: [{ id: Date.now().toString(), tipo: tipo, valor: valor, data: dt, mes: mes, responsavel: window.usuarioLogado.nome, obs: obs }], andamentos: [], timestamp: Date.now() });
+        let idCaso = document.getElementById('faturamento-caso-id').value;
+        if (!idCaso) {
+            idCaso = document.getElementById('faturamento-select-caso').value;
         }
+        if (!idCaso) return alert("Selecione um processo na lista!");
+
+        const tipo = document.getElementById('faturamento-tipo').value;
+        const valor = parseFloat(document.getElementById('faturamento-valor').value);
+        if (isNaN(valor) || valor <= 0) return alert("Por favor, informe um valor válido de comissão.");
+
+        const casoAtual = window.casosDb.find(c => c.id === idCaso);
+        if (!casoAtual) return alert("Erro ao localizar processo.");
+
+        const now = new Date();
+        
+        let faturamentos = Array.isArray(casoAtual.faturamentos) ? casoAtual.faturamentos : [];
+        let andamentos = Array.isArray(casoAtual.andamentos) ? casoAtual.andamentos : [];
+
+        const novoFat = {
+            id: Date.now().toString(),
+            tipo: tipo,
+            valor: valor,
+            data: now.toLocaleDateString('pt-BR'),
+            mes: now.toLocaleDateString('pt-BR', { month: '2-digit', year: 'numeric' }),
+            responsavel: window.usuarioLogado.nome
+        };
+
+        faturamentos.push(novoFat);
+        
+        andamentos.unshift({ 
+            id: Date.now(), 
+            descricao: `💰 Faturamento Lançado: ${tipo} (R$ ${valor.toFixed(2).replace('.',',')}).`, 
+            data: now.toLocaleDateString('pt-BR'), 
+            hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }), 
+            responsavel: window.usuarioLogado.nome 
+        });
+
+        await updateDoc(doc(db, "casos", idCaso), { 
+            faturamentos: faturamentos, 
+            andamentos: andamentos,
+            mandadoExpedido: true // mantido por compatibilidade
+        });
+
         window.closeModal('modal-faturamento');
     };
 
     window.desfazerFaturamento = async function(idCaso, idFat) {
         if(confirm("Cancelar este faturamento? Ele será removido do relatório financeiro.")) {
-            const casoAtual = window.casosDb.find(c => c.id === idCaso); if(!casoAtual) return;
-            if(casoAtual.isAvulso) { await deleteDoc(doc(db, "casos", idCaso)); }
-            else {
-                if (idFat === 'legacy') { let novosAndamentos = (casoAtual.andamentos||[]).filter(a => a && !(a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada') || a.descricao.includes('Faturamento Lançado'))); await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos }); } 
-                else { let novosFat = (casoAtual.faturamentos||[]).filter(f => f.id !== idFat); let novosAndamentos = (casoAtual.andamentos||[]).filter(a => a && !(a.descricao.includes('Faturamento Lançado') && a.id > (Date.now() - 86400000))); await updateDoc(doc(db, "casos", idCaso), { faturamentos: novosFat, andamentos: novosAndamentos }); }
+            const casoAtual = window.casosDb.find(c => c.id === idCaso);
+            if(!casoAtual) return;
+
+            if (idFat === 'legacy') {
+                let novosAndamentos = casoAtual.andamentos.filter(a => !(a.descricao.includes('Mandado Faturado') || a.descricao.includes('Comissão autorizada') || a.descricao.includes('Faturamento Lançado')));
+                await updateDoc(doc(db, "casos", idCaso), { mandadoExpedido: false, valorComissao: null, dataExpedicao: null, mesExpedicao: null, andamentos: novosAndamentos });
+            } else {
+                let novosFat = casoAtual.faturamentos.filter(f => f.id !== idFat);
+                let novosAndamentos = casoAtual.andamentos.filter(a => !(a.descricao.includes('Faturamento Lançado'))); 
+                await updateDoc(doc(db, "casos", idCaso), { faturamentos: novosFat, andamentos: novosAndamentos });
             }
         }
     };
 
     window.renderizarFinanceiro = function() {
-        const tbody = document.getElementById('financeiro-tbody'); tbody.innerHTML = ''; let faturamentosGerais = [];
+        const tbody = document.getElementById('financeiro-tbody'); tbody.innerHTML = '';
+        
+        let faturamentosGerais = [];
         window.casosDb.forEach(c => {
-            if (c.faturamentos && c.faturamentos.length > 0) { c.faturamentos.forEach(fat => { faturamentosGerais.push({ caso: c, ...fat }); }); } 
-            else if (c.mandadoExpedido === true) { faturamentosGerais.push({ caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao }); }
+            if (c.faturamentos && c.faturamentos.length > 0) {
+                c.faturamentos.forEach(fat => {
+                    faturamentosGerais.push({ caso: c, ...fat });
+                });
+            } else if (c.mandadoExpedido === true) {
+                faturamentosGerais.push({
+                    caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao
+                });
+            }
         });
+
         const mesFiltro = document.getElementById('filtro-mes-fin') ? document.getElementById('filtro-mes-fin').value : 'todos';
-        if (mesFiltro !== 'todos') faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
-        let t = 0; if(faturamentosGerais.length === 0) { document.getElementById('total-financeiro').innerText = `R$ 0,00`; return tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Nenhum lançamento no período.</td></tr>'; }
+        if (mesFiltro !== 'todos') {
+            faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
+        }
+
+        let t = 0;
+        if(faturamentosGerais.length === 0) {
+            document.getElementById('total-financeiro').innerText = `R$ 0,00`;
+            return tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">Nenhum lançamento no período.</td></tr>';
+        }
+
         faturamentosGerais.sort((a,b) => b.id === 'legacy' ? -1 : b.id - a.id);
+
         faturamentosGerais.forEach(f => {
-            let c = f.caso; const v = parseFloat(f.valor || 0); t += v; let btn = `<button class="btn btn-micro btn-danger" onclick="window.desfazerFaturamento('${c.id}', '${f.id}')">Estornar</button>`;
-            let obsText = f.obs ? ` - <i>${f.obs}</i>` : '';
-            tbody.innerHTML += `<tr><td>${f.data}</td><td style="font-family:monospace;">${c.contrato || ''}</td><td><strong>${c.cliente || ''}</strong><br><span style="font-size:0.75rem; color:#64748b;">${f.tipo}${obsText}</span></td><td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td><td>${btn}</td></tr>`;
+            let c = f.caso;
+            const v = parseFloat(f.valor || 0); t += v;
+            let btn = `<button class="btn btn-outline btn-small" style="color:var(--erro); border-color:var(--erro);" onclick="window.desfazerFaturamento('${c.id}', '${f.id}')">Estornar</button>`;
+            tbody.innerHTML += `<tr>
+                <td>${f.data}</td>
+                <td style="font-family:monospace;">${c.contrato || ''}</td>
+                <td><strong>${c.cliente || ''}</strong><br><span style="font-size:0.75rem; color:#64748b;">${f.tipo}</span></td>
+                <td style="font-weight:700; color:var(--sucesso);">R$ ${v.toFixed(2).replace('.',',')}</td>
+                <td>${btn}</td>
+            </tr>`;
         });
         document.getElementById('total-financeiro').innerText = `R$ ${t.toFixed(2).replace('.',',')}`;
     };
@@ -1069,67 +1780,169 @@
     window.exportarExcelFinanceiro = function() {
         let faturamentosGerais = [];
         window.casosDb.forEach(c => {
-            if (c.faturamentos && c.faturamentos.length > 0) { c.faturamentos.forEach(fat => { faturamentosGerais.push({ caso: c, ...fat }); }); } 
-            else if (c.mandadoExpedido === true) { faturamentosGerais.push({ caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao }); }
+            if (c.faturamentos && c.faturamentos.length > 0) {
+                c.faturamentos.forEach(fat => { faturamentosGerais.push({ caso: c, ...fat }); });
+            } else if (c.mandadoExpedido === true) {
+                faturamentosGerais.push({ caso: c, id: 'legacy', tipo: 'Mandado Expedido (Antigo)', valor: c.valorComissao, data: c.dataExpedicao, mes: c.mesExpedicao });
+            }
         });
+
         const mesFiltro = document.getElementById('filtro-mes-fin').value;
         if (mesFiltro !== 'todos') faturamentosGerais = faturamentosGerais.filter(f => f.mes === mesFiltro);
         if(faturamentosGerais.length === 0) return alert("Sem comissões no período.");
-        let csv = `DATA;TIPO_LANCAMENTO;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`; let total = 0;
-        faturamentosGerais.forEach(f => { let c = f.caso; const v = parseFloat(f.valor || 0); total += v; let comarca = (c.comarcaReq || c.comarcaOrigem || ''); csv += `${f.data};${f.tipo};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`; });
+        
+        let csv = `DATA;TIPO_LANCAMENTO;CONTRATO;CLIENTE;PROCESSO;COMARCA;VALOR_COMISSAO\n`;
+        let total = 0;
+        faturamentosGerais.forEach(f => {
+            let c = f.caso;
+            const v = parseFloat(f.valor || 0); total += v;
+            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
+            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
+            let comarca = comReq || comOri || '';
+            csv += `${f.data};${f.tipo};${c.contrato||''};${c.cliente||''};${c.processo||''};${comarca};${v.toFixed(2).replace('.', ',')}\n`;
+        });
         csv += `;;;;;;TOTAL:;${total.toFixed(2).replace('.', ',')}\n`;
-        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Financeiro_${mesFiltro}.csv`; link.click();
+        const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Financeiro_${mesFiltro}.csv`; link.click();
     };
 
+    // RELATÓRIOS E DASHBOARD
     window.exportarRelatorioMestre = function() {
-        if(window.casosDb.length === 0) return alert("Base vazia."); const dataHoje = new Date().toLocaleDateString('pt-BR');
+        if(window.casosDb.length === 0) return alert("Base vazia.");
+        const dataHoje = new Date().toLocaleDateString('pt-BR');
         let csvFinal = `RELATÓRIO DE PERFORMANCE SGI\nGerado em:;${dataHoje}\nBase total:;${window.casosDb.length} processos\n\nCONTRATO;CLIENTE;N PROCESSO;VARA;COMARCA PRINCIPAL;STATUS ATUAL;TOTAL FATURADO;DIAS SEM MOV.\n`;
         window.casosDb.forEach(c => {
-            if(c.isAvulso) return;
-            let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado'; let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
-            let comarca = c.comarcaReq ? `${c.comarcaReq} (Req)` : (c.comarcaOrigem ? `${c.comarcaOrigem} (Orig)` : 'Não inf.');
-            let somaFaturado = 0; if (c.faturamentos) { somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f.valor || 0), 0); } else if (c.mandadoExpedido) { somaFaturado = parseFloat(c.valorComissao || 0); }
+            let st = c.status || ''; if(st === 'Localizado') st = 'Veículo Localizado';
+            let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
+            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq : '';
+            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem : '';
+            let comarca = comReq ? `${comReq} (Req)` : (comOri ? `${comOri} (Orig)` : 'Não inf.');
+            
+            let somaFaturado = 0;
+            if (c.faturamentos) {
+                somaFaturado = c.faturamentos.reduce((acc, f) => acc + parseFloat(f.valor || 0), 0);
+            } else if (c.mandadoExpedido) {
+                somaFaturado = parseFloat(c.valorComissao || 0);
+            }
+            
             csvFinal += `${c.contrato||''};${c.cliente||''};${c.processo||''};${c.vara||''};${comarca};${st};R$ ${somaFaturado.toFixed(2).replace('.',',')};${dias}\n`;
         });
-        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
+        const blob = new Blob(["\uFEFF" + csvFinal], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `Relatorio_Performance_${dataHoje.replace(/\//g, '')}.csv`; link.click();
     };
 
     window.renderizarRelatorios = function() {
         if(!window.usuarioLogado || window.usuarioLogado.role !== 'admin') return;
-        let baseValida = window.casosDb.filter(c => c.emTriagem !== true && !c.isAvulso);
-        let ativos = baseValida.filter(c => c.encerrado !== true); let totalAtivos = ativos.length;
-        let faseMandadoId = STATUS_PHASES.findIndex(f => f.id === 'Mandado Expedido'); let expedidos = 0; let agil = 0, atencao = 0, criticos = 0; let comarcasMap = {};
-        let motivosCount = { 'Apreensão': 0, 'Entrega Amigável': 0, 'Acordo Realizado': 0, 'Quitado': 0, 'Pagou parcelas em atraso (Purgação da Mora)': 0 }; let totalApreendidos = 0;
+        
+        let baseValida = window.casosDb.filter(c => c.emTriagem !== true);
+        let ativos = baseValida.filter(c => c.encerrado !== true);
+        let totalAtivos = ativos.length;
+        
+        let faseMandadoId = STATUS_PHASES.findIndex(f => f.id === 'Mandado Expedido');
+        let expedidos = 0; 
+        let agil = 0, atencao = 0, criticos = 0; 
+        let comarcasMap = {};
+        
+        let motivosCount = { 'Apreensão': 0, 'Entrega Amigável': 0, 'Acordo Realizado': 0, 'Quitado': 0, 'Pagou parcelas em atraso (Purgação da Mora)': 0 };
+        let totalApreendidos = 0;
 
         baseValida.forEach(c => {
-            let st = c.status; if(st === 'Localizado') st = 'Veículo Localizado'; let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === st);
-            if (c.mandadoExpedido || idxFaseAtual >= faseMandadoId) expedidos++;
-            if (c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão')) totalApreendidos++;
-
-            if(c.encerrado !== true) { let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000); if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; } } 
-            else { if(c.motivoEncerramento && motivosCount[c.motivoEncerramento] !== undefined) motivosCount[c.motivoEncerramento]++; else if(c.motivoEncerramento && c.motivoEncerramento.includes('Apreens')) motivosCount['Apreensão']++; }
+            let st = c.status; if(st === 'Localizado') st = 'Veículo Localizado';
+            let idxFaseAtual = STATUS_PHASES.findIndex(f => f.id === st);
             
-            let comarcaNome = (c.comarcaReq||'').trim() || (c.comarcaOrigem||'').trim() || 'Sem Comarca';
-            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 }; comarcasMap[comarcaNome].total++;
+            if (c.mandadoExpedido || idxFaseAtual >= faseMandadoId) {
+                expedidos++;
+            }
+            
+            if (c.status === 'Apreendido' || (c.encerrado && c.motivoEncerramento === 'Apreensão')) {
+                totalApreendidos++;
+            }
+
+            if(c.encerrado !== true) {
+                let dias = Math.floor((Date.now() - (c.dataStatus || c.timestamp)) / 86400000);
+                if(dias > 15) { criticos++; } else if(dias > 7) { atencao++; } else { agil++; }
+            } else {
+                if(c.motivoEncerramento && motivosCount[c.motivoEncerramento] !== undefined) {
+                    motivosCount[c.motivoEncerramento]++;
+                } else if(c.motivoEncerramento && c.motivoEncerramento.includes('Apreens')) {
+                    motivosCount['Apreensão']++;
+                }
+            }
+            
+            const comReq = typeof c.comarcaReq === 'string' ? c.comarcaReq.trim() : '';
+            const comOri = typeof c.comarcaOrigem === 'string' ? c.comarcaOrigem.trim() : '';
+            let comarcaNome = comReq || comOri || 'Sem Comarca';
+            
+            if(!comarcasMap[comarcaNome]) comarcasMap[comarcaNome] = { total: 0 };
+            comarcasMap[comarcaNome].total++;
         });
 
-        document.getElementById('dash-total').innerText = totalAtivos; document.getElementById('dash-mandados').innerText = expedidos; document.getElementById('dash-apreendidos').innerText = totalApreendidos;
-        let taxaApreensao = baseValida.length > 0 ? ((totalApreendidos / baseValida.length) * 100).toFixed(1) : 0; document.getElementById('dash-taxa').innerText = `${taxaApreensao}%`;
+        document.getElementById('dash-total').innerText = totalAtivos; 
+        document.getElementById('dash-mandados').innerText = expedidos;
+        document.getElementById('dash-apreendidos').innerText = totalApreendidos;
+        
+        let taxaApreensao = baseValida.length > 0 ? ((totalApreendidos / baseValida.length) * 100).toFixed(1) : 0;
+        document.getElementById('dash-taxa').innerText = `${taxaApreensao}%`;
 
-        let listaComarcas = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total })); let topVol = [...listaComarcas].sort((a,b) => b.casos - a.casos).slice(0, 5);
+        let listaComarcas = Object.keys(comarcasMap).map(k => ({ nome: k, casos: comarcasMap[k].total }));
+        let topVol = [...listaComarcas].sort((a,b) => b.casos - a.casos).slice(0, 5);
 
         const ctxStatus = document.getElementById('chartStatus'); const ctxEncerramentos = document.getElementById('chartEncerramentos'); const ctxComarcas = document.getElementById('chartComarcas');
-        if(chartStatusInstance) chartStatusInstance.destroy(); if(chartEncerramentosInstance) chartEncerramentosInstance.destroy(); if(chartComarcasInstance) chartComarcasInstance.destroy();
+        
+        if(chartStatusInstance) chartStatusInstance.destroy(); 
+        if(chartEncerramentosInstance) chartEncerramentosInstance.destroy(); 
+        if(chartComarcasInstance) chartComarcasInstance.destroy();
 
-        if(ctxStatus && totalAtivos > 0) { chartStatusInstance = new Chart(ctxStatus, { type: 'doughnut', data: { labels: ['No Prazo', 'Atenção (>7d)', 'Crítico (>15d)'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right' } } } }); }
+        if(ctxStatus && totalAtivos > 0) {
+            chartStatusInstance = new Chart(ctxStatus, {
+                type: 'doughnut',
+                data: { labels: ['No Prazo', 'Atenção (>7d)', 'Crítico (>15d)'], datasets: [{ data: [agil, atencao, criticos], backgroundColor: ['#10b981', '#f59e0b', '#ef4444'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right' } } }
+            });
+        }
+        
         let totalEncerramentosExito = Object.values(motivosCount).reduce((a,b)=>a+b, 0);
-        if(ctxEncerramentos && totalEncerramentosExito > 0) { chartEncerramentosInstance = new Chart(ctxEncerramentos, { type: 'pie', data: { labels: ['Apreensão', 'Amigável', 'Acordo', 'Quitado', 'Mora'], datasets: [{ data: [motivosCount['Apreensão'], motivosCount['Entrega Amigável'], motivosCount['Acordo Realizado'], motivosCount['Quitado'], motivosCount['Pagou parcelas em atraso (Purgação da Mora)']], backgroundColor: ['#10b981', '#14b8a6', '#0ea5e9', '#059669', '#0284c7'], borderWidth: 1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 11} } } } } }); }
-        if(ctxComarcas && listaComarcas.length > 0) { chartComarcasInstance = new Chart(ctxComarcas, { type: 'bar', data: { labels: topVol.map(c => c.nome.split(' ')[0]), datasets: [{ label: 'Processos', data: topVol.map(c => c.casos), backgroundColor: '#ea580c', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } } }); }
+        if(ctxEncerramentos && totalEncerramentosExito > 0) {
+            chartEncerramentosInstance = new Chart(ctxEncerramentos, {
+                type: 'pie',
+                data: { labels: ['Apreensão', 'Amigável', 'Acordo', 'Quitado', 'Mora'], datasets: [{ data: [motivosCount['Apreensão'], motivosCount['Entrega Amigável'], motivosCount['Acordo Realizado'], motivosCount['Quitado'], motivosCount['Pagou parcelas em atraso (Purgação da Mora)']], backgroundColor: ['#10b981', '#14b8a6', '#0ea5e9', '#059669', '#0284c7'], borderWidth: 1 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 11} } } } }
+            });
+        }
+
+        if(ctxComarcas && listaComarcas.length > 0) {
+            chartComarcasInstance = new Chart(ctxComarcas, {
+                type: 'bar',
+                data: { labels: topVol.map(c => c.nome.split(' ')[0]), datasets: [{ label: 'Processos', data: topVol.map(c => c.casos), backgroundColor: '#ea580c', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }, plugins: { legend: { display: false } } }
+            });
+        }
     };
 
-    onSnapshot(collection(db, "usuarios"), (s) => { window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); if(window.usuarioLogado && window.usuarioLogado.role === 'admin') try { window.desenharTabelaEquipe(); } catch(e) {} });
-    onSnapshot(collection(db, "casos"), (snapshot) => { window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)); if(window.usuarioLogado) { const loadEl = document.getElementById('loading'); if(loadEl) loadEl.style.display = 'none'; try { window.renderizarGeral(); } catch(e) {} } }, (error) => { const loadEl = document.getElementById('loading'); if(loadEl) loadEl.innerHTML = `<span style="color:var(--erro);">Falha ao baixar dados. O Firebase recusou a leitura (Erro de Permissão).</span>`; });
-    let s = localStorage.getItem('usuarioSessao'); if(s) { window.usuarioLogado = JSON.parse(s); mostrarPainel(); }
+    onSnapshot(collection(db, "usuarios"), (s) => { 
+        window.usuariosDb = s.docs.map(d => ({ id: d.id, ...d.data() })); 
+        if(window.usuarioLogado && window.usuarioLogado.role === 'admin') {
+            try { window.desenharTabelaEquipe(); } catch(e) { console.error("Erro desenhar Equipe:", e); }
+        }
+    }, (error) => {
+        console.error("Firebase Sync Error (Usuarios):", error);
+    });
+    
+    onSnapshot(collection(db, "casos"), (snapshot) => {
+        window.casosDb = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        if(window.usuarioLogado) { 
+            const loadEl = document.getElementById('loading');
+            if(loadEl) loadEl.style.display = 'none';
+            try { window.renderizarGeral(); } catch(e) { console.error("Erro renderizarGeral:", e); }
+        }
+    }, (error) => {
+        console.error("Firebase Sync Error (Casos):", error);
+        const loadEl = document.getElementById('loading');
+        if(loadEl) loadEl.innerHTML = `<span style="color:var(--erro);">Falha ao baixar dados. O Firebase recusou a leitura (Erro de Permissão). Verifique as regras.</span>`;
+    });
+
+    let s = localStorage.getItem('usuarioSessao');
+    if(s) { window.usuarioLogado = JSON.parse(s); mostrarPainel(); }
 </script>
 </body>
 </html>
