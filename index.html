@@ -13,7 +13,7 @@
         .btn-primary{background-color:var(--laranja);color:var(--branco);} .btn-primary:hover:not(:disabled){background-color:var(--laranja-hover);}
         .btn-success{background-color:var(--sucesso);color:var(--branco);} .btn-danger{background-color:#fee2e2;color:#991b1b;}
         .btn-outline{background:transparent;border:1px solid var(--borda);color:var(--texto);} .btn-outline:hover{background:var(--fundo);}
-        .btn-small{padding:6px 12px;font-size:0.75rem;} .btn-icon{background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--texto-claro);transition:0.2s;padding:2px;} .btn-icon:hover{color:var(--laranja);}
+        .btn-small{padding:6px 12px;font-size:0.75rem;} .btn-micro{padding:4px 8px;font-size:0.7rem;gap:4px;border-radius:4px;} .btn-icon{background:transparent;border:none;cursor:pointer;font-size:1.1rem;color:var(--texto-claro);transition:0.2s;padding:2px;} .btn-icon:hover{color:var(--laranja);}
         .form-group{margin-bottom:15px;text-align:left;} label{display:block;margin-bottom:5px;font-weight:600;color:var(--azul);font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px;}
         input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--borda);border-radius:6px;font-size:0.9rem;color:var(--texto);background:#fff;transition:all 0.2s;}
         input:focus,select:focus,textarea:focus{outline:none;border-color:var(--laranja);box-shadow:0 0 0 3px rgba(234,88,12,0.1);} textarea{resize:vertical;min-height:80px;}
@@ -23,8 +23,7 @@
         .slider:before{position:absolute;content:"";height:14px;width:14px;left:3px;bottom:3px;background-color:white;transition:.3s;border-radius:50%;} input:checked + .slider{background-color:var(--laranja);} input:checked + .slider:before{transform:translateX(16px);}
         .auth-container{display:flex;height:100vh;justify-content:center;align-items:center;background:url('https://www.transparenttextures.com/patterns/cubes.png'),linear-gradient(135deg,var(--azul) 0%,var(--azul-escuro) 100%);}
         .auth-box{background:var(--fundo-card);padding:40px;border-radius:12px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.5);width:100%;max-width:400px;text-align:center;border-top:4px solid var(--laranja);} .auth-box h2{color:var(--azul);margin-top:0;margin-bottom:25px;font-size:1.5rem;font-weight:700;}
-        #error-msg{color:var(--erro);background:#fee2e2;padding:10px;border-radius:8px;margin-top:15px;font-size:0.85rem;display:none;text-align:left;}
-        #app-screen{display:none;height:100vh;display:flex;width:100vw;}
+        #error-msg{color:var(--erro);background:#fee2e2;padding:10px;border-radius:8px;margin-top:15px;font-size:0.85rem;display:none;text-align:left;} #app-screen{display:none;height:100vh;display:flex;width:100vw;}
         .sidebar{width:260px;background:var(--azul);color:#fff;display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 15px rgba(0,0,0,0.05);z-index:10;} .sidebar-header{padding:25px 20px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);} .sidebar-header .logo{font-size:1.6rem;color:#fff;font-weight:800;letter-spacing:-0.5px;line-height:1.1;} .sidebar-header .sublogo{color:var(--laranja);font-size:0.8rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;}
         .user-profile{padding:20px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.05);} .avatar{width:45px;height:45px;background:rgba(234,88,12,0.2);color:var(--laranja);border:1px solid rgba(234,88,12,0.5);border-radius:12px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;} .user-name{font-weight:600;font-size:0.95rem;margin-bottom:3px;color:#f8fafc;} .user-role{font-size:0.7rem;color:#94a3b8;background:rgba(0,0,0,0.3);padding:4px 10px;border-radius:12px;display:inline-block;border:1px solid rgba(255,255,255,0.05);}
         nav{flex:1;padding:15px 10px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;} .nav-item{padding:10px 15px;color:#94a3b8;cursor:pointer;transition:all 0.2s;font-weight:500;font-size:0.9rem;display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:8px;} .nav-item:hover{background:rgba(255,255,255,0.05);color:#fff;} .nav-item.active{background:var(--laranja);color:#fff;box-shadow:0 4px 6px rgba(234,88,12,0.2);}
@@ -45,8 +44,7 @@
         .cor-custas{background-color:var(--kb-custas);color:white;} .borda-custas{border-bottom-color:var(--kb-custas);} .cor-distribuicao{background-color:var(--kb-distribuicao);color:white;} .borda-distribuicao{border-bottom-color:var(--kb-distribuicao);} .cor-aguardando{background-color:var(--kb-aguardando);color:white;} .borda-aguardando{border-bottom-color:var(--kb-aguardando);} .cor-deferida{background-color:var(--kb-deferida);color:white;} .borda-deferida{border-bottom-color:var(--kb-deferida);} .cor-aguardando-mandado{background-color:var(--kb-aguardando-mandado);color:white;} .borda-aguardando-mandado{border-bottom-color:var(--kb-aguardando-mandado);} .cor-solic-bloq{background-color:var(--kb-solic-bloq);color:white;} .borda-solic-bloq{border-bottom-color:var(--kb-solic-bloq);} .cor-bloqueado{background-color:var(--kb-bloqueado);color:white;} .borda-bloqueado{border-bottom-color:var(--kb-bloqueado);} .cor-mandado{background-color:var(--kb-mandado);color:white;} .borda-mandado{border-bottom-color:var(--kb-mandado);} .cor-tentando{background-color:var(--kb-tentando);color:white;} .borda-tentando{border-bottom-color:var(--kb-tentando);} .cor-em-busca{background-color:var(--kb-em-busca);color:white;} .borda-em-busca{border-bottom-color:var(--kb-em-busca);} .cor-localizado{background-color:var(--kb-localizado);color:white;} .borda-localizado{border-bottom-color:var(--kb-localizado);} .cor-apreendido{background-color:var(--kb-apreendido);color:white;} .borda-apreendido{border-bottom-color:var(--kb-apreendido);}
         .drop-hover{background-color:rgba(234,88,12,0.05);border:2px dashed var(--laranja);} .badge-encerrado{position:absolute;top:15px;right:15px;background:#f1f5f9;color:#475569;padding:6px 12px;border-radius:20px;font-weight:700;font-size:0.75rem;border:1px solid #cbd5e1;display:flex;align-items:center;gap:5px;}
         #loading{display:none;background:#fff3cd;color:#856404;text-align:center;padding:10px;font-size:0.9rem;font-weight:bold;border-bottom:1px solid #ffeeba;}
-        @keyframes pulseAlert{0%{box-shadow:0 0 0 0 rgba(239,68,68,0.6);} 70%{box-shadow:0 0 0 6px rgba(239,68,68,0);} 100%{box-shadow:0 0 0 0 rgba(239,68,68,0);}}
-        .urgente-highlight{border:2px solid var(--erro) !important;background-color:#fef2f2 !important;} .urgente-badge{background-color:var(--erro);color:white;padding:4px 8px;border-radius:4px;font-size:0.7rem;font-weight:bold;animation:pulseAlert 2s infinite;display:inline-block;margin-bottom:8px;letter-spacing:0.5px;} .section-title{font-size:1.1rem;font-weight:600;padding-bottom:5px;margin-bottom:15px;margin-top:30px;border-bottom:2px solid;}
+        .urgente-highlight{border:2px solid var(--erro) !important;background-color:#fef2f2 !important;} .urgente-badge{background-color:var(--erro);color:white;padding:4px 8px;border-radius:4px;font-size:0.7rem;font-weight:bold;display:inline-block;margin-bottom:8px;} .section-title{font-size:1.1rem;font-weight:600;padding-bottom:5px;margin-bottom:15px;margin-top:30px;border-bottom:2px solid;}
     </style>
 </head>
 <body>
@@ -62,7 +60,7 @@
         <button class="btn btn-primary" id="btn-login-submit" style="width:100%;font-size:1rem;margin-top:10px;padding:12px;" onclick="window.doLogin()">Acessar Painel</button>
         <div id="error-msg"></div>
     </div>
-    <div id="force-password-box" class="auth-box" style="display:none;"><h2>Definir Senha</h2><p style="color:#64748b;font-size:0.85rem;margin-bottom:20px;">Por segurança, crie uma senha definitiva.</p><div class="form-group"><label>Nova Senha</label><input type="password" id="nova-senha-input"></div><button class="btn btn-primary" style="width:100%;" onclick="window.salvarNovaSenhaObrigatoria()">Salvar e Entrar</button></div>
+    <div id="force-password-box" class="auth-box" style="display:none;"><h2>Definir Senha</h2><div class="form-group"><label>Nova Senha</label><input type="password" id="nova-senha-input"></div><button class="btn btn-primary" style="width:100%;" onclick="window.salvarNovaSenhaObrigatoria()">Salvar e Entrar</button></div>
     <div id="master-admin-box" class="auth-box" style="display:none;"><h2 style="color:var(--alerta);">Restauração Gestor</h2><div class="form-group"><label>Seu Nome</label><input type="text" id="master-nome"></div><div class="form-group"><label>Senha Mestra</label><input type="password" id="master-senha"></div><button class="btn btn-primary" style="width:100%;" onclick="window.criarAdminMestre()">Restaurar Acesso</button></div>
 </div>
 
@@ -72,12 +70,11 @@
         <div class="sidebar-header"><div class="logo">Agente<br><span style="color:var(--laranja);">Sete Lagoas</span></div></div>
         <div class="user-profile"><div class="avatar" id="user-avatar">L</div><div class="user-name" id="user-display">Usuário</div><div class="user-role" id="role-badge">Admin</div></div>
         <nav>
-            <div class="nav-item admin-only" onclick="window.switchTab('tab-copiloto')" id="nav-copiloto" style="display:none;background-color:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.3);color:#38bdf8;"><div>🤖 Copiloto IA</div><div class="notif-badge-copiloto" id="notif-badge-copiloto">0</div></div>
-            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos"><div>📥 Triagem / Lançamentos</div></div>
+            <div class="nav-item" onclick="window.switchTab('tab-lancamentos')" id="nav-lancamentos"><div>📥 Triagem</div></div>
             <div class="nav-item active" onclick="window.switchTab('tab-casos')" id="nav-casos"><div>📁 Casos Ativos</div></div>
             <div class="nav-item" onclick="window.switchTab('tab-kanban')" id="nav-kanban"><div>📌 Visão Kanban</div></div>
             <div class="nav-item" onclick="window.switchTab('tab-apreendidos')" id="nav-apreendidos"><div>🚔 Apreendidos</div></div>
-            <div class="nav-item" onclick="window.switchTab('tab-encerrados')" id="nav-encerrados"><div>🔒 Arquivo Encerrados</div></div>
+            <div class="nav-item" onclick="window.switchTab('tab-encerrados')" id="nav-encerrados"><div>🔒 Arquivo Morto</div></div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-relatorios')" id="nav-relatorios" style="display:none;"><div>📊 Dashboard</div></div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-financeiro')" id="nav-financeiro" style="display:none;"><div>💰 Financeiro</div></div>
             <div class="nav-item admin-only" onclick="window.switchTab('tab-equipe')" id="nav-equipe" style="display:none;"><div>👥 Equipe</div></div>
@@ -85,14 +82,10 @@
         <div style="padding:20px;"><button class="btn" style="width:100%;background:rgba(255,255,255,0.05);color:#cbd5e1;border:1px solid rgba(255,255,255,0.1);" onclick="window.doLogout()">🚪 Sair do Sistema</button></div>
     </aside>
     <main>
-        <header class="main-header">
-            <div style="font-size:1.1rem;font-weight:600;color:var(--texto-claro);">Sistema de Gestão Interna (SGI)</div>
-            <div class="admin-only" style="display:none;gap:15px;align-items:center;"><button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button></div>
-        </header>
+        <header class="main-header"><div style="font-size:1.1rem;font-weight:600;color:var(--texto-claro);">Sistema de Gestão Interna (SGI)</div><div class="admin-only" style="display:none;"><button class="btn btn-primary" onclick="window.abrirModalNovoCaso()">➕ Novo Processo</button></div></header>
         <div id="loading">Conectando e Baixando Dados da Nuvem...</div>
 
         <!-- ABAS -->
-        <div id="tab-copiloto" class="tab-content"><div class="top-bar"><h2>🤖 Copiloto SGI</h2></div><div id="copiloto-container"></div></div>
         <div id="tab-lancamentos" class="tab-content"><div class="top-bar"><h2>Lançamentos Pendentes</h2></div><div id="triagem-container"></div></div>
         
         <div id="tab-casos" class="tab-content active">
@@ -120,7 +113,7 @@
             <div class="dash-grid">
                 <div class="dash-card primary"><h4>Processos Ativos</h4><p class="number" id="dash-total">0</p></div>
                 <div class="dash-card info"><h4>Trabalhados</h4><p class="number" id="dash-mandados">0</p></div>
-                <div class="dash-card success"><h4>Apreendidos (Total)</h4><p class="number" id="dash-apreendidos" style="color:var(--sucesso);">0</p></div>
+                <div class="dash-card success"><h4>Apreendidos</h4><p class="number" id="dash-apreendidos" style="color:var(--sucesso);">0</p></div>
                 <div class="dash-card warning"><h4>Taxa de Sucesso</h4><p class="number" id="dash-taxa">0%</p></div>
             </div>
             <div class="grid-3">
@@ -165,27 +158,42 @@
     </div>
 </div>
 
-<div id="modal-novo-andamento" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>📝 Lançar Andamento</h3><button class="close-btn" onclick="window.closeModal('modal-novo-andamento')">&times;</button></div><input type="hidden" id="andamento-caso-id"><div class="form-group" id="div-responsavel-andamento" style="display:none;background:#fff3cd;padding:10px;border-radius:6px;border:1px solid #ffeeba;"><label style="color:#856404;">Responsável</label><select id="nova-acao-responsavel" style="border-color:#ffeeba;"><option value="Lucas">Lucas</option><option value="Bárbara">Bárbara</option><option value="Equipe Externa">Equipe Externa</option></select></div><div class="form-group"><label>Descrição</label><textarea id="nova-acao"></textarea></div><button class="btn btn-primary" style="width:100%;" onclick="window.salvarAndamento()">Registrar Atividade</button></div></div>
-
+<div id="modal-novo-andamento" class="modal"><div class="modal-content" style="max-width:500px;"><div class="modal-header"><h3>📝 Lançar Andamento</h3><button class="close-btn" onclick="window.closeModal('modal-novo-andamento')">&times;</button></div><input type="hidden" id="andamento-caso-id"><div class="form-group"><label>Descrição</label><textarea id="nova-acao"></textarea></div><button class="btn btn-primary" style="width:100%;" onclick="window.salvarAndamento()">Registrar Atividade</button></div></div>
 <div id="modal-encerrar" class="modal"><div class="modal-content" style="max-width:450px;"><div class="modal-header"><h3>🔒 Encerrar Processo</h3><button class="close-btn" onclick="window.closeModal('modal-encerrar')">&times;</button></div><input type="hidden" id="encerrar-caso-id"><div class="form-group"><label>Motivo</label><select id="encerrar-motivo"><option value="Apreensão">Apreensão</option><option value="Entrega Amigável">Entrega Amigável</option><option value="Acordo Realizado">Acordo Realizado</option><option value="Quitado">Quitado</option><option value="Pagou parcelas em atraso (Purgação da Mora)">Pagou parcelas em atraso</option></select></div><div class="form-group"><label>Observação Final</label><textarea id="encerrar-obs"></textarea></div><button class="btn btn-danger" style="width:100%;padding:12px;font-size:1rem;" onclick="window.confirmarEncerramento()">Finalizar e Arquivar</button></div></div>
 
-<div id="modal-faturamento" class="modal"><div class="modal-content" style="max-width:450px;"><div class="modal-header"><h3>💰 Faturar</h3><button class="close-btn" onclick="window.closeModal('modal-faturamento')">&times;</button></div><input type="hidden" id="faturamento-caso-id"><div class="form-group" id="div-faturamento-caso" style="display:none;"><label>Processo</label><select id="faturamento-select-caso"><option value="">-- Selecione --</option></select></div><div class="form-group"><label>Tipo</label><select id="faturamento-tipo" onchange="window.atualizarValorFaturamento()"><option value="Mandado Expedido">Mandado Expedido</option><option value="Apreensão - Moto">Apreensão - Moto</option><option value="Apreensão - Carro">Apreensão - Carro</option><option value="Apreensão - Caminhão">Apreensão - Caminhão</option><option value="Entrega Amigável">Entrega Amigável</option></select></div><div class="form-group"><label>Valor (R$)</label><input type="number" id="faturamento-valor" value="30.00" step="0.01" style="font-weight:bold;color:var(--sucesso);font-size:1.2rem;"></div><button class="btn btn-success" style="width:100%;" onclick="window.salvarFaturamento()">Confirmar Lançamento</button></div></div>
+<!-- MODAL FATURAMENTO AVULSO -->
+<div id="modal-faturamento" class="modal">
+    <div class="modal-content" style="max-width:450px;">
+        <div class="modal-header"><h3>💰 Faturar</h3><button class="close-btn" onclick="window.closeModal('modal-faturamento')">&times;</button></div>
+        <input type="hidden" id="faturamento-caso-id">
+        <div class="form-group" id="div-faturamento-caso" style="display:none;"><label>Processo / Cliente (Opcional se Avulso)</label><select id="faturamento-select-caso"><option value="">-- Selecione --</option></select></div>
+        <div class="form-group"><label>Tipo de Faturamento</label><select id="faturamento-tipo" onchange="window.atualizarValorFaturamento()"><option value="Mandado Expedido">Mandado Expedido</option><option value="Apreensão - Moto">Apreensão - Moto</option><option value="Apreensão - Carro">Apreensão - Carro</option><option value="Apreensão - Caminhão">Apreensão - Caminhão</option><option value="Entrega Amigável">Entrega Amigável</option></select></div>
+        <div class="form-group"><label>Observação (Obrigatória p/ lançamentos sem cliente)</label><input type="text" id="faturamento-obs" placeholder="Ex: Honorários extras, despesa..."></div>
+        <div class="form-group"><label>Valor (R$)</label><input type="number" id="faturamento-valor" value="30.00" step="0.01" style="font-weight:bold;color:var(--sucesso);font-size:1.2rem;"></div>
+        <button class="btn btn-success" style="width:100%;" onclick="window.salvarFaturamento()">Confirmar Lançamento</button>
+    </div>
+</div>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, onSnapshot, doc, updateDoc, deleteDoc, where, query } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-    /* SUAS CHAVES AQUI */
-    const firebaseConfig = { apiKey: "AIzaSyAWjjd2SdsRQ1Pwm68m3LBj4uaC4k4enLM", authDomain: "sistema-andamentos.firebaseapp.com", projectId: "sistema-andamentos", storageBucket: "sistema-andamentos.firebasestorage.app", messagingSenderId: "421431391255", appId: "1:421431391255:web:fa23c4f9685b2ab2a15852" };
+    /* COLE SUAS CHAVES DO FIREBASE AQUI */
+    const firebaseConfig = { 
+        apiKey: "COLE_SUA_CHAVE_AQUI", 
+        authDomain: "SEU_DOMINIO.firebaseapp.com", 
+        projectId: "SEU_PROJETO", 
+        storageBucket: "SEU_BUCKET.firebasestorage.app", 
+        messagingSenderId: "ID", 
+        appId: "APP_ID" 
+    };
     
     const app = initializeApp(firebaseConfig); const db = getFirestore(app);
 
     window.casosDb = []; window.usuariosDb = []; window.usuarioLogado = null; window.usuarioPendenteTrocaSenha = null;
     let chartStatusInstance = null; let chartComarcasInstance = null; let chartEncerramentosInstance = null;
 
-    const STATUS_PHASES = [
-        {id:'Aguardando recolhimento das custas iniciais',cor:'cor-custas',borda:'borda-custas'},{id:'Aguardando distribuição da ação',cor:'cor-distribuicao',borda:'borda-distribuicao'},{id:'Aguardando Liminar',cor:'cor-aguardando',borda:'borda-aguardando'},{id:'Liminar Deferida',cor:'cor-deferida',borda:'borda-deferida'},{id:'Aguardando Mandado',cor:'cor-aguardando-mandado',borda:'borda-aguardando-mandado'},{id:'Solicitado Bloqueio',cor:'cor-solic-bloq',borda:'borda-solic-bloq'},{id:'Bloqueado',cor:'cor-bloqueado',borda:'borda-bloqueado'},{id:'Mandado Expedido',cor:'cor-mandado',borda:'borda-mandado'},{id:'Tentando Localização',cor:'cor-tentando',borda:'borda-tentando'},{id:'Em Busca',cor:'cor-em-busca',borda:'borda-em-busca'},{id:'Veículo Localizado',cor:'cor-localizado',borda:'borda-localizado'},{id:'Apreendido',cor:'cor-apreendido',borda:'borda-apreendido'}
-    ];
+    const STATUS_PHASES = [ {id:'Aguardando recolhimento das custas iniciais',cor:'cor-custas',borda:'borda-custas'},{id:'Aguardando distribuição da ação',cor:'cor-distribuicao',borda:'borda-distribuicao'},{id:'Aguardando Liminar',cor:'cor-aguardando',borda:'borda-aguardando'},{id:'Liminar Deferida',cor:'cor-deferida',borda:'borda-deferida'},{id:'Aguardando Mandado',cor:'cor-aguardando-mandado',borda:'borda-aguardando-mandado'},{id:'Solicitado Bloqueio',cor:'cor-solic-bloq',borda:'borda-solic-bloq'},{id:'Bloqueado',cor:'cor-bloqueado',borda:'borda-bloqueado'},{id:'Mandado Expedido',cor:'cor-mandado',borda:'borda-mandado'},{id:'Tentando Localização',cor:'cor-tentando',borda:'borda-tentando'},{id:'Em Busca',cor:'cor-em-busca',borda:'borda-em-busca'},{id:'Veículo Localizado',cor:'cor-localizado',borda:'borda-localizado'},{id:'Apreendido',cor:'cor-apreendido',borda:'borda-apreendido'} ];
 
     window.copiarTexto = function(texto) { if(!texto) return; navigator.clipboard.writeText(texto).then(()=>{ const t = document.getElementById("toast"); t.className="show"; setTimeout(()=>t.className="",2500); }); };
     window.abrirCriarAdminMestre = function() { document.getElementById('login-box').style.display='none'; document.getElementById('master-admin-box').style.display='block'; };
@@ -227,39 +235,38 @@
 
     window.atualizarFiltros = function() {
         const selOrigem = document.getElementById('filtro-comarca-origem'); const selReq = document.getElementById('filtro-comarca-req'); const selStatus = document.getElementById('filtro-status');
-        if(selOrigem){ let v=selOrigem.value; selOrigem.innerHTML='<option value="todas">Origem (Todas)</option>'; [...new Set(window.casosDb.map(c=>c.comarcaOrigem).filter(Boolean))].sort().forEach(o=>selOrigem.innerHTML+=`<option value="${o}">${o}</option>`); selOrigem.value=v; }
-        if(selReq){ let v=selReq.value; selReq.innerHTML='<option value="todas">Requerimento (Todas)</option>'; [...new Set(window.casosDb.map(c=>c.comarcaReq).filter(Boolean))].sort().forEach(r=>selReq.innerHTML+=`<option value="${r}">${r}</option>`); selReq.value=v; }
-        if(selStatus){ let v=selStatus.value; selStatus.innerHTML='<option value="todos">Status (Todos)</option>'; STATUS_PHASES.forEach(s=>selStatus.innerHTML+=`<option value="${s.id}">${s.id}</option>`); selStatus.value=v; }
+        if(selOrigem){ let v=selOrigem.value; selOrigem.innerHTML='<option value="todas">Origem (Todas)</option>'; [...new Set(window.casosDb.map(c=>(c.comarcaOrigem||'').trim()).filter(Boolean))].sort().forEach(o=>selOrigem.innerHTML+=`<option value="${o}">${o}</option>`); selOrigem.value=v; if(selOrigem.selectedIndex===-1)selOrigem.value='todas'; }
+        if(selReq){ let v=selReq.value; selReq.innerHTML='<option value="todas">Req (Todas)</option>'; [...new Set(window.casosDb.map(c=>(c.comarcaReq||'').trim()).filter(Boolean))].sort().forEach(r=>selReq.innerHTML+=`<option value="${r}">${r}</option>`); selReq.value=v; if(selReq.selectedIndex===-1)selReq.value='todas'; }
+        if(selStatus){ let v=selStatus.value; selStatus.innerHTML='<option value="todos">Status (Todos)</option>'; STATUS_PHASES.forEach(s=>selStatus.innerHTML+=`<option value="${s.id}">${s.id}</option>`); selStatus.value=v; if(selStatus.selectedIndex===-1)selStatus.value='todos'; }
     };
 
     function gerarHtmlCartaoBase(c, isAdmin, dataHoje) {
         let st = c.status || 'Aguardando recolhimento das custas iniciais'; if(st==='Localizado')st='Veículo Localizado'; const conf = STATUS_PHASES.find(x=>x.id===st)||STATUS_PHASES[0];
         let sf = c.faturamentos ? c.faturamentos.reduce((a,f)=>a+parseFloat(f.valor||0),0) : (c.mandadoExpedido?parseFloat(c.valorComissao||0):0);
-        let bFin = sf>0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;font-size:0.7rem;padding:4px 8px;border-radius:12px;">Faturado R$ ${sf.toFixed(2).replace('.',',')}</span>` : ``;
-        let bAdmin = isAdmin ? `<button class="btn btn-small btn-danger" onclick="window.excluirCaso('${c.id}')">🗑️</button><button class="btn btn-small btn-outline" style="color:var(--erro);border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')">🔒 Encerrar</button>` : ``;
-        let bVis = isAdmin ? (c.ultimaAnaliseData===dataHoje ? `<button class="btn btn-small" style="background:#dbeafe;color:var(--info);border:1px solid #bfdbfe;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto</button>` : `<button class="btn btn-small btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Marcar Ciente</button>`) : ``;
-        let bFat = isAdmin ? `<button class="btn btn-small btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>` : ``;
+        let bFin = sf>0 ? `<span class="badge" style="background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;font-size:0.65rem;padding:2px 6px;border-radius:12px;">Fat. R$ ${sf.toFixed(2).replace('.',',')}</span>` : ``;
+        let bAdmin = isAdmin ? `<button class="btn btn-micro btn-danger" onclick="window.excluirCaso('${c.id}')">🗑️</button><button class="btn btn-micro btn-outline" style="color:var(--erro);border-color:var(--erro);" onclick="window.abrirModalEncerrar('${c.id}')">🔒 Encerrar</button>` : ``;
+        let bVis = isAdmin ? (c.ultimaAnaliseData===dataHoje ? `<button class="btn btn-micro" style="background:#dbeafe;color:var(--info);border:1px solid #bfdbfe;" onclick="window.desmarcarVistoHoje('${c.id}')">✅ Visto</button>` : `<button class="btn btn-micro btn-outline" onclick="window.marcarVistoHoje('${c.id}')">👁️ Ciente</button>`) : ``;
+        let bFat = isAdmin ? `<button class="btn btn-micro btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>` : ``;
         let ands = (c.andamentos||[]).filter(a=>isAdmin||!a.descricao.includes('Faturamento'));
         let aHtml = ands.slice(0,4).map((a,i)=>`<div class="tl-item ${i===0?'recent':''}"><div><strong>${a.descricao||''}</strong> ${isAdmin&&a.responsavel!=='SISTEMA'?`<span class="btn-icon" onclick="window.excluirAndamento('${c.id}',${a.id})">✖</span>`:''}</div><div class="tl-meta">${a.data||''} • ${a.responsavel||''}</div></div>`).join('');
         let proc = c.processo ? `<div class="info-grid"><div><strong>Processo</strong>${c.processo} <span style="cursor:pointer;" onclick="window.copiarTexto('${c.processo}')">📋</span></div><div><strong>Vara</strong>${c.vara||'-'}</div></div>` : '';
         let cmc = `${c.comarcaOrigem?`📍 Orig: ${c.comarcaOrigem}`:''} ${c.comarcaReq?`| 📨 Req: ${c.comarcaReq}`:''}`.trim() || 'Sem Comarca';
         let urg = c.isLocalizado ? `<span class="urgente-badge">🚨 LOCALIZADO</span>` : '';
-        return `<div class="card ${c.isLocalizado?'urgente-highlight':''}"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:15px;"><div>${urg}<span class="tag-status ${conf.cor}" style="display:block;width:max-content;margin-bottom:5px;">${st}</span><h3 style="margin:5px 0;color:var(--azul);">${c.cliente||''}</h3><p style="margin:0;font-family:monospace;font-size:0.8rem;">CT: ${c.contrato||''}</p></div><div style="display:flex;gap:8px;"><button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>${bFat}<button class="btn btn-small btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Ação</button>${bAdmin}</div></div>${proc}<div class="timeline">${aHtml||'<span style="color:#94a3b8;font-size:0.8rem;">Sem andamentos.</span>'}</div><div style="margin-top:15px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--borda);padding-top:10px;"><div style="font-size:0.8rem;color:#64748b;">${cmc}</div><div style="display:flex;gap:10px;">${bVis}${bFin}</div></div></div>`;
+        return `<div class="card ${c.isLocalizado?'urgente-highlight':''}"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:15px;"><div>${urg}<span class="tag-status ${conf.cor}" style="display:block;width:max-content;margin-bottom:5px;">${st}</span><h3 style="margin:5px 0;color:var(--azul);">${c.cliente||''}</h3><p style="margin:0;font-family:monospace;font-size:0.8rem;">CT: ${c.contrato||''}</p></div><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"><button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Editar</button>${bFat}<button class="btn btn-micro btn-primary" onclick="window.abrirModalAndamento('${c.id}')">➕ Ação</button>${bAdmin}</div></div>${proc}<div class="timeline">${aHtml||'<span style="color:#94a3b8;font-size:0.8rem;">Sem andamentos.</span>'}</div><div style="margin-top:15px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--borda);padding-top:10px;"><div style="font-size:0.8rem;color:#64748b;">${cmc}</div><div style="display:flex;gap:10px;">${bVis}${bFin}</div></div></div>`;
     }
 
-    // LISTAS DE CASOS (Ocultação Automática Ativada)
+    // LISTAS DE CASOS
     window.renderizarCasos = function() {
         const cL = document.getElementById('cases-localizados-container'); const cB = document.getElementById('cases-busca-container');
         if(!cL || !cB) return; cL.innerHTML=''; cB.innerHTML='';
         const tb = (document.getElementById('search-input')?document.getElementById('search-input').value.toLowerCase():'');
         const adm = window.usuarioLogado.role==='admin'; const dH = new Date().toLocaleDateString('pt-BR');
         
-        // REGRA 2: Filtra os apreendidos da tela principal
-        let b = window.casosDb.filter(c=>!c.encerrado && !c.emTriagem && c.status!=='Apreendido');
+        let b = window.casosDb.filter(c=>!c.encerrado && !c.emTriagem && c.status!=='Apreendido' && !c.isAvulso);
         
         if(adm && document.getElementById('filtro-pendentes-hoje')?.checked) b = b.filter(c=>c.ultimaAnaliseData!==dH);
         const vO = document.getElementById('filtro-comarca-origem')?.value||'todas'; const vR = document.getElementById('filtro-comarca-req')?.value||'todas'; const vS = document.getElementById('filtro-status')?.value||'todos';
-        if(vO!=='todas') b = b.filter(c=>c.comarcaOrigem===vO); if(vR!=='todas') b = b.filter(c=>c.comarcaReq===vR); if(vS!=='todos') b = b.filter(c=>c.status===vS||(c.status==='Localizado'&&vS==='Veículo Localizado'));
+        if(vO!=='todas') b = b.filter(c=>(c.comarcaOrigem||'').trim()===vO); if(vR!=='todas') b = b.filter(c=>(c.comarcaReq||'').trim()===vR); if(vS!=='todos') b = b.filter(c=>c.status===vS||(c.status==='Localizado'&&vS==='Veículo Localizado'));
         if(tb) b = b.filter(c=>(c.cliente||'').toLowerCase().includes(tb)||(c.contrato||'').toLowerCase().includes(tb));
         
         b.sort((x,y)=>(x.isLocalizado===y.isLocalizado)?0:(x.isLocalizado?-1:1));
@@ -269,25 +276,24 @@
     window.renderizarApreendidos = function() {
         const cont = document.getElementById('apreendidos-container'); if(!cont) return; cont.innerHTML='';
         const adm = window.usuarioLogado.role==='admin';
-        let b = window.casosDb.filter(c=>!c.emTriagem && (c.status==='Apreendido' || (c.encerrado && c.motivoEncerramento==='Apreensão')));
+        let b = window.casosDb.filter(c=>!c.emTriagem && !c.isAvulso && (c.status==='Apreendido' || (c.encerrado && c.motivoEncerramento==='Apreensão')));
         b.forEach(c => {
             let sf = c.faturamentos?c.faturamentos.reduce((a,f)=>a+parseFloat(f.valor||0),0):(c.mandadoExpedido?parseFloat(c.valorComissao||0):0);
             let d = document.createElement('div'); d.className='card';
-            d.innerHTML = `<div style="display:flex;justify-content:space-between;"><div style="color:var(--azul);"><b>🚔 ${c.cliente||''}</b><br><span style="font-size:0.8rem;color:#64748b;">CT: ${c.contrato||''}</span></div><div style="display:flex;gap:5px;">${adm?`<button class="btn btn-small btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>`:''}<button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Ficha</button></div></div><div style="margin-top:10px;font-size:0.8rem;"><b>Data:</b> ${c.dataApreensao||'Não informada'} | <b>Fat:</b> R$ ${sf.toFixed(2).replace('.',',')}</div>`;
+            d.innerHTML = `<div style="display:flex;justify-content:space-between;"><div style="color:var(--azul);"><b>🚔 ${c.cliente||''}</b><br><span style="font-size:0.8rem;color:#64748b;">CT: ${c.contrato||''}</span></div><div style="display:flex;gap:5px;">${adm?`<button class="btn btn-micro btn-success" onclick="window.abrirModalFaturamento('${c.id}')">💲 Faturar</button>`:''}<button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">✏️ Ficha</button></div></div><div style="margin-top:10px;font-size:0.8rem;"><b>Data:</b> ${c.dataApreensao||'Não informada'} | <b>Fat:</b> R$ ${sf.toFixed(2).replace('.',',')}</div>`;
             cont.appendChild(d);
         });
     };
 
     window.renderizarEncerrados = function() {
         const cont = document.getElementById('encerrados-container'); if(!cont) return; cont.innerHTML='';
-        window.casosDb.filter(c=>c.encerrado && !c.emTriagem).forEach(c => {
+        window.casosDb.filter(c=>c.encerrado && !c.emTriagem && !c.isAvulso).forEach(c => {
             let d = document.createElement('div'); d.className='card'; d.style.background='#fafbfc';
-            d.innerHTML = `<div style="display:flex;justify-content:space-between;"><div style="color:var(--azul);"><b>🔒 ${c.cliente||''}</b><br><span style="font-size:0.8rem;color:#64748b;">Motivo: ${c.motivoEncerramento||''}</span></div><button class="btn btn-small btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Ficha</button></div>`;
+            d.innerHTML = `<div style="display:flex;justify-content:space-between;"><div style="color:var(--azul);"><b>🔒 ${c.cliente||''}</b><br><span style="font-size:0.8rem;color:#64748b;">Motivo: ${c.motivoEncerramento||''}</span></div><button class="btn btn-micro btn-outline" onclick="window.abrirModalEditarCaso('${c.id}')">👁️ Ficha</button></div>`;
             cont.appendChild(d);
         });
     };
 
-    // FUNÇÕES DE KANBAN E CRUD BÁSICO
     window.salvarCasoFull = async function() {
         const idCaso = document.getElementById('novo-caso-id').value; const p = { contrato:document.getElementById('novo-contrato').value.trim(), cliente:document.getElementById('novo-cliente').value.trim().toUpperCase(), processo:document.getElementById('novo-processo').value.trim(), vara:document.getElementById('novo-vara').value.trim(), comarcaOrigem:document.getElementById('novo-comarca-origem').value.trim(), comarcaReq:document.getElementById('novo-comarca-req').value.trim(), obs:document.getElementById('novo-obs').value.trim(), status:document.getElementById('novo-status').value, isLocalizado:document.getElementById('novo-is-localizado').checked };
         if(!p.contrato || !p.cliente) return alert('Preencha contrato e cliente!');
@@ -301,7 +307,6 @@
     window.abrirModalAndamento = function(id) { document.getElementById('andamento-caso-id').value=id; document.getElementById('nova-acao').value=''; window.openModal('modal-novo-andamento'); };
     window.salvarAndamento = async function() { const id=document.getElementById('andamento-caso-id').value; const c=window.casosDb.find(x=>x.id===id); let ands=c.andamentos||[]; ands.unshift({id:Date.now(),descricao:document.getElementById('nova-acao').value, data:new Date().toLocaleDateString('pt-BR'), responsavel:window.usuarioLogado.nome}); await updateDoc(doc(db,"casos",id),{andamentos:ands}); window.closeModal('modal-novo-andamento'); };
 
-    // REGRA 3: FINANCEIRO MÚLTIPLO
     window.atualizarValorFaturamento = function() {
         const t = document.getElementById('faturamento-tipo').value; const v = document.getElementById('faturamento-valor');
         if(t==='Mandado Expedido') v.value='30.00'; else if(t==='Apreensão - Moto') v.value='150.00'; else if(t==='Apreensão - Carro') v.value='250.00'; else v.value='';
@@ -309,25 +314,37 @@
     window.abrirModalFaturamento = function(id = null) {
         document.getElementById('faturamento-tipo').value='Mandado Expedido'; window.atualizarValorFaturamento();
         if(id) { document.getElementById('faturamento-caso-id').value=id; document.getElementById('div-faturamento-caso').style.display='none'; } 
-        else { document.getElementById('faturamento-caso-id').value=''; document.getElementById('div-faturamento-caso').style.display='block'; const s=document.getElementById('faturamento-select-caso'); s.innerHTML='<option value="">-- Selecione --</option>'; window.casosDb.sort((a,b)=>a.cliente.localeCompare(b.cliente)).forEach(c=>s.innerHTML+=`<option value="${c.id}">${c.cliente} (CT: ${c.contrato})</option>`); }
+        else { document.getElementById('faturamento-caso-id').value=''; document.getElementById('div-faturamento-caso').style.display='block'; const s=document.getElementById('faturamento-select-caso'); s.innerHTML='<option value="">-- Selecione (Opcional) --</option>'; window.casosDb.filter(c=>!c.isAvulso).sort((a,b)=>a.cliente.localeCompare(b.cliente)).forEach(c=>s.innerHTML+=`<option value="${c.id}">${c.cliente} (CT: ${c.contrato})</option>`); }
         window.openModal('modal-faturamento');
     };
+    
     window.salvarFaturamento = async function() {
         let id = document.getElementById('faturamento-caso-id').value || document.getElementById('faturamento-select-caso').value;
-        if(!id) return alert("Selecione um processo!");
-        const v = parseFloat(document.getElementById('faturamento-valor').value); if(isNaN(v)||v<=0) return alert("Valor inválido.");
-        const c = window.casosDb.find(x=>x.id===id); let fats = c.faturamentos||[]; let ands = c.andamentos||[];
-        const t = document.getElementById('faturamento-tipo').value; const dt = new Date().toLocaleDateString('pt-BR');
-        fats.push({id:Date.now().toString(), tipo:t, valor:v, data:dt, mes:new Date().toLocaleDateString('pt-BR',{month:'2-digit',year:'numeric'}), responsavel:window.usuarioLogado.nome});
-        ands.unshift({id:Date.now(), descricao:`💰 Faturamento Lançado: ${t} (R$ ${v.toFixed(2).replace('.',',')})`, data:dt, responsavel:window.usuarioLogado.nome});
-        await updateDoc(doc(db,"casos",id), {faturamentos:fats, andamentos:ands}); window.closeModal('modal-faturamento');
+        const obs = document.getElementById('faturamento-obs').value.trim();
+        const v = parseFloat(document.getElementById('faturamento-valor').value); 
+        if(isNaN(v)||v<=0) return alert("Valor inválido.");
+        if(!id && !obs) return alert("Selecione um processo ou preencha a observação!");
+        const t = document.getElementById('faturamento-tipo').value; const dt = new Date().toLocaleDateString('pt-BR'); const mes = new Date().toLocaleDateString('pt-BR',{month:'2-digit',year:'numeric'});
+        
+        if (id) {
+            const c = window.casosDb.find(x=>x.id===id); let fats = c.faturamentos||[]; let ands = c.andamentos||[];
+            fats.push({id:Date.now().toString(), tipo:t, valor:v, data:dt, mes:mes, responsavel:window.usuarioLogado.nome, obs:obs});
+            ands.unshift({id:Date.now(), descricao:`💰 Faturamento Lançado: ${t} (R$ ${v.toFixed(2).replace('.',',')}). ${obs}`, data:dt, responsavel:window.usuarioLogado.nome});
+            await updateDoc(doc(db,"casos",id), {faturamentos:fats, andamentos:ands}); 
+        } else {
+            await addDoc(collection(db, "casos"), { cliente:"Lançamento Avulso", contrato:"-", isAvulso:true, encerrado:true, motivoEncerramento:"Avulso", faturamentos:[{id:Date.now().toString(), tipo:t, valor:v, data:dt, mes:mes, responsavel:window.usuarioLogado.nome, obs:obs}], andamentos:[], timestamp:Date.now() });
+        }
+        window.closeModal('modal-faturamento');
     };
+    
     window.desfazerFaturamento = async function(id, idF) {
         if(confirm("Estornar?")) {
-            const c=window.casosDb.find(x=>x.id===id); if(idF==='legacy') await updateDoc(doc(db,"casos",id),{mandadoExpedido:false,valorComissao:null});
-            else { let nf=(c.faturamentos||[]).filter(f=>f.id!==idF); await updateDoc(doc(db,"casos",id),{faturamentos:nf}); }
+            const c=window.casosDb.find(x=>x.id===id); 
+            if(c.isAvulso) { await deleteDoc(doc(db, "casos", id)); }
+            else { if(idF==='legacy') await updateDoc(doc(db,"casos",id),{mandadoExpedido:false,valorComissao:null}); else { let nf=(c.faturamentos||[]).filter(f=>f.id!==idF); await updateDoc(doc(db,"casos",id),{faturamentos:nf}); } }
         }
     };
+    
     window.renderizarFinanceiro = function() {
         const t = document.getElementById('financeiro-tbody'); t.innerHTML=''; let fats=[]; let total=0;
         window.casosDb.forEach(c => {
@@ -336,7 +353,7 @@
         });
         fats.sort((a,b)=>b.id==='legacy'?-1:b.id-a.id).forEach(f => {
             total+=parseFloat(f.valor||0);
-            t.innerHTML+=`<tr><td>${f.data}</td><td>${f.caso.contrato||''}</td><td><b>${f.caso.cliente||''}</b><br><small>${f.tipo}</small></td><td style="color:var(--sucesso);font-weight:bold;">R$ ${parseFloat(f.valor||0).toFixed(2).replace('.',',')}</td><td><button class="btn btn-small btn-danger" onclick="window.desfazerFaturamento('${f.caso.id}','${f.id}')">Estornar</button></td></tr>`;
+            t.innerHTML+=`<tr><td>${f.data}</td><td>${f.caso.contrato||''}</td><td><b>${f.caso.cliente||''}</b><br><small>${f.tipo}${f.obs?' - '+f.obs:''}</small></td><td style="color:var(--sucesso);font-weight:bold;">R$ ${parseFloat(f.valor||0).toFixed(2).replace('.',',')}</td><td><button class="btn btn-micro btn-danger" onclick="window.desfazerFaturamento('${f.caso.id}','${f.id}')">Estornar</button></td></tr>`;
         });
         document.getElementById('total-financeiro').innerText = `R$ ${total.toFixed(2).replace('.',',')}`;
     };
